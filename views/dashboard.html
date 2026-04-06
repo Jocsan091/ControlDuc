@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Principal - ControlDoc</title>
+  <title>ControlDoc - Asistencia Docente</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
@@ -25,19 +25,19 @@
     </aside>
 
     <main class="dashboard-main">
-      <header class="dashboard-topbar">
-        <div>
-          <h1>Panel Principal</h1>
-          <p>Bienvenido al sistema de asistencia docente</p>
-        </div>
-        <div class="topbar-user">
-          <span>Administrador</span>
-        </div>
-      </header>
-
       <section id="contenido-dashboard">
         
         <section id="vista-inicio" class="vista-activa">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Panel Principal</h1>
+              <p>Bienvenido al sistema de asistencia docente</p>
+            </div>
+            <div class="topbar-user">
+              <span>Administrador</span>
+            </div>
+          </header>
+
           <section class="stats-grid">
             <div class="stat-card">
               <span class="stat-title">Profesores</span>
@@ -59,17 +59,17 @@
           
           <section class="quick-actions">
             <div class="action-card" id="btnProfesores">
-              <div class="action-icon"></div>
+              <div class="action-icon">👨‍🏫</div>
               <h3>Profesores</h3>
               <p>Administrar y revisar docentes registrados.</p>
             </div>
             <div class="action-card">
-              <div class="action-icon"></div>
+              <div class="action-icon">📊</div>
               <h3>Resumen</h3>
               <p>Visualizar estados y registros generales.</p>
             </div>
             <div class="action-card">
-              <div class="action-icon"></div>
+              <div class="action-icon">⚙️</div>
               <h3>Configuración</h3>
               <p>Ajustar opciones básicas del sistema.</p>
             </div>
@@ -77,16 +77,19 @@
         </section>
 
         <section id="vista-profesores" class="vista-oculta">
-          <section class="modulo-profesores">
-            <div class="profesores-superior">
-              <div>
-                <h2>Gestión de Profesores</h2>
-                <p>Administra los profesores registrados dentro del sistema.</p>
-              </div>
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Gestión de Profesores</h1>
+              <p>Administra los profesores registrados dentro del sistema.</p>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+              <div class="topbar-user"><span>Administrador</span></div>
               <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
             </div>
-      
-            <div class="profesores-barra">
+          </header>
+          
+          <section class="modulo-profesores">
+            <div class="profesores-barra" style="margin-top: -10px;">
               <input type="text" id="buscadorProfesores" placeholder="Buscar profesor por nombre o rut...">
             </div>
       

@@ -653,6 +653,61 @@ body {
   color: #333;
 }
 
+/* ==========================================
+   ESTILOS PARA FICHA PERSONAL (MODAL GRANDE)
+   ========================================== */
+.modal-largo {
+  max-width: 750px !important;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.seccion-titulo {
+  color: var(--verde-principal);
+  border-bottom: 2px solid var(--verde-suave);
+  padding-bottom: 5px;
+  margin: 15px 0 10px 0;
+  font-size: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.ficha-resumen {
+  background: #f9faf7;
+  border: 1px solid var(--gris-borde);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ficha-resumen p {
+  margin: 0;
+  color: var(--gris-texto);
+  font-size: 15px;
+}
+
+.ficha-resumen strong {
+  color: var(--verde-oscuro);
+}
+
+.ficha-completa {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 1200px) {
   .stats-grid,
   .lista-profesores,
