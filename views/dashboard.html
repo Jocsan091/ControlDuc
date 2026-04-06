@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Principal</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/img/logo.png" alt="Logo del sistema" class="sidebar-logo">
+        <h2>ControlDoc</h2>
+        <p>Gestión de asistencia docente</p>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="#" class="menu-item active" id="menuInicio">Inicio</a>
+        <a href="#" class="menu-item" id="menuProfesores">Profesores</a>
+        <a href="#" class="menu-item">Resumen</a>
+        <a href="#" class="menu-item">Configuración</a>
+        <a href="#" class="menu-item" id="logout">Cerrar sesión</a>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <header class="dashboard-topbar">
+        <div>
+          <h1>Panel Principal</h1>
+          <p>Bienvenido al sistema de asistencia docente</p>
+        </div>
+        <div class="topbar-user">
+          <span>Administrador</span>
+        </div>
+      </header>
+
+      <section id="contenido-dashboard">
+        <section class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-title">Profesores</span>
+            <strong>0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-title">Faltas</span>
+            <strong>0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-title">Licencias</span>
+            <strong>0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-title">Pendientes</span>
+            <strong>0</strong>
+          </div>
+        </section>
+        
+        <section class="quick-actions">
+          <div class="action-card" id="btnProfesores">
+            <div class="action-icon">👨‍🏫</div>
+            <h3>Profesores</h3>
+            <p>Administrar y revisar docentes registrados.</p>
+          </div>
+
+          <div class="action-card">
+            <div class="action-icon">📊</div>
+            <h3>Resumen</h3>
+            <p>Visualizar estados y registros generales.</p>
+          </div>
+
+          <div class="action-card">
+            <div class="action-icon">⚙️</div>
+            <h3>Configuración</h3>
+            <p>Ajustar opciones básicas del sistema.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+  </div>
+
+  <script src="../assets/js/dashboard.js"></script>
+</body>
+</html>
