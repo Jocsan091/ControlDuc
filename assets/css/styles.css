@@ -676,3 +676,13 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ==========================================
+   CLASES PARA EL ROUTER SPA
+   ========================================== */
+.vista-oculta { 
+  display: none !important; 
+}
+.vista-activa { 
+  display: block; 
+}

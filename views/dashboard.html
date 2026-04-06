@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Principal</title>
+  <title>Panel Principal - ControlDoc</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
@@ -36,52 +36,75 @@
       </header>
 
       <section id="contenido-dashboard">
-        <section class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-title">Profesores</span>
-            <strong>0</strong>
-          </div>
-
-          <div class="stat-card">
-            <span class="stat-title">Faltas</span>
-            <strong>0</strong>
-          </div>
-
-          <div class="stat-card">
-            <span class="stat-title">Licencias</span>
-            <strong>0</strong>
-          </div>
-
-          <div class="stat-card">
-            <span class="stat-title">Pendientes</span>
-            <strong>0</strong>
-          </div>
-        </section>
         
-        <section class="quick-actions">
-          <div class="action-card" id="btnProfesores">
-            <div class="action-icon">👨‍🏫</div>
-            <h3>Profesores</h3>
-            <p>Administrar y revisar docentes registrados.</p>
-          </div>
-
-          <div class="action-card">
-            <div class="action-icon">📊</div>
-            <h3>Resumen</h3>
-            <p>Visualizar estados y registros generales.</p>
-          </div>
-
-          <div class="action-card">
-            <div class="action-icon">⚙️</div>
-            <h3>Configuración</h3>
-            <p>Ajustar opciones básicas del sistema.</p>
-          </div>
+        <section id="vista-inicio" class="vista-activa">
+          <section class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-title">Profesores</span>
+              <strong id="contadorProfesores">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Faltas</span>
+              <strong>0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Licencias</span>
+              <strong>0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Pendientes</span>
+              <strong>0</strong>
+            </div>
+          </section>
+          
+          <section class="quick-actions">
+            <div class="action-card" id="btnProfesores">
+              <div class="action-icon"></div>
+              <h3>Profesores</h3>
+              <p>Administrar y revisar docentes registrados.</p>
+            </div>
+            <div class="action-card">
+              <div class="action-icon"></div>
+              <h3>Resumen</h3>
+              <p>Visualizar estados y registros generales.</p>
+            </div>
+            <div class="action-card">
+              <div class="action-icon"></div>
+              <h3>Configuración</h3>
+              <p>Ajustar opciones básicas del sistema.</p>
+            </div>
+          </section>
         </section>
-      </section>
-    </main>
 
+        <section id="vista-profesores" class="vista-oculta">
+          <section class="modulo-profesores">
+            <div class="profesores-superior">
+              <div>
+                <h2>Gestión de Profesores</h2>
+                <p>Administra los profesores registrados dentro del sistema.</p>
+              </div>
+              <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
+            </div>
+      
+            <div class="profesores-barra">
+              <input type="text" id="buscadorProfesores" placeholder="Buscar profesor por nombre o rut...">
+            </div>
+      
+            <div id="listaProfesores" class="lista-profesores">
+              </div>
+          </section>
+        </section>
+
+        <section id="vista-detalle-profesor" class="vista-oculta">
+          </section>
+
+      </section> </main>
   </div>
 
-  <script src="../assets/js/dashboard.js"></script>
+  <script src="../assets/js/datos.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/horarios.js"></script>
+  <script src="../assets/js/profesores.js"></script>
+  <script src="../assets/js/navegacion.js"></script>
 </body>
 </html>

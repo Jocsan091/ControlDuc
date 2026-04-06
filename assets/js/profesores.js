@@ -3,6 +3,20 @@
 // Propósito: Gestión visual y lógica de docentes y sus perfiles
 // ==========================================
 
+// --- 1. EVENTOS PRINCIPALES DE LA VISTA PROFESORES ---
+const btnAgregar = document.getElementById('btnAgregarProfesor');
+if (btnAgregar) {
+  btnAgregar.addEventListener('click', mostrarFormularioProfesor);
+}
+
+const buscador = document.getElementById('buscadorProfesores');
+if (buscador) {
+  buscador.addEventListener('input', (e) => {
+    renderProfesores(e.target.value.trim().toLowerCase());
+  });
+}
+
+// --- 2. FUNCIONES CRUD ---
 function mostrarFormularioProfesor() {
   if (document.querySelector('.modal')) return;
 
@@ -38,6 +52,10 @@ function guardarProfesor() {
 
   cerrarModal();
   renderProfesores();
+  
+  // Actualizar el contador del inicio
+  const contador = document.getElementById('contadorProfesores');
+  if (contador) contador.innerText = profesores.length;
 }
 
 function renderProfesores(filtro = '') {
@@ -71,8 +89,11 @@ function renderProfesores(filtro = '') {
   });
 }
 
+// --- 3. FUNCIONES DE DETALLE (Inyectan en vista-detalle-profesor) ---
+
 function verProfesor(index) {
   const profesor = profesores[index];
+  const vistaDetalle = document.getElementById('vista-detalle-profesor');
 
   let listaHorarios = `<div class="sin-profesores">Aún no hay horarios registrados para este profesor.</div>`;
 
@@ -88,7 +109,7 @@ function verProfesor(index) {
     `).join('');
   }
 
-  contenidoDashboard.innerHTML = `
+  vistaDetalle.innerHTML = `
     <section class="modulo-profesores">
       <div class="profesores-superior">
         <div>
@@ -108,10 +129,13 @@ function verProfesor(index) {
     </section>
   `;
 
-  limpiarMenu();
-  menuProfesores.classList.add('active');
+  // Cambiamos a la vista de detalles sin borrar el HTML principal
+  window.cambiarVista(vistaDetalle, document.getElementById('menuProfesores'));
 
-  document.getElementById('btnVolverProfesores').addEventListener('click', mostrarProfesores);
+  document.getElementById('btnVolverProfesores').addEventListener('click', () => {
+    window.cambiarVista(document.getElementById('vista-profesores'), document.getElementById('menuProfesores'));
+    renderProfesores();
+  });
   document.getElementById('btnAgregarHorario').addEventListener('click', () => mostrarFormularioHorario(index));
 }
 
@@ -122,21 +146,11 @@ function mostrarFormularioHorario(indexProfesor) {
     <div class="modal">
       <div class="modal-content">
         <h3>Agregar Horario / Año</h3>
-
         <input type="number" id="anioHorario" placeholder="Año (ej: 2026)">
-
-        <label for="inicioSemestre1">Inicio semestre 1</label>
-        <input type="date" id="inicioSemestre1">
-
-        <label for="finSemestre1">Término semestre 1</label>
-        <input type="date" id="finSemestre1">
-
-        <label for="inicioSemestre2">Inicio semestre 2</label>
-        <input type="date" id="inicioSemestre2">
-
-        <label for="finSemestre2">Término semestre 2</label>
-        <input type="date" id="finSemestre2">
-
+        <label>Inicio semestre 1</label><input type="date" id="inicioSemestre1">
+        <label>Término semestre 1</label><input type="date" id="finSemestre1">
+        <label>Inicio semestre 2</label><input type="date" id="inicioSemestre2">
+        <label>Término semestre 2</label><input type="date" id="finSemestre2">
         <div class="modal-botones">
           <button id="guardarHorario">Guardar</button>
           <button id="cancelar">Cancelar</button>
@@ -156,21 +170,17 @@ function guardarHorario(indexProfesor) {
   const inicioSemestre2 = document.getElementById('inicioSemestre2').value;
   const finSemestre2 = document.getElementById('finSemestre2').value;
 
-  if (!anio || !inicioSemestre1 || !finSemestre1 || !inicioSemestre2 || !finSemestre2) {
+  if (!anio || !inicioSemestre1 || !finSemestre1 || !inicioSemestre2 || !finSemestre2) return;
+
+  const yaExiste = profesores[indexProfesor].horarios.some(h => h.anio === anio);
+  if (yaExiste) {
+    alert("Ese año ya está registrado.");
     return;
   }
 
-  const yaExiste = profesores[indexProfesor].horarios.some(h => h.anio === anio);
-  if (yaExiste) return;
-
   profesores[indexProfesor].horarios.push({
-    anio,
-    inicioSemestre1,
-    finSemestre1,
-    inicioSemestre2,
-    finSemestre2,
-    inasistencias: [],
-    licencias: [],
+    anio, inicioSemestre1, finSemestre1, inicioSemestre2, finSemestre2,
+    inasistencias: [], licencias: [],
     horarioClases: crearHorarioClasesBase()
   });
 
@@ -181,23 +191,21 @@ function guardarHorario(indexProfesor) {
 function verHorario(indexProfesor, indexHorario) {
   const profesor = profesores[indexProfesor];
   const horario = profesores[indexProfesor].horarios[indexHorario];
-  const anio = parseInt(horario.anio, 10);
+  const vistaDetalle = document.getElementById('vista-detalle-profesor');
 
-  contenidoDashboard.innerHTML = `
+  vistaDetalle.innerHTML = `
     <section class="modulo-profesores">
       <div class="profesores-superior">
         <div>
           <h2>${profesor.nombre}</h2>
           <p>RUT: ${profesor.rut} | Horario ${horario.anio}</p>
-          <p>Semestre 1: ${horario.inicioSemestre1} a ${horario.finSemestre1}</p>
-          <p>Semestre 2: ${horario.inicioSemestre2} a ${horario.finSemestre2}</p>
         </div>
         <button class="btn-principal" id="btnAgregarIncidencia">+ Agregar Incidencia</button>
       </div>
 
       <div class="profesores-barra barra-acciones-horario">
-        <button class="btn-secundario" id="btnVolverHorarios">← Volver a Horarios</button>
-        <button class="btn-secundario" id="btnHorarioClases">Horario de clases</button>
+        <button class="btn-secundario" id="btnVolverProfesor">← Volver al Perfil</button>
+        <button class="btn-secundario" id="btnHorarioClases">Horario de clases (Ingresar)</button>
       </div>
 
       <section class="horario-resumen">
@@ -209,26 +217,24 @@ function verHorario(indexProfesor, indexHorario) {
       </section>
 
       <section class="meses-grid">
-        ${generarMesesHorario(anio, horario)}
+        ${generarMesesHorario(parseInt(horario.anio), horario)}
       </section>
     </section>
   `;
 
-  limpiarMenu();
-  menuProfesores.classList.add('active');
+  window.cambiarVista(vistaDetalle, document.getElementById('menuProfesores'));
 
-  document.getElementById('btnVolverHorarios').addEventListener('click', () => verProfesor(indexProfesor));
+  document.getElementById('btnVolverProfesor').addEventListener('click', () => verProfesor(indexProfesor));
   document.getElementById('btnHorarioClases').addEventListener('click', () => verHorarioClases(indexProfesor, indexHorario));
-  document.getElementById('btnAgregarIncidencia').addEventListener('click', () => {
-    alert('Aquí después agregaremos inasistencias y licencias');
-  });
+  document.getElementById('btnAgregarIncidencia').addEventListener('click', () => alert('Incidencias próximamente'));
 }
 
 function verHorarioClases(indexProfesor, indexHorario) {
   const profesor = profesores[indexProfesor];
   const horario = profesores[indexProfesor].horarios[indexHorario];
+  const vistaDetalle = document.getElementById('vista-detalle-profesor');
 
-  contenidoDashboard.innerHTML = `
+  vistaDetalle.innerHTML = `
     <section class="modulo-profesores">
       <div class="profesores-superior">
         <div>
@@ -245,12 +251,7 @@ function verHorarioClases(indexProfesor, indexHorario) {
         <table class="tabla-horario-clases">
           <thead>
             <tr>
-              <th>Bloque</th>
-              <th>Lunes</th>
-              <th>Martes</th>
-              <th>Miércoles</th>
-              <th>Jueves</th>
-              <th>Viernes</th>
+              <th>Bloque</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th>
             </tr>
           </thead>
           <tbody>
@@ -261,41 +262,23 @@ function verHorarioClases(indexProfesor, indexHorario) {
     </section>
   `;
 
-  limpiarMenu();
-  menuProfesores.classList.add('active');
+  window.cambiarVista(vistaDetalle, document.getElementById('menuProfesores'));
 
   document.getElementById('btnVolverCalendario').addEventListener('click', () => verHorario(indexProfesor, indexHorario));
 }
 
 function editarBloque(indexProfesor, indexHorario, dia, bloque) {
   if (document.querySelector('.modal')) return;
-
-  const opcionesAsignaturas = ASIGNATURAS.map(asignatura => `
-    <option value="${asignatura}">${asignatura}</option>
-  `).join('');
-
-  const opcionesCursos = CURSOS.map(curso => `
-    <option value="${curso}">${curso}</option>
-  `).join('');
+  const opcionesAsignaturas = ASIGNATURAS.map(a => `<option value="${a}">${a}</option>`).join('');
+  const opcionesCursos = CURSOS.map(c => `<option value="${c}">${c}</option>`).join('');
 
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
-        <h3>Seleccionar asignatura y curso</h3>
-        <p>${dia.charAt(0).toUpperCase() + dia.slice(1)} - Bloque ${bloque}</p>
-
-        <label for="selectAsignatura">Asignatura</label>
-        <select id="selectAsignatura" class="select-asignatura">
-          <option value="">Seleccione una asignatura</option>
-          ${opcionesAsignaturas}
-        </select>
-
-        <label for="selectCurso">Curso</label>
-        <select id="selectCurso" class="select-asignatura">
-          <option value="">Seleccione un curso</option>
-          ${opcionesCursos}
-        </select>
-
+        <h3>Asignar bloque</h3>
+        <p>${dia.toUpperCase()} - Bloque ${bloque}</p>
+        <select id="selectAsignatura"><option value="">Asignatura...</option>${opcionesAsignaturas}</select>
+        <select id="selectCurso"><option value="">Curso...</option>${opcionesCursos}</select>
         <div class="modal-botones">
           <button id="guardarAsignatura">Guardar</button>
           <button id="cancelar">Cancelar</button>
@@ -305,33 +288,27 @@ function editarBloque(indexProfesor, indexHorario, dia, bloque) {
   `);
 
   document.getElementById('guardarAsignatura').addEventListener('click', () => {
-    const asignatura = document.getElementById('selectAsignatura').value;
-    const curso = document.getElementById('selectCurso').value;
-
-    if (!asignatura || !curso) return;
-
-    profesores[indexProfesor].horarios[indexHorario].horarioClases[dia][bloque] = `${asignatura} - ${curso}`;
-    cerrarModal();
-    verHorarioClases(indexProfesor, indexHorario);
+    const asig = document.getElementById('selectAsignatura').value;
+    const cur = document.getElementById('selectCurso').value;
+    if (asig && cur) {
+      profesores[indexProfesor].horarios[indexHorario].horarioClases[dia][bloque] = `${asig} - ${cur}`;
+      cerrarModal();
+      verHorarioClases(indexProfesor, indexHorario);
+    }
   });
-
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
 }
 
 function editarHora(indexProfesor, indexHorario, dia, tipo) {
   if (document.querySelector('.modal')) return;
-
   const titulo = tipo === 'llegada' ? 'Hora de llegada' : 'Hora de salida';
-
+  
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
         <h3>${titulo}</h3>
-        <p>${dia.charAt(0).toUpperCase() + dia.slice(1)}</p>
-
-        <label for="inputHora">Hora</label>
+        <p>${dia.toUpperCase()}</p>
         <input type="time" id="inputHora">
-
         <div class="modal-botones">
           <button id="guardarHora">Guardar</button>
           <button id="cancelar">Cancelar</button>
@@ -342,12 +319,11 @@ function editarHora(indexProfesor, indexHorario, dia, tipo) {
 
   document.getElementById('guardarHora').addEventListener('click', () => {
     const hora = document.getElementById('inputHora').value;
-    if (!hora) return;
-
-    profesores[indexProfesor].horarios[indexHorario].horarioClases[dia][tipo] = hora;
-    cerrarModal();
-    verHorarioClases(indexProfesor, indexHorario);
+    if (hora) {
+      profesores[indexProfesor].horarios[indexHorario].horarioClases[dia][tipo] = hora;
+      cerrarModal();
+      verHorarioClases(indexProfesor, indexHorario);
+    }
   });
-
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
 }
