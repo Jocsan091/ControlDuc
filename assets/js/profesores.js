@@ -3,11 +3,8 @@
 // Propósito: Gestión visual y lógica de docentes y sus perfiles
 // ==========================================
 
-// --- 1. EVENTOS PRINCIPALES DE LA VISTA PROFESORES ---
 const btnAgregar = document.getElementById('btnAgregarProfesor');
-if (btnAgregar) {
-  btnAgregar.addEventListener('click', mostrarFormularioProfesor);
-}
+if (btnAgregar) btnAgregar.addEventListener('click', mostrarFormularioProfesor);
 
 const buscador = document.getElementById('buscadorProfesores');
 if (buscador) {
@@ -16,7 +13,6 @@ if (buscador) {
   });
 }
 
-// --- 2. FUNCIONES CRUD ---
 function mostrarFormularioProfesor() {
   if (document.querySelector('.modal')) return;
 
@@ -38,22 +34,20 @@ function mostrarFormularioProfesor() {
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
 }
 
-function guardarProfesor() {
+// ACTUALIZADO CON GUARDADO EN DISCO
+async function guardarProfesor() {
   const nombre = document.getElementById('nombreCompleto').value.trim();
   const rut = document.getElementById('rutProfesor').value.trim();
 
   if (!nombre || !rut) return;
 
-  profesores.push({
-    nombre,
-    rut,
-    horarios: []
-  });
+  profesores.push({ nombre, rut, horarios: [] });
+  
+  await guardarDatosGlobales(); // Guarda en el PC
 
   cerrarModal();
   renderProfesores();
   
-  // Actualizar el contador del inicio
   const contador = document.getElementById('contadorProfesores');
   if (contador) contador.innerText = profesores.length;
 }
@@ -63,8 +57,7 @@ function renderProfesores(filtro = '') {
   if (!lista) return;
 
   const filtrados = profesores.filter(prof =>
-    prof.nombre.toLowerCase().includes(filtro) ||
-    prof.rut.toLowerCase().includes(filtro)
+    prof.nombre.toLowerCase().includes(filtro) || prof.rut.toLowerCase().includes(filtro)
   );
 
   if (filtrados.length === 0) {
@@ -73,10 +66,8 @@ function renderProfesores(filtro = '') {
   }
 
   lista.innerHTML = '';
-
   filtrados.forEach((profesorOriginal) => {
     const indexReal = profesores.indexOf(profesorOriginal);
-
     lista.innerHTML += `
       <div class="profesor-card clickable-card" onclick="verProfesor(${indexReal})">
         <div class="profesor-info">
@@ -88,8 +79,6 @@ function renderProfesores(filtro = '') {
     `;
   });
 }
-
-// --- 3. FUNCIONES DE DETALLE (Inyectan en vista-detalle-profesor) ---
 
 function verProfesor(index) {
   const profesor = profesores[index];
@@ -112,24 +101,16 @@ function verProfesor(index) {
   vistaDetalle.innerHTML = `
     <section class="modulo-profesores">
       <div class="profesores-superior">
-        <div>
-          <h2>${profesor.nombre}</h2>
-          <p>RUT: ${profesor.rut}</p>
-        </div>
+        <div><h2>${profesor.nombre}</h2><p>RUT: ${profesor.rut}</p></div>
         <button class="btn-principal" id="btnAgregarHorario">+ Agregar Horario</button>
       </div>
-
       <div class="profesores-barra">
         <button class="btn-secundario" id="btnVolverProfesores">← Volver a Profesores</button>
       </div>
-
-      <div class="lista-profesores">
-        ${listaHorarios}
-      </div>
+      <div class="lista-profesores">${listaHorarios}</div>
     </section>
   `;
 
-  // Cambiamos a la vista de detalles sin borrar el HTML principal
   window.cambiarVista(vistaDetalle, document.getElementById('menuProfesores'));
 
   document.getElementById('btnVolverProfesores').addEventListener('click', () => {
@@ -163,7 +144,8 @@ function mostrarFormularioHorario(indexProfesor) {
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
 }
 
-function guardarHorario(indexProfesor) {
+// ACTUALIZADO CON GUARDADO EN DISCO
+async function guardarHorario(indexProfesor) {
   const anio = document.getElementById('anioHorario').value.trim();
   const inicioSemestre1 = document.getElementById('inicioSemestre1').value;
   const finSemestre1 = document.getElementById('finSemestre1').value;
@@ -172,17 +154,17 @@ function guardarHorario(indexProfesor) {
 
   if (!anio || !inicioSemestre1 || !finSemestre1 || !inicioSemestre2 || !finSemestre2) return;
 
-  const yaExiste = profesores[indexProfesor].horarios.some(h => h.anio === anio);
-  if (yaExiste) {
+  if (profesores[indexProfesor].horarios.some(h => h.anio === anio)) {
     alert("Ese año ya está registrado.");
     return;
   }
 
   profesores[indexProfesor].horarios.push({
     anio, inicioSemestre1, finSemestre1, inicioSemestre2, finSemestre2,
-    inasistencias: [], licencias: [],
-    horarioClases: crearHorarioClasesBase()
+    inasistencias: [], licencias: [], horarioClases: crearHorarioClasesBase()
   });
+
+  await guardarDatosGlobales(); // Guarda en el PC
 
   cerrarModal();
   verProfesor(indexProfesor);
@@ -196,18 +178,13 @@ function verHorario(indexProfesor, indexHorario) {
   vistaDetalle.innerHTML = `
     <section class="modulo-profesores">
       <div class="profesores-superior">
-        <div>
-          <h2>${profesor.nombre}</h2>
-          <p>RUT: ${profesor.rut} | Horario ${horario.anio}</p>
-        </div>
+        <div><h2>${profesor.nombre}</h2><p>RUT: ${profesor.rut} | Horario ${horario.anio}</p></div>
         <button class="btn-principal" id="btnAgregarIncidencia">+ Agregar Incidencia</button>
       </div>
-
       <div class="profesores-barra barra-acciones-horario">
         <button class="btn-secundario" id="btnVolverProfesor">← Volver al Perfil</button>
-        <button class="btn-secundario" id="btnHorarioClases">Horario de clases (Ingresar)</button>
+        <button class="btn-secundario" id="btnHorarioClases">Horario de clases</button>
       </div>
-
       <section class="horario-resumen">
         <div class="estado-box estado-verde">Días asistidos</div>
         <div class="estado-box estado-gris">Días futuros</div>
@@ -215,10 +192,7 @@ function verHorario(indexProfesor, indexHorario) {
         <div class="estado-box estado-amarillo">Días con licencia</div>
         <div class="estado-box estado-tachado">Días no hábiles</div>
       </section>
-
-      <section class="meses-grid">
-        ${generarMesesHorario(parseInt(horario.anio), horario)}
-      </section>
+      <section class="meses-grid">${generarMesesHorario(parseInt(horario.anio), horario)}</section>
     </section>
   `;
 
@@ -226,7 +200,7 @@ function verHorario(indexProfesor, indexHorario) {
 
   document.getElementById('btnVolverProfesor').addEventListener('click', () => verProfesor(indexProfesor));
   document.getElementById('btnHorarioClases').addEventListener('click', () => verHorarioClases(indexProfesor, indexHorario));
-  document.getElementById('btnAgregarIncidencia').addEventListener('click', () => alert('Incidencias próximamente'));
+  document.getElementById('btnAgregarIncidencia').addEventListener('click', () => alert('Próximamente'));
 }
 
 function verHorarioClases(indexProfesor, indexHorario) {
@@ -237,33 +211,21 @@ function verHorarioClases(indexProfesor, indexHorario) {
   vistaDetalle.innerHTML = `
     <section class="modulo-profesores">
       <div class="profesores-superior">
-        <div>
-          <h2>${profesor.nombre}</h2>
-          <p>RUT: ${profesor.rut} | Horario de clases ${horario.anio}</p>
-        </div>
+        <div><h2>${profesor.nombre}</h2><p>RUT: ${profesor.rut} | Horario de clases ${horario.anio}</p></div>
       </div>
-
       <div class="profesores-barra barra-acciones-horario">
         <button class="btn-secundario" id="btnVolverCalendario">← Volver al calendario</button>
       </div>
-
       <section class="tabla-horario-contenedor">
         <table class="tabla-horario-clases">
-          <thead>
-            <tr>
-              <th>Bloque</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${generarFilasHorarioClases(indexProfesor, indexHorario)}
-          </tbody>
+          <thead><tr><th>Bloque</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr></thead>
+          <tbody>${generarFilasHorarioClases(indexProfesor, indexHorario)}</tbody>
         </table>
       </section>
     </section>
   `;
 
   window.cambiarVista(vistaDetalle, document.getElementById('menuProfesores'));
-
   document.getElementById('btnVolverCalendario').addEventListener('click', () => verHorario(indexProfesor, indexHorario));
 }
 
@@ -275,8 +237,7 @@ function editarBloque(indexProfesor, indexHorario, dia, bloque) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
-        <h3>Asignar bloque</h3>
-        <p>${dia.toUpperCase()} - Bloque ${bloque}</p>
+        <h3>Asignar bloque</h3><p>${dia.toUpperCase()} - Bloque ${bloque}</p>
         <select id="selectAsignatura"><option value="">Asignatura...</option>${opcionesAsignaturas}</select>
         <select id="selectCurso"><option value="">Curso...</option>${opcionesCursos}</select>
         <div class="modal-botones">
@@ -287,11 +248,12 @@ function editarBloque(indexProfesor, indexHorario, dia, bloque) {
     </div>
   `);
 
-  document.getElementById('guardarAsignatura').addEventListener('click', () => {
+  document.getElementById('guardarAsignatura').addEventListener('click', async () => {
     const asig = document.getElementById('selectAsignatura').value;
     const cur = document.getElementById('selectCurso').value;
     if (asig && cur) {
       profesores[indexProfesor].horarios[indexHorario].horarioClases[dia][bloque] = `${asig} - ${cur}`;
+      await guardarDatosGlobales(); // Guarda en el PC
       cerrarModal();
       verHorarioClases(indexProfesor, indexHorario);
     }
@@ -306,21 +268,18 @@ function editarHora(indexProfesor, indexHorario, dia, tipo) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
-        <h3>${titulo}</h3>
-        <p>${dia.toUpperCase()}</p>
+        <h3>${titulo}</h3><p>${dia.toUpperCase()}</p>
         <input type="time" id="inputHora">
-        <div class="modal-botones">
-          <button id="guardarHora">Guardar</button>
-          <button id="cancelar">Cancelar</button>
-        </div>
+        <div class="modal-botones"><button id="guardarHora">Guardar</button><button id="cancelar">Cancelar</button></div>
       </div>
     </div>
   `);
 
-  document.getElementById('guardarHora').addEventListener('click', () => {
+  document.getElementById('guardarHora').addEventListener('click', async () => {
     const hora = document.getElementById('inputHora').value;
     if (hora) {
       profesores[indexProfesor].horarios[indexHorario].horarioClases[dia][tipo] = hora;
+      await guardarDatosGlobales(); // Guarda en el PC
       cerrarModal();
       verHorarioClases(indexProfesor, indexHorario);
     }

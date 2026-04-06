@@ -1,17 +1,20 @@
+// ==========================================
+// ARCHIVO: main.js
+// Propósito: Motor de Electron y conexión con el sistema operativo
+// ==========================================
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// Ruta segura en Windows (AppData) para que no haya problemas de permisos
+// Ruta segura donde Windows guarda los datos de las aplicaciones (AppData)
 const dbPath = path.join(app.getPath('userData'), 'base_datos_profesores.json');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1024,
-    height: 768,
+    width: 1200,
+    height: 800,
     webPreferences: {
-      // El puente de seguridad obligatorio en Electron moderno
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.js'), // El puente de seguridad
       contextIsolation: true,
       nodeIntegration: false
     }
@@ -21,17 +24,17 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  createWindow();
-
-  // Asegurarnos de que el archivo JSON exista al abrir la app
+  // Si el archivo JSON no existe, lo creamos vacío
   if (!fs.existsSync(dbPath)) {
     fs.writeFileSync(dbPath, JSON.stringify({ profesores: [] }));
   }
+  
+  createWindow();
 });
 
 // --- CANALES DE COMUNICACIÓN (Backend) ---
 
-// Canal para leer la base de datos
+// Escucha cuando el frontend pide leer los datos
 ipcMain.handle('leer-datos', async () => {
   try {
     const data = fs.readFileSync(dbPath, 'utf-8');
@@ -42,14 +45,14 @@ ipcMain.handle('leer-datos', async () => {
   }
 });
 
-// Canal para guardar en la base de datos
+// Escucha cuando el frontend manda datos nuevos para guardar
 ipcMain.handle('guardar-datos', async (event, datosNuevos) => {
   try {
     fs.writeFileSync(dbPath, JSON.stringify(datosNuevos, null, 2));
-    return true; // Éxito
+    return true;
   } catch (error) {
     console.error("Error guardando DB:", error);
-    return false; // Fallo
+    return false;
   }
 });
 
