@@ -327,10 +327,15 @@ body {
   gap: 20px;
 }
 
+/* ==========================================
+   AQUÍ ESTÁ LA CORRECCIÓN CLAVE (position: relative)
+   ========================================== */
 .profesor-card,
 .horario-card {
   padding: 24px;
   border-left: 6px solid var(--verde-principal);
+  position: relative;
+  display: block; /* Asegura que la tarjeta use todo el bloque correctamente */
 }
 
 .profesor-info h3,
@@ -338,6 +343,7 @@ body {
   color: var(--verde-oscuro);
   font-size: 24px;
   margin-bottom: 10px;
+  padding-right: 40px; /* Evita que el nombre choque con el menú de 3 puntos */
 }
 
 .profesor-info p,
@@ -654,6 +660,16 @@ body {
 }
 
 /* ==========================================
+   CLASES PARA EL ROUTER SPA
+   ========================================== */
+.vista-oculta { 
+  display: none !important; 
+}
+.vista-activa { 
+  display: block; 
+}
+
+/* ==========================================
    ESTILOS PARA FICHA PERSONAL (MODAL GRANDE)
    ========================================== */
 .modal-largo {
@@ -708,6 +724,80 @@ body {
   grid-column: 1 / -1;
 }
 
+/* ==========================================
+   MENÚ DE OPCIONES (3 PUNTITOS) EN TARJETAS
+   CORRECCIÓN: ANCLAJE ABSOLUTO A LA ESQUINA
+   ========================================== */
+.acciones-tarjeta {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.btn-opciones {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--gris-texto);
+  cursor: pointer;
+  padding: 0px 10px;
+  border-radius: 8px;
+  transition: 0.2s;
+  font-weight: bold;
+  line-height: 1; /* Previene desajustes de altura */
+}
+
+.btn-opciones:hover {
+  background: var(--gris-suave);
+  color: var(--verde-oscuro);
+}
+
+.menu-opciones {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: 8px;
+  box-shadow: var(--sombra-media);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+}
+
+.menu-opciones.mostrar {
+  display: block;
+}
+
+.opcion-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 15px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--gris-texto);
+  transition: 0.2s;
+}
+
+.opcion-item:hover {
+  background: var(--gris-suave);
+  color: var(--verde-oscuro);
+}
+
+.opcion-eliminar {
+  color: #c62828;
+}
+
+.opcion-eliminar:hover {
+  background: #ffebee;
+  color: #b71c1c;
+}
+
 @media (max-width: 1200px) {
   .stats-grid,
   .lista-profesores,
@@ -733,11 +823,15 @@ body {
 }
 
 /* ==========================================
-   CLASES PARA EL ROUTER SPA
+   COLORES PARA DÍAS CON INCIDENCIAS
    ========================================== */
-.vista-oculta { 
-  display: none !important; 
+.dia-rojo {
+  background: var(--rojo-suave) !important;
+  color: #c62828 !important;
+  text-decoration: none !important;
 }
-.vista-activa { 
-  display: block; 
+.dia-amarillo {
+  background: var(--amarillo-suave) !important;
+  color: #e65100 !important;
+  text-decoration: none !important;
 }
