@@ -1,6 +1,6 @@
 // ==========================================
 // ARCHIVO: assets/js/navegacion.js
-// Propósito: Manejar el cambio de pantallas y disparar los módulos lógicos
+// Propósito: Manejar el cambio de pantallas y enrutamiento avanzado
 // ==========================================
 
 const menuInicio = document.getElementById('menuInicio');
@@ -38,12 +38,12 @@ window.cambiarVista = function(vistaDestino, menuActivo) {
     menuActivo.classList.add('active');
   }
 
-  // Obligamos a que los números de la pantalla de inicio se refresquen cada vez que te muevas
   if (typeof actualizarDashboardInicio === 'function') {
     actualizarDashboardInicio();
   }
 };
 
+// Navegación Básica del Menú Lateral
 if (menuInicio) menuInicio.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaInicio, menuInicio); });
 if (menuProfesores) menuProfesores.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaProfesores, menuProfesores); if (typeof renderProfesores === 'function') renderProfesores(); });
 if (menuResumen) menuResumen.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaResumen, menuResumen); if (typeof renderListaDiaria === 'function') renderListaDiaria(); });
@@ -54,3 +54,23 @@ if (btnAccionProfesores) btnAccionProfesores.addEventListener('click', () => { w
 
 const btnAccionResumen = document.getElementById('btnAccionResumen');
 if (btnAccionResumen) btnAccionResumen.addEventListener('click', () => { window.cambiarVista(vistaResumen, menuResumen); if (typeof renderListaDiaria === 'function') renderListaDiaria(); });
+
+// ==========================================
+// ENRUTAMIENTO AVANZADO DESDE TARJETAS ESTADÍSTICAS
+// ==========================================
+function navegarYFiltrarResumen(filtro) {
+  window.cambiarVista(vistaResumen, menuResumen);
+  if (typeof window.aplicarFiltroResumen === 'function') {
+    window.aplicarFiltroResumen(filtro);
+  }
+}
+
+const cardTotalProfesores = document.getElementById('cardTotalProfesores');
+const cardLicenciasHoy = document.getElementById('cardLicenciasHoy');
+const cardFaltasHoy = document.getElementById('cardFaltasHoy');
+const cardAsistentesHoy = document.getElementById('cardAsistentesHoy');
+
+if (cardTotalProfesores) cardTotalProfesores.addEventListener('click', () => navegarYFiltrarResumen('todos'));
+if (cardLicenciasHoy) cardLicenciasHoy.addEventListener('click', () => navegarYFiltrarResumen('licencia'));
+if (cardFaltasHoy) cardFaltasHoy.addEventListener('click', () => navegarYFiltrarResumen('falta'));
+if (cardAsistentesHoy) cardAsistentesHoy.addEventListener('click', () => navegarYFiltrarResumen('presente'));

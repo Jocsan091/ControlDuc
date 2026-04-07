@@ -88,13 +88,21 @@ body {
   min-height: 100vh;
 }
 
+/* ================== AJUSTE STICKY SIDEBAR ================== */
 .dashboard-sidebar {
   width: 285px;
   background: linear-gradient(180deg, var(--verde-oscuro), var(--verde-principal));
   color: var(--blanco);
   padding: 26px 20px;
   flex-shrink: 0;
+  
+  /* ESTO MANTIENE LA BARRA LATERAL FIJA */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto; /* Por si el menú crece mucho en pantallas pequeñas */
 }
+/* ========================================================== */
 
 .sidebar-brand {
   margin-bottom: 34px;
@@ -149,7 +157,7 @@ body {
 /* ================== AJUSTE STICKY HEADER ================== */
 .dashboard-main {
   flex: 1;
-  padding: 0 28px 28px 28px; /* Se quitó el padding-top para pegar el topbar al techo */
+  padding: 0 28px 28px 28px;
 }
 
 .dashboard-topbar {
@@ -160,10 +168,9 @@ body {
   margin-bottom: 26px;
   border-left: 6px solid var(--amarillo-principal);
   background: var(--blanco);
-  border-radius: 0 0 22px 22px; /* Redondeado solo abajo */
+  border-radius: 0 0 22px 22px; 
   box-shadow: var(--sombra-media);
   
-  /* ESTO LO MANTIENE FIJO ARRIBA AL BAJAR */
   position: sticky;
   top: 0;
   z-index: 900;
@@ -772,7 +779,7 @@ body {
 
 @media (max-width: 900px) {
   .dashboard-layout { flex-direction: column; }
-  .dashboard-sidebar { width: 100%; }
+  .dashboard-sidebar { width: 100%; height: auto; position: static; }
   .dashboard-topbar, .profesores-superior { flex-direction: column; align-items: flex-start; }
 }
 
@@ -785,4 +792,42 @@ body {
   background: var(--amarillo-suave) !important;
   color: #e65100 !important;
   text-decoration: none !important;
+}
+
+/* ==========================================
+   FILTROS DE TOMA DE LISTA (RESUMEN)
+   ========================================== */
+.filtro-btn {
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+  background: #f1f1f1;
+  color: #555;
+}
+.filtro-btn:hover {
+  opacity: 0.8;
+}
+.filtro-btn.activo-todos { 
+  background: #e0e0e0;
+  border-color: #777; 
+  color: #222;
+}
+.filtro-btn.activo-presentes { 
+  background: #c8e6c9; 
+  color: var(--verde-oscuro); 
+  border-color: var(--verde-principal); 
+}
+.filtro-btn.activo-faltas { 
+  background: var(--rojo-suave); 
+  color: #c62828; 
+  border-color: #c62828; 
+}
+.filtro-btn.activo-licencias { 
+  background: var(--amarillo-suave); 
+  color: #e65100; 
+  border-color: #e65100; 
 }

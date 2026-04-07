@@ -39,19 +39,19 @@
           </header>
 
           <section class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card clickable-card" id="cardTotalProfesores">
               <span class="stat-title">Total Profesores</span>
               <strong id="statProfesores">0</strong>
             </div>
-            <div class="stat-card" style="border-top-color: #f57f17;">
+            <div class="stat-card clickable-card" id="cardLicenciasHoy" style="border-top-color: #f57f17;">
               <span class="stat-title">Licencias Hoy</span>
               <strong id="statLicencias" style="color: #e65100;">0</strong>
             </div>
-            <div class="stat-card" style="border-top-color: #c62828;">
+            <div class="stat-card clickable-card" id="cardFaltasHoy" style="border-top-color: #c62828;">
               <span class="stat-title">Faltas Hoy</span>
               <strong id="statFaltas" style="color: #c62828;">0</strong>
             </div>
-            <div class="stat-card" style="border-top-color: #2e7d32;">
+            <div class="stat-card clickable-card" id="cardAsistentesHoy" style="border-top-color: #2e7d32;">
               <span class="stat-title">Asistentes Hoy</span>
               <strong id="statAsistentes" style="color: #2e7d32;">0</strong>
             </div>
@@ -98,6 +98,17 @@
             </div>
           </header>
           <section class="modulo-profesores">
+            <div class="profesores-superior" style="padding: 15px 26px; flex-direction: column; align-items: flex-start; gap: 15px;">
+              <input type="text" id="buscadorResumen" placeholder="Buscar por nombre o RUT..." style="width: 100%; max-width: 420px; padding: 12px 14px; border: 1px solid var(--gris-borde); border-radius: 10px; font-size: 15px;">
+              
+              <div class="filtros-resumen" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="filtro-btn activo-todos" data-filtro="todos">Todos: <span id="countTodos">0</span></button>
+                <button class="filtro-btn" data-filtro="presente">Presentes: <span id="countPresentes">0</span></button>
+                <button class="filtro-btn" data-filtro="falta">Faltas/Permisos: <span id="countFaltas">0</span></button>
+                <button class="filtro-btn" data-filtro="licencia">Licencias: <span id="countLicencias">0</span></button>
+              </div>
+            </div>
+
             <div class="tabla-horario-contenedor">
               <table class="tabla-horario-clases" style="min-width: 100%;">
                 <thead>
@@ -106,6 +117,7 @@
                     <th>RUT</th>
                     <th>Estado Actual</th>
                     <th>Acción Rápida</th>
+                    <th>Perfil</th>
                   </tr>
                 </thead>
                 <tbody id="listaAsistenciaDiaria"></tbody>
