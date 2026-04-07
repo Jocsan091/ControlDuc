@@ -1,6 +1,6 @@
 // ==========================================
 // ARCHIVO: assets/js/profesores.js
-// Propósito: CRUD de docentes, Faltas/Licencias y Borrado de Incidencias
+// Propósito: CRUD de docentes, UI Consistente y Validaciones Estrictas (RUT Módulo 11)
 // ==========================================
 
 const btnAgregar = document.getElementById('btnAgregarProfesor');
@@ -31,12 +31,69 @@ function habilitarEnterEnModal(botonId) {
   }
 }
 
+// Transformador visual de fechas (YYYY-MM-DD a DD-MM-YYYY)
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return '-';
+  const partes = fechaStr.split('-');
+  if (partes.length === 3) {
+    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+  }
+  return fechaStr;
+}
+
+// ==========================================
+// VALIDACIONES ESTRICTAS DE DATOS (CHILE)
+// ==========================================
+function formatearRUT(rut) {
+  let actual = rut.replace(/^0+/, "");
+  if (actual != '' && actual.length > 1) {
+    let sinPuntos = actual.replace(/\./g, "");
+    let actualLimpio = sinPuntos.replace(/-/g, "");
+    let inicio = actualLimpio.substring(0, actualLimpio.length - 1);
+    let rutPuntos = "";
+    let i = 0;
+    let j = 1;
+    for (i = inicio.length - 1; i >= 0; i--) {
+      let letra = inicio.charAt(i);
+      rutPuntos = letra + rutPuntos;
+      if (j % 3 == 0 && j <= inicio.length - 1) {
+        rutPuntos = "." + rutPuntos;
+      }
+      j++;
+    }
+    let dv = actualLimpio.substring(actualLimpio.length - 1);
+    return rutPuntos + "-" + dv.toUpperCase();
+  }
+  return rut;
+}
+
+function validarRUT(rut) {
+  if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut.replace(/\./g, ''))) return false;
+  let tmp = rut.split('-');
+  let digv = tmp[1].toLowerCase();
+  let rutNum = tmp[0].replace(/\./g, '');
+  if (digv == 'K') digv = 'k';
+  let M = 0, S = 1;
+  for (; rutNum; rutNum = Math.floor(rutNum / 10))
+    S = (S + rutNum % 10 * (9 - M++ % 6)) % 11;
+  let dvReal = S ? S - 1 : 'k';
+  return (dvReal == digv);
+}
+
+function soloNumeros(e) {
+  const charCode = (e.which) ? e.which : e.keyCode;
+  if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+  return true;
+}
+
+// ==========================================
+
 function crearFilaEmergencia(em = {}, index) {
   const ph = index === 0 ? '' : ' (Opcional)';
   return `<div class="form-grid-3 fila-emergencia" style="margin-bottom: 10px;" data-index="${index}">
-      <input type="text" class="em-nombre" value="${em.nombre || ''}" placeholder="Nombre${ph}">
-      <input type="text" class="em-vinculo" value="${em.vinculo || ''}" placeholder="Vínculo${ph}">
-      <input type="text" class="em-tel" value="${em.telefono || em.tel || ''}" placeholder="Teléfono${ph}">
+      <input type="text" class="em-nombre" value="${em.nombre || ''}" maxlength="40" placeholder="Nombre${ph}">
+      <input type="text" class="em-vinculo" value="${em.vinculo || ''}" maxlength="20" placeholder="Vínculo${ph}">
+      <input type="text" class="em-tel" value="${em.telefono || em.tel || ''}" maxlength="15" placeholder="Teléfono (+569...)${ph}">
     </div>`;
 }
 
@@ -58,24 +115,24 @@ function mostrarFormularioProfesor(indexEdicion = null) {
         <h3>${esEdicion ? 'Editar Ficha del Docente' : 'Nueva Ficha del Docente'}</h3>
         <h4 class="seccion-titulo">Datos Personales</h4>
         <div class="form-grid">
-          <div><label>Nombre Completo</label><input type="text" id="f_nombre" value="${p.nombre || ''}"></div>
-          <div><label>RUT</label><input type="text" id="f_rut" value="${p.rut || ''}"></div>
+          <div><label>Nombre Completo *</label><input type="text" id="f_nombre" value="${p.nombre || ''}" maxlength="60" placeholder="Ej: Juan Pérez"></div>
+          <div><label>RUT *</label><input type="text" id="f_rut" value="${p.rut || ''}" maxlength="12" placeholder="12.345.678-9"></div>
           <div><label>Fecha de Nacimiento</label><input type="date" id="f_fechaNac" value="${p.fechaNacimiento || ''}"></div>
-          <div><label>Domicilio</label><input type="text" id="f_domicilio" value="${p.domicilio || ''}"></div>
-          <div><label>Traslado Frecuente</label><input type="text" id="f_traslado" value="${p.traslado || ''}"></div>
-          <div><label>Licencia de Conducir</label><input type="text" id="f_licencia" value="${p.licencia || ''}"></div>
-          <div><label>Profesión</label><input type="text" id="f_profesion" value="${p.profesion || ''}"></div>
-          <div><label>Hijos (Cantidad)</label><input type="number" id="f_hijos" value="${p.hijos || '0'}" min="0"></div>
-          <div><label>Personas C/ Vive</label><input type="number" id="f_personasVive" value="${p.personasVive || '0'}" min="0"></div>
+          <div><label>Domicilio</label><input type="text" id="f_domicilio" value="${p.domicilio || ''}" maxlength="80"></div>
+          <div><label>Traslado Frecuente</label><input type="text" id="f_traslado" value="${p.traslado || ''}" maxlength="50"></div>
+          <div><label>Licencia de Conducir</label><input type="text" id="f_licencia" value="${p.licencia || ''}" maxlength="20"></div>
+          <div><label>Profesión</label><input type="text" id="f_profesion" value="${p.profesion || ''}" maxlength="50"></div>
+          <div><label>Hijos (Cantidad)</label><input type="number" id="f_hijos" value="${p.hijos || '0'}" min="0" max="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></div>
+          <div><label>Personas C/ Vive</label><input type="number" id="f_personasVive" value="${p.personasVive || '0'}" min="0" max="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></div>
         </div>
         <h4 class="seccion-titulo">En caso de Emergencia avisar a:</h4>
         <div id="contenedor-emergencias">${emergenciasHTML}</div>
         <button type="button" id="btnAgregarEmergencia" class="btn-secundario" style="margin-bottom: 15px; font-size: 12px; padding: 6px 12px;">+ Agregar otro contacto</button>
         <h4 class="seccion-titulo">Salud y Antecedentes</h4>
-        <label>Enfermedades y/o condición médica</label><textarea id="f_enfermedades">${salud.enfermedades || ''}</textarea>
-        <label>Alergias</label><input type="text" id="f_alergias" value="${salud.alergias || ''}">
-        <label>Medicamentos Permanentes</label><textarea id="f_medicamentos">${salud.medicamentos || ''}</textarea>
-        <label>Observaciones</label><textarea id="f_observaciones">${p.observaciones || ''}</textarea>
+        <label>Enfermedades y/o condición médica</label><textarea id="f_enfermedades" maxlength="300">${salud.enfermedades || ''}</textarea>
+        <label>Alergias</label><input type="text" id="f_alergias" value="${salud.alergias || ''}" maxlength="100">
+        <label>Medicamentos Permanentes</label><textarea id="f_medicamentos" maxlength="300">${salud.medicamentos || ''}</textarea>
+        <label>Observaciones</label><textarea id="f_observaciones" maxlength="500">${p.observaciones || ''}</textarea>
         <div id="errorProfesor" style="color: #c62828; font-weight: bold; font-size: 14px; margin-top: 15px; display: none; text-align: center;"></div>
         <div class="modal-botones" style="margin-top: 15px;">
           <button id="guardarProfesor" class="btn-principal">${esEdicion ? 'Guardar Cambios' : 'Guardar Ficha'}</button>
@@ -84,6 +141,11 @@ function mostrarFormularioProfesor(indexEdicion = null) {
       </div>
     </div>
   `);
+
+  const inputRut = document.getElementById('f_rut');
+  inputRut.addEventListener('input', function() {
+    this.value = formatearRUT(this.value.replace(/[^0-9kK]/g, ''));
+  });
 
   let emIndex = emergencias.length;
   document.getElementById('btnAgregarEmergencia').addEventListener('click', () => { document.getElementById('contenedor-emergencias').insertAdjacentHTML('beforeend', crearFilaEmergencia({}, emIndex++)); });
@@ -95,7 +157,21 @@ function mostrarFormularioProfesor(indexEdicion = null) {
 async function guardarProfesor(indexEdicion) {
   const nombre = document.getElementById('f_nombre').value.trim();
   const rut = document.getElementById('f_rut').value.trim();
-  if (!nombre || !rut) { document.getElementById('errorProfesor').innerText = "Nombre y RUT obligatorios."; document.getElementById('errorProfesor').style.display = 'block'; return; }
+  const errorDiv = document.getElementById('errorProfesor');
+
+  if (!nombre || !rut) { 
+    errorDiv.innerText = "Error: El Nombre y el RUT son obligatorios."; 
+    errorDiv.style.display = 'block'; 
+    return; 
+  }
+  
+  if (!validarRUT(rut)) {
+    errorDiv.innerText = "Error: El RUT ingresado no es válido."; 
+    errorDiv.style.display = 'block'; 
+    return; 
+  }
+  
+  errorDiv.style.display = 'none';
 
   const contactos = Array.from(document.querySelectorAll('.fila-emergencia')).map(fila => ({
     nombre: fila.querySelector('.em-nombre').value.trim(), vinculo: fila.querySelector('.em-vinculo').value.trim(), telefono: fila.querySelector('.em-tel').value.trim()
@@ -111,7 +187,7 @@ async function guardarProfesor(indexEdicion) {
   
   await guardarDatosGlobales();
   cerrarModal();
-  if (typeof indexEdicion === 'number' && document.getElementById('vista-detalle-profesor').classList.contains('vista-activa')) verProfesor(indexEdicion); else { renderProfesores(); actualizarDashboardInicio(); }
+  if (typeof indexEdicion === 'number' && document.getElementById('vista-detalle-profesor').classList.contains('vista-activa')) verProfesor(indexEdicion); else { renderProfesores(); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio(); }
 }
 
 async function eliminarProfesor(index) {
@@ -119,7 +195,7 @@ async function eliminarProfesor(index) {
     document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
     profesores.splice(index, 1);
     await guardarDatosGlobales(); 
-    actualizarDashboardInicio();
+    if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
     window.cambiarVista(document.getElementById('vista-profesores'), document.getElementById('menuProfesores'));
     renderProfesores();
   }
@@ -158,8 +234,12 @@ function verFichaCompleta(index) {
         <h3>Ficha Completa: ${p.nombre}</h3><p style="color: var(--gris-texto); margin-top: -5px; margin-bottom: 15px;">RUT: ${p.rut}</p>
         <h4 class="seccion-titulo">Datos Personales</h4>
         <div class="ficha-resumen" style="display: grid; margin-bottom: 15px;">
-          <p><strong>Fecha Nacimiento:</strong> ${p.fechaNacimiento || '-'}</p><p><strong>Profesión:</strong> ${p.profesion || '-'}</p><p><strong>Domicilio:</strong> ${p.domicilio || '-'}</p>
-          <p><strong>Traslado Frecuente:</strong> ${p.traslado || '-'}</p><p><strong>Licencia Conducir:</strong> ${p.licencia || '-'}</p><p><strong>Hijos / Viven c/:</strong> ${p.hijos || '0'} / ${p.personasVive || '0'}</p>
+          <p><strong>Fecha Nacimiento:</strong> ${formatearFecha(p.fechaNacimiento)}</p>
+          <p><strong>Profesión:</strong> ${p.profesion || '-'}</p>
+          <p><strong>Domicilio:</strong> ${p.domicilio || '-'}</p>
+          <p><strong>Traslado Frecuente:</strong> ${p.traslado || '-'}</p>
+          <p><strong>Licencia Conducir:</strong> ${p.licencia || '-'}</p>
+          <p><strong>Hijos / Viven c/:</strong> ${p.hijos || '0'} / ${p.personasVive || '0'}</p>
         </div>
         <h4 class="seccion-titulo">Emergencia</h4><div class="ficha-resumen" style="display: block; margin-bottom: 15px;">${emergenciasHTML || '<p>Sin contactos.</p>'}</div>
         <h4 class="seccion-titulo">Salud</h4><div class="ficha-resumen" style="display: block; margin-bottom: 15px;">
@@ -181,7 +261,11 @@ function verProfesor(index) {
 
   let listaHorarios = p.horarios.length ? p.horarios.map((h, i) => `
       <div class="horario-card clickable-card" onclick="verHorario(${index}, ${i})">
-        <div class="horario-info"><h3 style="padding-right: 30px;">Horario ${h.anio}</h3><p>Semestre 1: ${h.inicioSemestre1} a ${h.finSemestre1}</p><p>Semestre 2: ${h.inicioSemestre2} a ${h.finSemestre2}</p></div>
+        <div class="horario-info">
+          <h3 style="padding-right: 30px;">Horario ${h.anio}</h3>
+          <p>Semestre 1: ${formatearFecha(h.inicioSemestre1)} a ${formatearFecha(h.finSemestre1)}</p>
+          <p>Semestre 2: ${formatearFecha(h.inicioSemestre2)} a ${formatearFecha(h.finSemestre2)}</p>
+        </div>
         <div class="acciones-tarjeta">
           <button class="btn-opciones" onclick="toggleMenuOpciones(event, 'menu-horario-${i}')">&#8942;</button>
           <div id="menu-horario-${i}" class="menu-opciones">
@@ -192,22 +276,29 @@ function verProfesor(index) {
       </div>`).join('') : `<div class="sin-profesores">Aún no hay horarios registrados.</div>`;
 
   const em = p.emergencia[0] || {}; 
+  
   vistaDetalle.innerHTML = `
     <header class="dashboard-topbar">
-      <div style="margin-bottom: 15px;"><button class="btn-secundario" id="btnVolverProfesores" style="padding: 6px 12px; font-size: 13px; background: transparent; border: 1px solid var(--gris-borde);">← Volver a Profesores</button></div>
-      <div style="display:flex; justify-content: space-between; align-items: center;">
-        <div><h1>${p.nombre}</h1><p>RUT: ${p.rut}</p></div>
-        <div><button class="btn-principal" id="btnAgregarHorario">Nuevo Horario</button></div>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <button class="btn-secundario" id="btnVolverProfesores" style="padding: 8px 16px; border-radius: 12px; font-size: 14px;">← Volver</button>
+        <div>
+          <h1 style="margin-bottom: 2px; font-size: 32px; line-height: 1;">${p.nombre}</h1>
+          <p style="margin: 0; font-size: 15px;">RUT: ${p.rut}</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn-principal" id="btnAgregarHorario">+ Nuevo Horario</button>
       </div>
     </header>
+
     <section class="modulo-profesores">
       <div class="profesor-card clickable-card" onclick="verFichaCompleta(${index})" style="margin-bottom: 20px; background: var(--blanco);">
         <div class="profesor-info" style="width: 100%;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;"><h3 style="margin: 0; font-size: 20px;">Resumen de Ficha Personal</h3><span style="color: var(--verde-principal); font-weight: bold; font-size: 13px; background: var(--verde-suave); padding: 6px 12px; border-radius: 8px;">Ver Ficha Completa y Editar ➔</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-            <div><p style="color: var(--verde-oscuro); font-size: 12px; margin-bottom: 4px; font-weight: bold;">Profesión</p><p style="font-size: 15px;">${p.profesion || '-'}</p></div>
-            <div><p style="color: var(--verde-oscuro); font-size: 12px; margin-bottom: 4px; font-weight: bold;">Nacimiento</p><p style="font-size: 15px;">${p.fechaNacimiento || '-'}</p></div>
-            <div><p style="color: var(--verde-oscuro); font-size: 12px; margin-bottom: 4px; font-weight: bold;">Emergencia</p><p style="font-size: 15px;">${em.nombre || '-'} <br><span style="font-size:13px; color:var(--gris-texto);">${em.tel || em.telefono || '-'}</span></p></div>
+            <div><p style="color: var(--verde-oscuro); font-size: 13px; margin-bottom: 6px; text-transform: uppercase; font-weight: bold;">Profesión</p><p style="font-size: 18px; font-weight: bold; color: #111;">${p.profesion || '-'}</p></div>
+            <div><p style="color: var(--verde-oscuro); font-size: 13px; margin-bottom: 6px; text-transform: uppercase; font-weight: bold;">Nacimiento</p><p style="font-size: 18px; font-weight: bold; color: #111;">${formatearFecha(p.fechaNacimiento)}</p></div>
+            <div><p style="color: var(--verde-oscuro); font-size: 13px; margin-bottom: 6px; text-transform: uppercase; font-weight: bold;">Contacto Emergencia</p><p style="font-size: 18px; font-weight: bold; color: #111;">${em.nombre || '-'} <br><span style="font-size:15px; color:var(--gris-texto); font-weight: normal;">${em.tel || em.telefono || '-'}</span></p></div>
           </div>
         </div>
       </div>
@@ -232,7 +323,7 @@ function mostrarFormularioHorario(ip, ih = null) {
       <div class="modal-content">
         <h3>${typeof ih === 'number' ? 'Editar Fechas' : 'Nuevo Horario'}</h3>
         <p style="font-size:13px; color:var(--gris-texto); margin-top:-5px;">Ingresa el año primero.</p>
-        <input type="number" id="anioHorario" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly style="background:#eee;"' : ''}>
+        <input type="number" id="anioHorario" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly style="background:#eee;"' : ''} onkeypress="return soloNumeros(event)">
         <div id="contenedorFechas" style="${typeof ih === 'number' ? '' : 'opacity: 0.4; pointer-events: none;'}">
           <label>Inicio/Fin Semestre 1</label>
           <div style="display:flex; gap:10px;"><input type="date" class="input-fecha-semestre" id="is1" value="${h.inicioSemestre1 || ''}"><input type="date" class="input-fecha-semestre" id="fs1" value="${h.finSemestre1 || ''}"></div>
@@ -277,18 +368,18 @@ async function eliminarHorario(ip, ih) {
   }
 }
 
-// MAGIA: PANEL DE ADMINISTRACIÓN DE INCIDENCIAS
+// PANEL DE ADMINISTRACIÓN DE INCIDENCIAS
 window.borrarFalta = async function(ip, ih, iFalta) {
   if(confirm('¿Seguro de borrar esta falta/permiso? El día volverá a quedar limpio.')) {
     profesores[ip].horarios[ih].faltas.splice(iFalta, 1);
-    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); mostrarAdministradorIncidencias(ip, ih); actualizarDashboardInicio();
+    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); mostrarAdministradorIncidencias(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   }
 }
 
 window.borrarLicencia = async function(ip, ih, iLic) {
   if(confirm('¿Seguro de borrar esta licencia médica?')) {
     profesores[ip].horarios[ih].licencias.splice(iLic, 1);
-    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); mostrarAdministradorIncidencias(ip, ih); actualizarDashboardInicio();
+    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); mostrarAdministradorIncidencias(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   }
 }
 
@@ -298,13 +389,13 @@ function mostrarAdministradorIncidencias(ip, ih) {
   
   let fHtml = (h.faltas || []).map((f, i) => `
     <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background: #fafafa; border:1px solid var(--gris-borde); border-radius: 8px; margin-bottom: 8px;">
-      <div><strong style="color:var(--verde-oscuro);">${f.fecha}</strong> - <span style="color:#c62828; font-weight:bold;">${f.tipo}</span><br><span style="font-size:13px; color:var(--gris-texto);">Motivo: ${f.motivo || '-'}</span></div>
+      <div><strong style="color:var(--verde-oscuro);">${formatearFecha(f.fecha)}</strong> - <span style="color:#c62828; font-weight:bold;">${f.tipo}</span><br><span style="font-size:13px; color:var(--gris-texto);">Motivo: ${f.motivo || '-'}</span></div>
       <button class="btn-secundario" style="background:#c62828; color:white; padding:6px 12px; font-size:12px; border:none;" onclick="borrarFalta(${ip}, ${ih}, ${i})">Borrar</button>
     </div>`).join('') || '<p style="color:var(--gris-texto); font-size:14px;">No hay faltas registradas este año.</p>';
 
   let lHtml = (h.licencias || []).map((l, i) => `
     <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background: #fafafa; border:1px solid var(--gris-borde); border-radius: 8px; margin-bottom: 8px;">
-      <div><strong style="color:var(--verde-oscuro);">Del ${l.fechaInicio} al ${l.fechaFin}</strong> - <span style="color:#e65100; font-weight:bold;">Licencia</span><br><span style="font-size:13px; color:var(--gris-texto);">Motivo: ${l.motivo || '-'}</span></div>
+      <div><strong style="color:var(--verde-oscuro);">Del ${formatearFecha(l.fechaInicio)} al ${formatearFecha(l.fechaFin)}</strong> - <span style="color:#e65100; font-weight:bold;">Licencia</span><br><span style="font-size:13px; color:var(--gris-texto);">Motivo: ${l.motivo || '-'}</span></div>
       <button class="btn-secundario" style="background:#c62828; color:white; padding:6px 12px; font-size:12px; border:none;" onclick="borrarLicencia(${ip}, ${ih}, ${i})">Borrar</button>
     </div>`).join('') || '<p style="color:var(--gris-texto); font-size:14px;">No hay licencias registradas este año.</p>';
 
@@ -325,24 +416,36 @@ function verHorario(ip, ih) {
   const p = profesores[ip]; const h = p.horarios[ih];
   if (!h.faltas) h.faltas = []; if (!h.licencias) h.licencias = [];
 
+  const totalFaltas = h.faltas.length;
+  const totalLicencias = h.licencias.length;
+
   document.getElementById('vista-detalle-profesor').innerHTML = `
     <header class="dashboard-topbar">
-      <div style="margin-bottom: 15px;"><button class="btn-secundario" id="btnVolverProfesor" style="padding: 6px 12px; font-size: 13px; background: transparent; border: 1px solid var(--gris-borde);">← Volver al Perfil</button></div>
-      <div style="display:flex; justify-content: space-between; align-items: center;">
-        <div><h1>${p.nombre}</h1><p>RUT: ${p.rut} | Calendario ${h.anio}</p></div>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button class="btn-secundario" id="btnAdministrarIncidencias" style="border: 1px solid var(--gris-borde);">⚙️ Ajustes de Registro</button>
-          <button class="btn-secundario" id="btnHorarioClases">Ver Horario Clases</button>
-          <button class="btn-principal" id="btnRegistrarFalta">Registrar Falta/Permiso</button>
-          <button class="btn-principal" id="btnRegistrarLicencia">Registrar Licencia</button>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <button class="btn-secundario" id="btnVolverProfesor" style="padding: 8px 16px; border-radius: 12px; font-size: 14px;">← Volver</button>
+        <div>
+          <h1 style="margin-bottom: 2px; font-size: 32px; line-height: 1;">${p.nombre}</h1>
+          <p style="margin: 0; font-size: 15px;">RUT: ${p.rut} | Calendario ${h.anio}</p>
         </div>
       </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn-secundario" id="btnAdministrarIncidencias" style="border: 1px solid var(--gris-borde);">⚙️ Ajustes</button>
+        <button class="btn-secundario" id="btnHorarioClases">Ver Horario Clases</button>
+        <button class="btn-principal" id="btnRegistrarFalta" style="background: var(--rojo-suave); color: #c62828; border: 1px solid #c62828;">Registrar Falta/Permiso</button>
+        <button class="btn-principal" id="btnRegistrarLicencia" style="background: var(--amarillo-suave); color: #e65100; border: 1px solid #e65100;">Registrar Licencia</button>
+      </div>
     </header>
+
+    <div style="background: var(--blanco); padding: 15px 25px; border-radius: 12px; box-shadow: var(--sombra-suave); margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+      <div class="estado-box estado-verde" style="font-size: 14px; padding: 8px 14px;">Días asistidos</div>
+      <div class="estado-box estado-gris" style="font-size: 14px; padding: 8px 14px; border: 1px solid var(--gris-borde);">Días futuros</div>
+      <div class="estado-box estado-tachado" style="font-size: 14px; padding: 8px 14px; border: 1px dashed #999;">Días no hábiles</div>
+      <div style="width: 2px; height: 24px; background: var(--gris-borde); margin: 0 5px;"></div>
+      <div class="estado-box estado-rojo" style="font-size: 14px; padding: 8px 14px; border: 1px solid #c62828;">Faltas/Permisos: <strong>${totalFaltas}</strong></div>
+      <div class="estado-box estado-amarillo" style="font-size: 14px; padding: 8px 14px; border: 1px solid #e65100;">Licencias: <strong>${totalLicencias}</strong></div>
+    </div>
+
     <section class="modulo-profesores">
-      <section class="horario-resumen">
-        <div class="estado-box estado-rojo">Faltas/Permisos: ${h.faltas.length}</div>
-        <div class="estado-box estado-amarillo">Licencias: ${h.licencias.length}</div>
-      </section>
       <section class="meses-grid">${generarMesesHorario(parseInt(h.anio), h)}</section>
     </section>
   `;
@@ -353,17 +456,16 @@ function verHorario(ip, ih) {
   document.getElementById('btnAdministrarIncidencias').addEventListener('click', () => mostrarAdministradorIncidencias(ip, ih));
 }
 
-// Faltas y Licencias
 function mostrarFormularioFalta(ip, ih) {
   if (document.querySelector('.modal')) return; const anio = profesores[ip].horarios[ih].anio;
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
-        <h3>Registrar Falta o Permiso</h3>
+        <h3 style="color: #c62828;">Registrar Falta o Permiso</h3>
         <select id="tipoFalta" style="padding: 12px; width: 100%; border: 1px solid var(--gris-borde); border-radius: 10px; margin-bottom: 10px;"><option value="Inasistencia">Inasistencia</option><option value="Permiso">Permiso</option></select>
         <label>Día</label><input type="date" id="fechaFalta" min="${anio}-01-01" max="${anio}-12-31" style="width: 100%; padding: 12px; border: 1px solid var(--gris-borde); border-radius: 10px; margin-bottom: 10px;">
-        <label>Motivo</label><textarea id="motivoFalta"></textarea>
-        <div class="modal-botones" style="margin-top: 15px;"><button id="guardarFalta" class="btn-principal">Registrar</button><button id="cancelarFalta" class="btn-secundario">Cancelar</button></div>
+        <label>Motivo</label><textarea id="motivoFalta" maxlength="250"></textarea>
+        <div class="modal-botones" style="margin-top: 15px;"><button id="guardarFalta" class="btn-principal" style="background: #c62828; color: white;">Registrar</button><button id="cancelarFalta" class="btn-secundario">Cancelar</button></div>
       </div>
     </div>
   `);
@@ -371,7 +473,7 @@ function mostrarFormularioFalta(ip, ih) {
     const t = document.getElementById('tipoFalta').value; const f = document.getElementById('fechaFalta').value;
     if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida");
     profesores[ip].horarios[ih].faltas.push({ tipo: t, fecha: f, motivo: document.getElementById('motivoFalta').value.trim() });
-    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); actualizarDashboardInicio();
+    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   });
   document.getElementById('cancelarFalta').addEventListener('click', cerrarModal);
 }
@@ -381,13 +483,13 @@ function mostrarFormularioLicencia(ip, ih) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
-        <h3>Registrar Licencia Médica</h3>
+        <h3 style="color: #f57f17;">Registrar Licencia Médica</h3>
         <div class="form-grid">
           <div><label>Desde</label><input type="date" id="fILic" min="${anio}-01-01" max="${anio}-12-31" style="width: 100%; padding: 12px; border-radius: 10px;"></div>
           <div><label>Hasta</label><input type="date" id="fFLic" min="${anio}-01-01" max="${anio}-12-31" style="width: 100%; padding: 12px; border-radius: 10px;"></div>
         </div>
-        <label>Motivo</label><textarea id="motivoLic"></textarea>
-        <div class="modal-botones" style="margin-top: 15px;"><button id="guardarLicencia" class="btn-principal">Registrar</button><button id="cancelarLicencia" class="btn-secundario">Cancelar</button></div>
+        <label>Motivo</label><textarea id="motivoLic" maxlength="250"></textarea>
+        <div class="modal-botones" style="margin-top: 15px;"><button id="guardarLicencia" class="btn-principal" style="background: #f57f17; color: white;">Registrar</button><button id="cancelarLicencia" class="btn-secundario">Cancelar</button></div>
       </div>
     </div>
   `);
@@ -395,7 +497,7 @@ function mostrarFormularioLicencia(ip, ih) {
     const fi = document.getElementById('fILic').value; const ff = document.getElementById('fFLic').value;
     if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas");
     profesores[ip].horarios[ih].licencias.push({ fechaInicio: fi, fechaFin: ff, motivo: document.getElementById('motivoLic').value.trim() });
-    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); actualizarDashboardInicio();
+    await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   });
   document.getElementById('cancelarLicencia').addEventListener('click', cerrarModal);
 }
@@ -404,8 +506,13 @@ function verHorarioClases(ip, ih) {
   const p = profesores[ip]; const h = p.horarios[ih];
   document.getElementById('vista-detalle-profesor').innerHTML = `
     <header class="dashboard-topbar">
-      <div style="margin-bottom: 15px;"><button class="btn-secundario" id="btnVolverCalendario" style="padding: 6px 12px; font-size: 13px; background: transparent; border: 1px solid var(--gris-borde);">← Volver al Calendario</button></div>
-      <div><h1>${p.nombre}</h1><p>Horario Semanal ${h.anio}</p></div>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <button class="btn-secundario" id="btnVolverCalendario" style="padding: 8px 16px; border-radius: 12px; font-size: 14px;">← Volver</button>
+        <div>
+          <h1 style="margin-bottom: 2px; font-size: 32px; line-height: 1;">${p.nombre}</h1>
+          <p style="margin: 0; font-size: 15px;">Horario Semanal ${h.anio}</p>
+        </div>
+      </div>
     </header>
     <section class="modulo-profesores">
       <section class="tabla-horario-contenedor">
