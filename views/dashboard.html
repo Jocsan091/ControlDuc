@@ -18,8 +18,8 @@
       <nav class="sidebar-menu">
         <a href="#" class="menu-item active" id="menuInicio">Inicio</a>
         <a href="#" class="menu-item" id="menuProfesores">Profesores</a>
-        <a href="#" class="menu-item">Resumen</a>
-        <a href="#" class="menu-item">Configuración</a>
+        <a href="#" class="menu-item" id="menuResumen">Resumen Diario</a>
+        <a href="#" class="menu-item" id="menuConfiguracion">Configuración</a>
         <a href="#" class="menu-item" id="logout">Cerrar sesión</a>
       </nav>
     </aside>
@@ -40,38 +40,31 @@
 
           <section class="stats-grid">
             <div class="stat-card">
-              <span class="stat-title">Profesores</span>
-              <strong id="contadorProfesores">0</strong>
+              <span class="stat-title">Total Profesores</span>
+              <strong id="statProfesores">0</strong>
             </div>
-            <div class="stat-card">
-              <span class="stat-title">Faltas</span>
-              <strong>0</strong>
+            <div class="stat-card" style="border-top-color: #f57f17;">
+              <span class="stat-title">Licencias Hoy</span>
+              <strong id="statLicencias" style="color: #e65100;">0</strong>
             </div>
-            <div class="stat-card">
-              <span class="stat-title">Licencias</span>
-              <strong>0</strong>
+            <div class="stat-card" style="border-top-color: #c62828;">
+              <span class="stat-title">Faltas Hoy</span>
+              <strong id="statFaltas" style="color: #c62828;">0</strong>
             </div>
-            <div class="stat-card">
-              <span class="stat-title">Pendientes</span>
-              <strong>0</strong>
+            <div class="stat-card" style="border-top-color: #2e7d32;">
+              <span class="stat-title">Asistentes Hoy</span>
+              <strong id="statAsistentes" style="color: #2e7d32;">0</strong>
             </div>
           </section>
           
           <section class="quick-actions">
-            <div class="action-card" id="btnProfesores">
-              <div class="action-icon">👨‍🏫</div>
-              <h3>Profesores</h3>
-              <p>Administrar y revisar docentes registrados.</p>
+            <div class="action-card" id="btnAccionProfesores">
+              <h3>Gestión de Profesores</h3>
+              <p>Administrar fichas, crear horarios y registrar licencias médicas.</p>
             </div>
-            <div class="action-card">
-              <div class="action-icon">📊</div>
-              <h3>Resumen</h3>
-              <p>Visualizar estados y registros generales.</p>
-            </div>
-            <div class="action-card">
-              <div class="action-icon">⚙️</div>
-              <h3>Configuración</h3>
-              <p>Ajustar opciones básicas del sistema.</p>
+            <div class="action-card" id="btnAccionResumen">
+              <h3>Toma de Lista Diaria</h3>
+              <p>Registrar rápidamente la asistencia del día actual para todo el personal.</p>
             </div>
           </section>
         </section>
@@ -83,7 +76,6 @@
               <p>Administra los profesores registrados dentro del sistema.</p>
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
-              <div class="topbar-user"><span>Administrador</span></div>
               <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
             </div>
           </header>
@@ -92,22 +84,72 @@
             <div class="profesores-barra" style="margin-top: -10px;">
               <input type="text" id="buscadorProfesores" placeholder="Buscar profesor por nombre o rut...">
             </div>
-      
-            <div id="listaProfesores" class="lista-profesores">
-              </div>
+            <div id="listaProfesores" class="lista-profesores"></div>
           </section>
         </section>
 
-        <section id="vista-detalle-profesor" class="vista-oculta">
-          </section>
+        <section id="vista-detalle-profesor" class="vista-oculta"></section>
 
-      </section> </main>
+        <section id="vista-resumen" class="vista-oculta">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Toma de Lista Diaria</h1>
+              <p id="fechaHoyResumen">Cargando fecha...</p>
+            </div>
+          </header>
+          <section class="modulo-profesores">
+            <div class="tabla-horario-contenedor">
+              <table class="tabla-horario-clases" style="min-width: 100%;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left; padding-left: 20px;">Profesor</th>
+                    <th>RUT</th>
+                    <th>Estado Actual</th>
+                    <th>Acción Rápida</th>
+                  </tr>
+                </thead>
+                <tbody id="listaAsistenciaDiaria"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="vista-configuracion" class="vista-oculta">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Configuración del Sistema</h1>
+              <p>Herramientas de desarrollo y base de datos.</p>
+            </div>
+          </header>
+          <section class="modulo-profesores">
+            <div class="ficha-resumen">
+              <div style="grid-column: 1 / -1;">
+                <h3 style="margin-bottom: 10px; color: var(--verde-oscuro);">Inyección de Datos (Testing)</h3>
+                <p style="margin-bottom: 15px; color: var(--gris-texto);">Utiliza este botón para cargar 10 perfiles de profesores falsos con faltas y licencias registradas el día de hoy. Ideal para probar los paneles gráficos.</p>
+                <button class="btn-principal" style="background: var(--amarillo-principal); color: #222;" onclick="window.generarDatosDePrueba()">Inyectar Datos Falsos</button>
+              </div>
+            </div>
+            
+            <div class="ficha-resumen" style="margin-top: 20px; border-color: #ffcdd2; background: #fff5f5;">
+              <div style="grid-column: 1 / -1;">
+                <h3 style="color: #c62828; margin-bottom: 10px;">Zona de Peligro</h3>
+                <p style="margin-bottom: 15px; color: var(--gris-texto);">Borrar todos los profesores, horarios y registros del sistema de forma irreversible.</p>
+                <button class="btn-secundario" style="background: #c62828; color: white; border: none;" onclick="window.borrarBaseDeDatos()">Eliminar Toda la Base de Datos</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+      </section>
+    </main>
   </div>
 
   <script src="../assets/js/datos.js"></script>
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/horarios.js"></script>
   <script src="../assets/js/profesores.js"></script>
+  <script src="../assets/js/resumen.js"></script>
+  <script src="../assets/js/dashboard.js"></script>
   <script src="../assets/js/navegacion.js"></script>
 </body>
 </html>
