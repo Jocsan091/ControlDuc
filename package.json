@@ -1,16 +1,37 @@
 {
-  "name": "sistema-asistencia",
+  "name": "controldoc",
   "version": "1.0.0",
-  "description": "",
+  "description": "Sistema de gestión de asistencia docente",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Rodrigo Demonte",
   "license": "ISC",
-  "type": "commonjs",
+  "dependencies": {
+    "electron": "^29.1.1"
+  },
   "devDependencies": {
-    "electron": "^41.1.0"
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.rodrigodemonte.controldoc",
+    "productName": "ControlDoc",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/img/logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ControlDoc"
+    }
   }
 }
