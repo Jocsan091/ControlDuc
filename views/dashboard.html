@@ -43,17 +43,17 @@
               <span class="stat-title">Total Profesores</span>
               <strong id="statProfesores">0</strong>
             </div>
-            <div class="stat-card clickable-card" id="cardLicenciasHoy" style="border-top-color: #f57f17;">
+            <div class="stat-card clickable-card border-top-warning" id="cardLicenciasHoy">
               <span class="stat-title">Licencias Hoy</span>
-              <strong id="statLicencias" style="color: #e65100;">0</strong>
+              <strong id="statLicencias" class="text-warning">0</strong>
             </div>
-            <div class="stat-card clickable-card" id="cardFaltasHoy" style="border-top-color: #c62828;">
+            <div class="stat-card clickable-card border-top-danger" id="cardFaltasHoy">
               <span class="stat-title">Faltas Hoy</span>
-              <strong id="statFaltas" style="color: #c62828;">0</strong>
+              <strong id="statFaltas" class="text-danger">0</strong>
             </div>
-            <div class="stat-card clickable-card" id="cardAsistentesHoy" style="border-top-color: #2e7d32;">
+            <div class="stat-card clickable-card border-top-success" id="cardAsistentesHoy">
               <span class="stat-title">Asistentes Hoy</span>
-              <strong id="statAsistentes" style="color: #2e7d32;">0</strong>
+              <strong id="statAsistentes" class="text-success">0</strong>
             </div>
           </section>
           
@@ -75,14 +75,14 @@
               <h1>Gestión de Profesores</h1>
               <p>Administra los profesores registrados dentro del sistema.</p>
             </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
+            <div class="d-flex gap-2 align-center">
               <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
             </div>
           </header>
           
           <section class="modulo-profesores">
-            <div class="profesores-barra" style="margin-top: -10px;">
-              <input type="text" id="buscadorProfesores" placeholder="Buscar profesor por nombre o rut...">
+            <div class="profesores-barra mt-0">
+              <input type="text" id="buscadorProfesores" class="input-global w-100 max-w-420" placeholder="Buscar profesor por nombre o rut...">
             </div>
             <div id="listaProfesores" class="lista-profesores"></div>
           </section>
@@ -94,14 +94,14 @@
           <header class="dashboard-topbar">
             <div>
               <h1>Toma de Lista Diaria</h1>
-              <p id="fechaHoyResumen">Cargando fecha...</p>
+              <p id="fechaHoyResumen" class="fs-md text-muted mt-1">Cargando fecha...</p>
             </div>
           </header>
           <section class="modulo-profesores">
-            <div class="profesores-superior" style="padding: 15px 26px; flex-direction: column; align-items: flex-start; gap: 15px;">
-              <input type="text" id="buscadorResumen" placeholder="Buscar por nombre o RUT..." style="width: 100%; max-width: 420px; padding: 12px 14px; border: 1px solid var(--gris-borde); border-radius: 10px; font-size: 15px;">
+            <div class="profesores-superior p-3 d-flex flex-column align-left gap-2">
+              <input type="text" id="buscadorResumen" class="input-global w-100 max-w-420" placeholder="Buscar por nombre o RUT...">
               
-              <div class="filtros-resumen" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <div class="filtros-resumen d-flex gap-1 flex-wrap">
                 <button class="filtro-btn activo-todos" data-filtro="todos">Todos: <span id="countTodos">0</span></button>
                 <button class="filtro-btn" data-filtro="presente">Presentes: <span id="countPresentes">0</span></button>
                 <button class="filtro-btn" data-filtro="falta">Faltas/Permisos: <span id="countFaltas">0</span></button>
@@ -110,10 +110,10 @@
             </div>
 
             <div class="tabla-horario-contenedor">
-              <table class="tabla-horario-clases" style="min-width: 100%;">
+              <table class="tabla-horario-clases w-100">
                 <thead>
                   <tr>
-                    <th style="text-align: left; padding-left: 20px;">Profesor</th>
+                    <th class="text-left px-3">Profesor</th>
                     <th>RUT</th>
                     <th>Estado Actual</th>
                     <th>Acción Rápida</th>
@@ -130,23 +130,35 @@
           <header class="dashboard-topbar">
             <div>
               <h1>Configuración del Sistema</h1>
-              <p>Herramientas de desarrollo y base de datos.</p>
+              <p>Parámetros globales del colegio y herramientas administrativas.</p>
             </div>
           </header>
           <section class="modulo-profesores">
+            
             <div class="ficha-resumen">
-              <div style="grid-column: 1 / -1;">
-                <h3 style="margin-bottom: 10px; color: var(--verde-oscuro);">Inyección de Datos (Testing)</h3>
-                <p style="margin-bottom: 15px; color: var(--gris-texto);">Utiliza este botón para cargar 10 perfiles de profesores falsos con faltas y licencias registradas el día de hoy. Ideal para probar los paneles gráficos.</p>
-                <button class="btn-principal" style="background: var(--amarillo-principal); color: #222;" onclick="window.generarDatosDePrueba()">Inyectar Datos Falsos</button>
+              <div class="col-span-full">
+                <h3 class="mb-2 text-primary">Calendario de Feriados e Interferiados</h3>
+                <p class="mb-3 text-muted">Agrega los días en los que el colegio no tendrá clases por razones oficiales. El sistema los tachará automáticamente en los calendarios de todos los docentes.</p>
+                
+                <div class="d-flex gap-1 mb-3 flex-wrap">
+                  <input type="date" id="inputFeriado" class="input-global">
+                  <select id="tipoFeriado" class="input-global w-auto">
+                    <option value="Feriado">Feriado Oficial</option>
+                    <option value="Interferiado">Interferiado</option>
+                  </select>
+                  <input type="text" id="descFeriado" class="input-global flex-1" placeholder="Motivo (Ej: Fiestas Patrias)" maxlength="50">
+                  <button class="btn-principal" onclick="window.agregarFeriado()">+ Agregar Día Libre</button>
+                </div>
+                
+                <ul id="listaFeriados" class="list-none p-0 d-flex flex-column gap-1"></ul>
               </div>
             </div>
             
-            <div class="ficha-resumen" style="margin-top: 20px; border-color: #ffcdd2; background: #fff5f5;">
-              <div style="grid-column: 1 / -1;">
-                <h3 style="color: #c62828; margin-bottom: 10px;">Zona de Peligro</h3>
-                <p style="margin-bottom: 15px; color: var(--gris-texto);">Borrar todos los profesores, horarios y registros del sistema de forma irreversible.</p>
-                <button class="btn-secundario" style="background: #c62828; color: white; border: none;" onclick="window.borrarBaseDeDatos()">Eliminar Toda la Base de Datos</button>
+            <div class="ficha-resumen bg-danger-zone border-danger mt-3">
+              <div class="col-span-full">
+                <h3 class="text-danger mb-2">Zona de Peligro</h3>
+                <p class="mb-3 text-muted">Borrar todos los profesores, horarios y registros del sistema de forma irreversible.</p>
+                <button class="btn-danger border-none border-radius-sm py-2 px-3 fw-bold cursor-pointer bg-danger text-white" onclick="window.borrarBaseDeDatos()">Eliminar Toda la Base de Datos</button>
               </div>
             </div>
           </section>
@@ -157,7 +169,6 @@
   </div>
 
   <script src="../assets/js/datos.js"></script>
-  <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/horarios.js"></script>
   <script src="../assets/js/profesores.js"></script>
   <script src="../assets/js/resumen.js"></script>

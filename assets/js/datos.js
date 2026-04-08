@@ -1,12 +1,50 @@
 // ==========================================
 // ARCHIVO: assets/js/datos.js
-// Propósito: Almacenar data global, BD y Herramientas de Pruebas (Mock Data)
+// Propósito: Almacenar data global, BD y Motor de Feriados Nacionales
 // ==========================================
 
 const ASIGNATURAS = ['Artes visuales', 'Ciencias naturales', 'Comunicación', 'Educación física y salud', 'Historia, geografía y ciencias sociales', 'Inglés', 'Lengua y literatura', 'Lenguaje', 'Matemáticas', 'Música', 'Orientación', 'Religión', 'Tecnología', 'Taller artístico', 'Taller deportivo'];
 const CURSOS = ['1°', '2°', '3°', '4°', '5°A', '5°B', '6°A', '6°B', '7°A', '7°B', '8°'];
 
 let profesores = [];
+let feriadosGlobales = []; // Aquí se guardan los Interferiados manuales
+
+// === FUNCIÓN PUENTE PARA EVITAR ERRORES DE LECTURA ===
+window.obtenerFeriados = function() {
+  return feriadosGlobales;
+};
+
+// === MOTOR DE FERIADOS NACIONALES CHILENOS ===
+const FERIADOS_FIJOS = [
+  '01-01', // Año Nuevo
+  '05-01', // Día del Trabajador
+  '05-21', // Glorias Navales
+  '06-21', // Día de los Pueblos Indígenas
+  '06-29', // San Pedro y San Pablo
+  '07-16', // Día de la Virgen del Carmen
+  '08-15', // Asunción de la Virgen
+  '09-18', // Primera Junta de Gobierno
+  '09-19', // Glorias del Ejército
+  '10-31', // Iglesias Evangélicas
+  '11-01', // Todos los Santos
+  '12-08', // Inmaculada Concepción
+  '12-25'  // Navidad
+];
+
+const FERIADOS_MOBILES = [
+  '2026-04-03', // Viernes Santo 2026
+  '2026-04-04', // Sábado Santo 2026
+  '2027-03-26', // Viernes Santo 2027
+  '2027-03-27'  // Sábado Santo 2027
+];
+
+window.esFeriadoNacional = function(fechaStr) {
+  const mesDia = fechaStr.substring(5); // Extrae "MM-DD"
+  if (FERIADOS_FIJOS.includes(mesDia)) return { tipo: 'Feriado Oficial', desc: 'Feriado Nacional de Chile' };
+  if (FERIADOS_MOBILES.includes(fechaStr)) return { tipo: 'Feriado Oficial', desc: 'Feriado Religioso' };
+  return null;
+}
+// ===============================================
 
 function cerrarModal() {
   const modal = document.querySelector('.modal');
@@ -15,7 +53,7 @@ function cerrarModal() {
 
 async function guardarDatosGlobales() {
   if (window.apiBaseDatos) {
-    const exito = await window.apiBaseDatos.guardar({ profesores: profesores });
+    const exito = await window.apiBaseDatos.guardar({ profesores: profesores, feriadosGlobales: feriadosGlobales });
     if (!exito) console.error("Error crítico guardando.");
   }
 }
@@ -24,71 +62,30 @@ async function cargarDatosIniciales() {
   if (window.apiBaseDatos) {
     const bd = await window.apiBaseDatos.leer();
     profesores = bd.profesores || [];
+    feriadosGlobales = bd.feriadosGlobales || [];
     
-    if (typeof actualizarDashboardInicio === 'function') {
-      actualizarDashboardInicio();
-    }
-    if (typeof renderProfesores === 'function' && document.getElementById('listaProfesores')) {
-      renderProfesores();
-    }
+    if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
+    if (typeof renderProfesores === 'function' && document.getElementById('listaProfesores')) renderProfesores();
+    if (typeof window.renderFeriados === 'function') window.renderFeriados();
   }
 }
 
 cargarDatosIniciales();
 
-// ==========================================
-// HERRAMIENTAS DE DESARROLLO (MOCK DATA)
-// ==========================================
-window.generarDatosDePrueba = async function() {
-  if(!confirm("¿Estás seguro? Esto inyectará 10 profesores falsos a tu sistema para hacer pruebas gráficas.")) return;
-  
-  const nombres = ['Juan Pérez', 'María González', 'Carlos Soto', 'Ana Silva', 'Luis Morales', 'Carmen Castro', 'Jorge Vargas', 'Paula Medina', 'Roberto Ríos', 'Elena Núñez'];
-  const hoyObj = new Date();
-  const hoyStr = `${hoyObj.getFullYear()}-${String(hoyObj.getMonth() + 1).padStart(2, '0')}-${String(hoyObj.getDate()).padStart(2, '0')}`;
-  const anio = hoyStr.split('-')[0];
-
-  nombres.forEach((n, i) => {
-    profesores.push({
-      nombre: n,
-      rut: `1${i}234567-${i}`,
-      profesion: 'Profesor Titular',
-      fechaNacimiento: '1980-05-15',
-      domicilio: 'Avenida Siempre Viva 123',
-      emergencia: [{nombre: 'Contacto Prueba', vinculo: 'Familiar', telefono: '+56912345678'}],
-      salud: {enfermedades: 'Ninguna', alergias: 'Ninguna', medicamentos: ''},
-      observaciones: 'Ficha inyectada para pruebas de sistema',
-      horarios: [{
-        anio: anio,
-        inicioSemestre1: `${anio}-03-01`,
-        finSemestre1: `${anio}-07-15`,
-        inicioSemestre2: `${anio}-07-30`,
-        finSemestre2: `${anio}-12-15`,
-        faltas: i % 2 === 0 ? [{tipo: 'Inasistencia', fecha: hoyStr, motivo: 'Falta inyectada hoy', registro: hoyStr}] : [],
-        licencias: i === 3 ? [{fechaInicio: hoyStr, fechaFin: hoyStr, motivo: 'Licencia inyectada', archivo: '', registro: hoyStr}] : [],
-        horarioClases: crearHorarioBasePrueba()
-      }]
-    });
-  });
-
-  await guardarDatosGlobales();
-  alert("10 profesores inyectados con éxito. Recargando la aplicación...");
-  window.location.reload(); 
-}
-
 window.borrarBaseDeDatos = async function() {
-  if(!confirm("⚠️ PELIGRO EXTREMO: Vas a borrar todos los profesores, horarios y faltas. ¿Confirmar?")) return;
+  if(!confirm("⚠️ PELIGRO EXTREMO: Vas a borrar todos los profesores, horarios, faltas y feriados. ¿Confirmar?")) return;
   if(!confirm("Esta acción es irreversible. ¿Destruir base de datos?")) return;
   
   profesores = [];
+  feriadosGlobales = [];
   await guardarDatosGlobales();
   alert("Base de datos purgada.");
   window.location.reload();
 }
 
-function crearHorarioBasePrueba() {
-  const d = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-  const f = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'llegada', 'salida'];
-  let b = {};
-  d.forEach(dia => { b[dia] = {}; f.forEach(fila => b[dia][fila] = ''); });
-  return b;
+window.formatearFechaGlobal = function(fechaStr) {
+  if (!fechaStr) return '-';
+  const partes = fechaStr.split('-');
+  if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`;
+  return fechaStr;
 }

@@ -1,14 +1,17 @@
 // ==========================================
 // ARCHIVO: assets/js/horarios.js
-// Propósito: Motor de renderizado del calendario con jerarquía de incidencias
+// Propósito: Motor de renderizado del calendario con Feriados/Interferiados
 // ==========================================
 
 function generarMesesHorario(anio, horario) {
   const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   let html = '';
   
-  const hoy = new Date();
-  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+  const hoyObj = new Date();
+  const hoyStr = `${hoyObj.getFullYear()}-${String(hoyObj.getMonth() + 1).padStart(2, '0')}-${String(hoyObj.getDate()).padStart(2, '0')}`;
+
+  // Obtenemos los feriados de forma segura usando la función puente
+  const listaFeriadosSegura = typeof window.obtenerFeriados === 'function' ? window.obtenerFeriados() : [];
 
   for (let m = 0; m < 12; m++) {
     let diasHtml = '';
@@ -30,17 +33,36 @@ function generarMesesHorario(anio, horario) {
       const enSemestre2 = fechaActualStr >= horario.inicioSemestre2 && fechaActualStr <= horario.finSemestre2;
       const enSemestreActivo = enSemestre1 || enSemestre2;
 
-      let claseDia = '';
-
-      // BUSCAR INCIDENCIAS EN LA BASE DE DATOS
+      // 1. REVISIÓN DE INCIDENCIAS PERSONALES
       const tieneLicencia = horario.licencias && horario.licencias.some(lic => fechaActualStr >= lic.fechaInicio && fechaActualStr <= lic.fechaFin);
       const tieneFalta = horario.faltas && horario.faltas.some(fal => fal.fecha === fechaActualStr);
+      
+      // 2. REVISIÓN DE FERIADOS NACIONALES (Automáticos de Chile)
+      let feriadoNacional = null;
+      if (typeof window.esFeriadoNacional === 'function') {
+        feriadoNacional = window.esFeriadoNacional(fechaActualStr);
+      }
 
-      // JERARQUÍA ESTRICTA
+      // 3. REVISIÓN DE INTERFERIADOS (Manuales agregados por el Inspector)
+      const feriadoManual = listaFeriadosSegura.find(f => f.fecha === fechaActualStr);
+
+      let claseDia = '';
+      let tooltip = '';
+
+      // JERARQUÍA ESTRICTA DE COLORES
       if (tieneLicencia) {
         claseDia = 'dia-amarillo';
       } else if (tieneFalta) {
         claseDia = 'dia-rojo';
+      } else if (feriadoManual && feriadoManual.tipo === 'Interferiado') {
+        claseDia = 'dia-morado'; // Los interferiados del colegio mandan
+        tooltip = `title="Interferiado: ${feriadoManual.desc}"`;
+      } else if (feriadoNacional) {
+        claseDia = 'dia-tachado'; // Feriado Oficial de Chile
+        tooltip = `title="${feriadoNacional.desc}"`;
+      } else if (feriadoManual && (feriadoManual.tipo === 'Feriado' || feriadoManual.tipo === 'Feriado Oficial')) {
+        claseDia = 'dia-tachado'; // Feriado manual extra
+        tooltip = `title="Día Libre: ${feriadoManual.desc}"`;
       } else if (!enSemestreActivo || esFinde) {
         claseDia = 'dia-tachado';
       } else if (fechaActualStr > hoyStr) {
@@ -49,7 +71,7 @@ function generarMesesHorario(anio, horario) {
         claseDia = 'dia-verde'; 
       }
 
-      diasHtml += `<div class="dia-box ${claseDia}">${d}</div>`;
+      diasHtml += `<div class="dia-box ${claseDia}" ${tooltip}>${d}</div>`;
     }
 
     html += `
@@ -66,8 +88,6 @@ function generarMesesHorario(anio, horario) {
   }
   return html;
 }
-
-// --- ESTRUCTURA BASE PARA EL HORARIO SEMANAL DE CLASES ---
 
 function crearHorarioClasesBase() {
   return {

@@ -1,32 +1,37 @@
 // ==========================================
 // ARCHIVO: assets/js/login.js
-// Propósito: Autenticación con soporte de teclado (Enter)
+// Propósito: Autenticación dura para un solo usuario local
 // ==========================================
 
-const btnIngresar = document.getElementById('btnIngresar');
-const inputUsuario = document.getElementById('usuario');
-const inputPassword = document.getElementById('password');
+document.addEventListener('DOMContentLoaded', () => {
+  const formLogin = document.getElementById('formLogin');
+  const btnLogin = document.getElementById('btnLogin');
+  const errorMsg = document.getElementById('error');
 
-function iniciarSesion() {
-  const usuario = inputUsuario.value.trim();
-  const password = inputPassword.value.trim();
+  function procesarLogin(e) {
+    e.preventDefault();
+    
+    const userEl = document.getElementById('usuario');
+    const passEl = document.getElementById('password');
 
-  if (usuario === 'admin' && password === '1234') {
-    localStorage.setItem('sesionActiva', 'true');
-    window.location.href = 'dashboard.html';
-  } else {
-    document.getElementById('error').innerText = 'Credenciales incorrectas';
-  }
-}
-
-btnIngresar.addEventListener('click', iniciarSesion);
-
-// Escuchar la tecla Enter en ambos inputs
-[inputUsuario, inputPassword].forEach(input => {
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      iniciarSesion();
+    if (!userEl || !passEl) {
+      console.error("Error: No se encontraron los inputs de usuario o contraseña en el HTML.");
+      return;
     }
-  });
+
+    const user = userEl.value.trim();
+    const pass = passEl.value.trim();
+
+    if (user === 'inspector' && pass === 'admin123') {
+      sessionStorage.setItem('sesionActiva', 'true');
+      window.location.href = 'dashboard.html';
+    } else {
+      errorMsg.innerText = 'Usuario o contraseña incorrectos.';
+      errorMsg.classList.remove('d-none');
+      errorMsg.classList.add('d-block');
+    }
+  }
+
+  if (formLogin) formLogin.addEventListener('submit', procesarLogin);
+  else if (btnLogin) btnLogin.addEventListener('click', procesarLogin);
 });

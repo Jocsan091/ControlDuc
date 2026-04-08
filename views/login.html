@@ -2,20 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>ControlDoc - Iniciar Sesión</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body class="login-body">
-
   <div class="container">
-    <h2>Iniciar Sesión</h2>
-
-    <input type="text" id="usuario" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-
-    <button id="btnIngresar">Ingresar</button>
-
-    <p id="error"></p>
+    <h2>ControlDoc</h2>
+    <p class="text-muted mb-3">Acceso exclusivo Inspectoría</p>
+    
+    <form id="formLogin">
+      <input type="text" id="usuario" placeholder="Usuario" class="input-global w-100 mb-2">
+      <input type="password" id="password" placeholder="Contraseña" class="input-global w-100 mb-3">
+      
+      <button type="submit" id="btnLogin" class="btn-principal w-100 py-2 fs-md">Iniciar Sesión</button>
+      
+      <div id="error" class="text-danger fw-bold mt-2 d-none">Usuario o contraseña incorrectos.</div>
+    </form>
   </div>
 
   <script src="../assets/js/login.js"></script>
