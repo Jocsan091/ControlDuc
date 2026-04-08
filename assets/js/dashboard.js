@@ -2,6 +2,25 @@
 // ARCHIVO: assets/js/dashboard.js
 // Propósito: Panel Principal y Configuración de Feriados/Interferiados
 // ==========================================
+// ==========================================
+// SEGURIDAD: Bloqueo de puerta trasera
+// ==========================================
+if (sessionStorage.getItem('sesionActiva') !== 'true') {
+  window.location.replace('login.html'); // Expulsa al intruso inmediatamente
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Lógica del botón Cerrar Sesión
+  const btnLogout = document.getElementById('logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', (e) => {
+      e.preventDefault();
+      sessionStorage.removeItem('sesionActiva'); // Destruye el pase
+      window.location.replace('login.html');
+    });
+  }
+});
+
 
 function actualizarDashboardInicio() {
   const statProfesores = document.getElementById('statProfesores');

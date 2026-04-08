@@ -1,13 +1,15 @@
 // ==========================================
 // ARCHIVO: assets/js/datos.js
-// Propósito: Almacenar data global, BD y Motor de Feriados Nacionales
+// Propósito: Almacenar data global, BD, Feriados y Configuración
 // ==========================================
 
 const ASIGNATURAS = ['Artes visuales', 'Ciencias naturales', 'Comunicación', 'Educación física y salud', 'Historia, geografía y ciencias sociales', 'Inglés', 'Lengua y literatura', 'Lenguaje', 'Matemáticas', 'Música', 'Orientación', 'Religión', 'Tecnología', 'Taller artístico', 'Taller deportivo'];
 const CURSOS = ['1°', '2°', '3°', '4°', '5°A', '5°B', '6°A', '6°B', '7°A', '7°B', '8°'];
 
-let profesores = [];
-let feriadosGlobales = []; // Aquí se guardan los Interferiados manuales
+// IMPORTANTE: Se usa 'var' para que Electron y todos los scripts lo reconozcan globalmente.
+var profesores = [];
+var feriadosGlobales = []; // Aquí se guardan los Interferiados manuales
+var configuracion = {}; // NUEVO: Guarda la contraseña y datos del colegio
 
 // === FUNCIÓN PUENTE PARA EVITAR ERRORES DE LECTURA ===
 window.obtenerFeriados = function() {
@@ -15,7 +17,7 @@ window.obtenerFeriados = function() {
 };
 
 // === MOTOR DE FERIADOS NACIONALES CHILENOS ===
-const FERIADOS_FIJOS = [
+var FERIADOS_FIJOS = [
   '01-01', // Año Nuevo
   '05-01', // Día del Trabajador
   '05-21', // Glorias Navales
@@ -31,7 +33,7 @@ const FERIADOS_FIJOS = [
   '12-25'  // Navidad
 ];
 
-const FERIADOS_MOBILES = [
+var FERIADOS_MOBILES = [
   '2026-04-03', // Viernes Santo 2026
   '2026-04-04', // Sábado Santo 2026
   '2027-03-26', // Viernes Santo 2027
@@ -53,7 +55,11 @@ function cerrarModal() {
 
 async function guardarDatosGlobales() {
   if (window.apiBaseDatos) {
-    const exito = await window.apiBaseDatos.guardar({ profesores: profesores, feriadosGlobales: feriadosGlobales });
+    const exito = await window.apiBaseDatos.guardar({ 
+      profesores: profesores, 
+      feriadosGlobales: feriadosGlobales,
+      configuracion: configuracion // Guardamos la config
+    });
     if (!exito) console.error("Error crítico guardando.");
   }
 }
@@ -63,6 +69,13 @@ async function cargarDatosIniciales() {
     const bd = await window.apiBaseDatos.leer();
     profesores = bd.profesores || [];
     feriadosGlobales = bd.feriadosGlobales || [];
+    configuracion = bd.configuracion || {}; // Cargamos la config
+    
+    // Si estamos en el dashboard, aplicamos el nombre del colegio
+    if (window.location.pathname.includes('dashboard.html') && configuracion.nombreColegio) {
+      const brandP = document.querySelector('.sidebar-brand p');
+      if (brandP) brandP.innerText = configuracion.nombreColegio;
+    }
     
     if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
     if (typeof renderProfesores === 'function' && document.getElementById('listaProfesores')) renderProfesores();
@@ -76,6 +89,7 @@ window.borrarBaseDeDatos = async function() {
   if(!confirm("⚠️ PELIGRO EXTREMO: Vas a borrar todos los profesores, horarios, faltas y feriados. ¿Confirmar?")) return;
   if(!confirm("Esta acción es irreversible. ¿Destruir base de datos?")) return;
   
+  // OJO: No borramos 'configuracion' para no perder la contraseña
   profesores = [];
   feriadosGlobales = [];
   await guardarDatosGlobales();

@@ -8,3 +8,9 @@ contextBridge.exposeInMainWorld('apiBaseDatos', {
   leer: () => ipcRenderer.invoke('leer-datos'),
   guardar: (datos) => ipcRenderer.invoke('guardar-datos', datos)
 });
+
+// NUEVO: Exponemos las herramientas de archivos al frontend
+contextBridge.exposeInMainWorld('apiArchivos', {
+  adjuntarLicencia: () => ipcRenderer.invoke('adjuntar-licencia'),
+  abrirLicencia: (nombreArchivo) => ipcRenderer.invoke('abrir-licencia', nombreArchivo)
+});

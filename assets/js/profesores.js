@@ -1,6 +1,6 @@
 // ==========================================
 // ARCHIVO: assets/js/profesores.js
-// Propósito: CRUD Docentes, UI sin CSS Inline y Textareas arreglados
+// Propósito: CRUD Docentes, UI sin CSS Inline, Formulario Cuadrado (Sin Emojis)
 // ==========================================
 
 const btnAgregar = document.getElementById('btnAgregarProfesor');
@@ -80,9 +80,9 @@ function soloNumeros(e) {
 function crearFilaEmergencia(em = {}, index) {
   const ph = index === 0 ? '' : ' (Opcional)';
   return `<div class="form-grid-3 fila-emergencia mb-2" data-index="${index}">
-      <input type="text" class="em-nombre input-global" value="${em.nombre || ''}" maxlength="40" placeholder="Nombre${ph}">
-      <input type="text" class="em-vinculo input-global" value="${em.vinculo || ''}" maxlength="20" placeholder="Vínculo${ph}">
-      <input type="text" class="em-tel input-global" value="${em.telefono || em.tel || ''}" maxlength="15" placeholder="Teléfono (+569...)${ph}">
+      <input type="text" class="em-nombre input-global w-100" value="${em.nombre || ''}" maxlength="40" placeholder="Nombre${ph}">
+      <input type="text" class="em-vinculo input-global w-100" value="${em.vinculo || ''}" maxlength="20" placeholder="Vínculo${ph}">
+      <input type="text" class="em-tel input-global w-100" value="${em.telefono || em.tel || ''}" maxlength="15" placeholder="Teléfono (+569...)${ph}">
     </div>`;
 }
 
@@ -100,29 +100,39 @@ function mostrarFormularioProfesor(indexEdicion = null) {
     <div class="modal">
       <div class="modal-content modal-largo">
         <h3>${esEdicion ? 'Editar Ficha del Docente' : 'Nueva Ficha del Docente'}</h3>
+        
         <h4 class="seccion-titulo">Datos Personales</h4>
         <div class="form-grid">
-          <div><label>Nombre Completo *</label><input type="text" id="f_nombre" class="input-global" value="${p.nombre || ''}" maxlength="60" placeholder="Ej: Juan Pérez"></div>
-          <div><label>RUT *</label><input type="text" id="f_rut" class="input-global" value="${p.rut || ''}" maxlength="12" placeholder="12.345.678-9"></div>
-          <div><label>Fecha de Nacimiento</label><input type="date" id="f_fechaNac" class="input-global" value="${p.fechaNacimiento || ''}"></div>
-          <div><label>Domicilio</label><input type="text" id="f_domicilio" class="input-global" value="${p.domicilio || ''}" maxlength="80"></div>
-          <div><label>Traslado Frecuente</label><input type="text" id="f_traslado" class="input-global" value="${p.traslado || ''}" maxlength="50"></div>
-          <div><label>Licencia de Conducir</label><input type="text" id="f_licencia" class="input-global" value="${p.licencia || ''}" maxlength="20"></div>
-          <div><label>Profesión</label><input type="text" id="f_profesion" class="input-global" value="${p.profesion || ''}" maxlength="50"></div>
-          <div><label>Hijos (Cantidad)</label><input type="number" id="f_hijos" class="input-global" value="${p.hijos || '0'}" min="0" max="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></div>
-          <div><label>Personas C/ Vive</label><input type="number" id="f_personasVive" class="input-global" value="${p.personasVive || '0'}" min="0" max="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></div>
+          <div><label class="d-block mb-1">Nombre Completo *</label><input type="text" id="f_nombre" class="input-global w-100" value="${p.nombre || ''}" maxlength="60" placeholder="Ej: Juan Pérez"></div>
+          <div><label class="d-block mb-1">RUT *</label><input type="text" id="f_rut" class="input-global w-100" value="${p.rut || ''}" maxlength="12" placeholder="12.345.678-9"></div>
+          <div><label class="d-block mb-1">Fecha de Nacimiento</label><input type="date" id="f_fechaNac" class="input-global w-100" value="${p.fechaNacimiento || ''}"></div>
+          <div><label class="d-block mb-1">Domicilio</label><input type="text" id="f_domicilio" class="input-global w-100" value="${p.domicilio || ''}" maxlength="80"></div>
+          <div><label class="d-block mb-1">Traslado Frecuente</label><input type="text" id="f_traslado" class="input-global w-100" value="${p.traslado || ''}" maxlength="50"></div>
+          <div><label class="d-block mb-1">Licencia de Conducir</label><input type="text" id="f_licencia" class="input-global w-100" value="${p.licencia || ''}" maxlength="20"></div>
+          <div><label class="d-block mb-1">Profesión</label><input type="text" id="f_profesion" class="input-global w-100" value="${p.profesion || ''}" maxlength="50"></div>
+          <div><label class="d-block mb-1">Hijos (Cantidad)</label><input type="number" id="f_hijos" class="input-global w-100" value="${p.hijos || '0'}" min="0" max="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></div>
+          <div><label class="d-block mb-1">Personas C/ Vive</label><input type="number" id="f_personasVive" class="input-global w-100" value="${p.personasVive || '0'}" min="0" max="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57"></div>
         </div>
-        <h4 class="seccion-titulo">En caso de Emergencia avisar a:</h4>
+
+        <h4 class="seccion-titulo mt-3">En caso de Emergencia avisar a:</h4>
         <div id="contenedor-emergencias">${emergenciasHTML}</div>
-        <button type="button" id="btnAgregarEmergencia" class="btn-secundario mb-3 fs-xs py-1 px-2">+ Agregar otro contacto</button>
+        <button type="button" id="btnAgregarEmergencia" class="btn-secundario mb-3 fs-sm py-1 px-2 w-100">+ Agregar otro contacto</button>
+
         <h4 class="seccion-titulo">Salud y Antecedentes</h4>
-        <label>Enfermedades y/o condición médica</label><textarea id="f_enfermedades" class="input-global" style="resize: vertical; min-height: 80px;" maxlength="300">${salud.enfermedades || ''}</textarea>
-        <label>Alergias</label><input type="text" id="f_alergias" class="input-global" value="${salud.alergias || ''}" maxlength="100">
-        <label>Medicamentos Permanentes</label><textarea id="f_medicamentos" class="input-global" style="resize: vertical; min-height: 80px;" maxlength="300">${salud.medicamentos || ''}</textarea>
-        <label>Observaciones</label><textarea id="f_observaciones" class="input-global" style="resize: vertical; min-height: 80px;" maxlength="500">${p.observaciones || ''}</textarea>
+        <label class="d-block mb-1">Enfermedades y/o condición médica</label>
+        <textarea id="f_enfermedades" class="input-global w-100" style="resize: vertical; min-height: 80px;" maxlength="300">${salud.enfermedades || ''}</textarea>
+        
+        <label class="d-block mb-1 mt-2">Alergias</label>
+        <input type="text" id="f_alergias" class="input-global w-100" value="${salud.alergias || ''}" maxlength="100">
+        
+        <label class="d-block mb-1 mt-2">Medicamentos Permanentes</label>
+        <textarea id="f_medicamentos" class="input-global w-100" style="resize: vertical; min-height: 80px;" maxlength="300">${salud.medicamentos || ''}</textarea>
+        
+        <label class="d-block mb-1 mt-2">Observaciones</label>
+        <textarea id="f_observaciones" class="input-global w-100" style="resize: vertical; min-height: 80px;" maxlength="500">${p.observaciones || ''}</textarea>
         
         <div id="errorProfesor" class="text-danger fw-bold fs-md mt-3 text-center d-none"></div>
-        <div class="modal-botones mt-3">
+        <div class="modal-botones mt-4">
           <button id="guardarProfesor" class="btn-principal">${esEdicion ? 'Guardar Cambios' : 'Guardar Ficha'}</button>
           <button id="cancelar" class="btn-secundario">Cancelar</button>
         </div>
@@ -270,14 +280,14 @@ function verProfesor(index) {
   vistaDetalle.innerHTML = `
     <header class="dashboard-topbar">
       <div class="d-flex align-center gap-3">
-        <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverProfesores">← Volver</button>
+        <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverProfesores">Volver</button>
         <div>
           <h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1>
           <p class="m-0 fs-md">RUT: ${p.rut}</p>
         </div>
       </div>
       <div class="d-flex gap-1 align-center">
-        <button class="btn-principal" id="btnAgregarHorario">+ Nuevo Horario</button>
+        <button class="btn-principal" id="btnAgregarHorario">Nuevo Horario</button>
       </div>
     </header>
 
@@ -286,7 +296,7 @@ function verProfesor(index) {
         <div class="profesor-info w-100">
           <div class="d-flex justify-between align-left mb-3">
             <h3 class="m-0 fs-xl">Resumen de Ficha Personal</h3>
-            <span class="text-primary fw-bold fs-sm bg-success-light py-1 px-2 border-radius-md">Ver Ficha Completa y Editar ➔</span>
+            <span class="text-primary fw-bold fs-sm bg-success-light py-1 px-2 border-radius-md">Ver Ficha Completa y Editar</span>
           </div>
           <div class="form-grid-3 gap-3">
             <div><p class="text-primary fs-sm mb-1 text-uppercase fw-bold">Profesión</p><p class="fs-lg fw-bold text-dark">${p.profesion || '-'}</p></div>
@@ -318,9 +328,9 @@ function mostrarFormularioHorario(ip, ih = null) {
         <p class="fs-sm text-muted mt-0">Ingresa el año primero.</p>
         <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''} onkeypress="return soloNumeros(event)">
         <div id="contenedorFechas" class="${typeof ih === 'number' ? '' : 'opacidad-mitad'}">
-          <label>Inicio/Fin Semestre 1</label>
+          <label class="d-block mb-1">Inicio/Fin Semestre 1</label>
           <div class="d-flex gap-1 mb-2"><input type="date" class="input-global flex-1" id="is1" value="${h.inicioSemestre1 || ''}"><input type="date" class="input-global flex-1" id="fs1" value="${h.finSemestre1 || ''}"></div>
-          <label>Inicio/Fin Semestre 2</label>
+          <label class="d-block mb-1">Inicio/Fin Semestre 2</label>
           <div class="d-flex gap-1"><input type="date" class="input-global flex-1" id="is2" value="${h.inicioSemestre2 || ''}"><input type="date" class="input-global flex-1" id="fs2" value="${h.finSemestre2 || ''}"></div>
         </div>
         <div class="modal-botones mt-3"><button id="guardarHorario" class="btn-principal">Guardar</button><button id="cancelar" class="btn-secundario">Cancelar</button></div>
@@ -376,6 +386,15 @@ window.borrarLicencia = async function(ip, ih, iLic) {
   }
 }
 
+window.abrirLicenciaPDF = async function(nombreArchivo) {
+  if(window.apiArchivos) {
+    const exito = await window.apiArchivos.abrirLicencia(nombreArchivo);
+    if(!exito) alert("No se pudo abrir el archivo. Es posible que haya sido eliminado del disco duro.");
+  } else {
+    alert("Función no disponible en el navegador.");
+  }
+}
+
 function mostrarAdministradorIncidencias(ip, ih) {
   if (document.querySelector('.modal')) return;
   const h = profesores[ip].horarios[ih];
@@ -386,11 +405,18 @@ function mostrarAdministradorIncidencias(ip, ih) {
       <button class="btn-danger py-1 px-2 fs-xs border-none cursor-pointer" onclick="borrarFalta(${ip}, ${ih}, ${i})">Borrar</button>
     </div>`).join('') || '<p class="text-muted fs-sm">No hay faltas registradas este año.</p>';
 
-  let lHtml = (h.licencias || []).map((l, i) => `
+  let lHtml = (h.licencias || []).map((l, i) => {
+    const btnArchivo = l.archivoAdjunto ? `<button class="btn-principal bg-success-light text-success border-success py-1 px-2 fs-xs border-none cursor-pointer mr-2" style="margin-right: 8px;" onclick="window.abrirLicenciaPDF('${l.archivoAdjunto}')">Ver Documento</button>` : '';
+
+    return `
     <div class="d-flex justify-between align-center p-2 bg-gray-light border-muted border-radius-md mb-2">
       <div><strong class="text-primary">Del ${formatearFecha(l.fechaInicio)} al ${formatearFecha(l.fechaFin)}</strong> - <span class="text-warning fw-bold">Licencia</span><br><span class="fs-sm text-muted">Motivo: ${l.motivo || '-'}</span></div>
-      <button class="btn-danger py-1 px-2 fs-xs border-none cursor-pointer" onclick="borrarLicencia(${ip}, ${ih}, ${i})">Borrar</button>
-    </div>`).join('') || '<p class="text-muted fs-sm">No hay licencias registradas este año.</p>';
+      <div class="d-flex align-center">
+        ${btnArchivo}
+        <button class="btn-danger py-1 px-2 fs-xs border-none cursor-pointer" onclick="borrarLicencia(${ip}, ${ih}, ${i})">Borrar</button>
+      </div>
+    </div>`
+  }).join('') || '<p class="text-muted fs-sm">No hay licencias registradas este año.</p>';
 
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
@@ -413,11 +439,11 @@ function verHorario(ip, ih) {
   document.getElementById('vista-detalle-profesor').innerHTML = `
     <header class="dashboard-topbar">
       <div class="d-flex align-center gap-3">
-        <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverProfesor">← Volver</button>
+        <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverProfesor">Volver</button>
         <div><h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1><p class="m-0 fs-md">RUT: ${p.rut} | Calendario ${h.anio}</p></div>
       </div>
       <div class="d-flex gap-1 align-center">
-        <button class="btn-secundario btn-outline-muted" id="btnAdministrarIncidencias">⚙️ Ajustes</button>
+        <button class="btn-secundario btn-outline-muted" id="btnAdministrarIncidencias">Ajustes</button>
         <button class="btn-secundario" id="btnHorarioClases">Ver Horario Clases</button>
         <button class="btn-principal bg-danger-light border-danger text-danger" id="btnRegistrarFalta">Registrar Falta/Permiso</button>
         <button class="btn-principal bg-warning-light border-warning text-warning" id="btnRegistrarLicencia">Registrar Licencia</button>
@@ -452,8 +478,8 @@ function mostrarFormularioFalta(ip, ih) {
       <div class="modal-content">
         <h3 class="text-danger">Registrar Falta o Permiso</h3>
         <select id="tipoFalta" class="input-global mb-2"><option value="Inasistencia">Inasistencia</option><option value="Permiso">Permiso</option></select>
-        <label>Día</label><input type="date" id="fechaFalta" min="${anio}-01-01" max="${anio}-12-31" class="input-global mb-2">
-        <label>Motivo</label><textarea id="motivoFalta" class="input-global" style="resize: vertical; min-height: 80px;" maxlength="250"></textarea>
+        <label class="d-block mb-1">Día</label><input type="date" id="fechaFalta" min="${anio}-01-01" max="${anio}-12-31" class="input-global w-100 mb-2">
+        <label class="d-block mb-1">Motivo</label><textarea id="motivoFalta" class="input-global w-100" style="resize: vertical; min-height: 80px;" maxlength="250"></textarea>
         <div class="modal-botones mt-3"><button id="guardarFalta" class="btn-danger">Registrar</button><button id="cancelarFalta" class="btn-secundario">Cancelar</button></div>
       </div>
     </div>
@@ -469,25 +495,57 @@ function mostrarFormularioFalta(ip, ih) {
 
 function mostrarFormularioLicencia(ip, ih) {
   if (document.querySelector('.modal')) return; const anio = profesores[ip].horarios[ih].anio;
+  
+  let archivoSeleccionado = null;
+
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
         <h3 class="text-warning">Registrar Licencia Médica</h3>
         <div class="form-grid">
-          <div><label>Desde</label><input type="date" id="fILic" min="${anio}-01-01" max="${anio}-12-31" class="input-global"></div>
-          <div><label>Hasta</label><input type="date" id="fFLic" min="${anio}-01-01" max="${anio}-12-31" class="input-global"></div>
+          <div><label class="d-block mb-1">Desde</label><input type="date" id="fILic" min="${anio}-01-01" max="${anio}-12-31" class="input-global w-100"></div>
+          <div><label class="d-block mb-1">Hasta</label><input type="date" id="fFLic" min="${anio}-01-01" max="${anio}-12-31" class="input-global w-100"></div>
         </div>
-        <label>Motivo</label><textarea id="motivoLic" class="input-global" style="resize: vertical; min-height: 80px;" maxlength="250"></textarea>
+        <label class="d-block mb-1 mt-2">Motivo</label><textarea id="motivoLic" class="input-global w-100" style="resize: vertical; min-height: 80px;" maxlength="250"></textarea>
+        
+        <label class="d-block mb-1 mt-2">Documento de Respaldo (PDF o Imagen)</label>
+        <div class="d-flex gap-2 align-center mt-1">
+          <button type="button" id="btnSubirArchivo" class="btn-secundario bg-gray-light border-muted fs-sm py-2">Buscar Archivo...</button>
+          <span id="nombreArchivoUI" class="text-muted fs-xs">Ningún archivo seleccionado</span>
+        </div>
+
         <div class="modal-botones mt-3"><button id="guardarLicencia" class="btn-principal bg-warning-light text-dark">Registrar</button><button id="cancelarLicencia" class="btn-secundario">Cancelar</button></div>
       </div>
     </div>
   `);
+
+  document.getElementById('btnSubirArchivo').addEventListener('click', async () => {
+    if (window.apiArchivos) {
+      const nombreFinal = await window.apiArchivos.adjuntarLicencia();
+      if (nombreFinal) {
+        archivoSeleccionado = nombreFinal;
+        document.getElementById('nombreArchivoUI').innerText = "Archivo cargado correctamente.";
+        document.getElementById('nombreArchivoUI').classList.add('text-success');
+      }
+    } else {
+      alert("La subida de archivos solo funciona en la aplicación de escritorio instalada.");
+    }
+  });
+
   document.getElementById('guardarLicencia').addEventListener('click', async () => {
     const fi = document.getElementById('fILic').value; const ff = document.getElementById('fFLic').value;
     if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas");
-    profesores[ip].horarios[ih].licencias.push({ fechaInicio: fi, fechaFin: ff, motivo: document.getElementById('motivoLic').value.trim() });
+    
+    profesores[ip].horarios[ih].licencias.push({ 
+      fechaInicio: fi, 
+      fechaFin: ff, 
+      motivo: document.getElementById('motivoLic').value.trim(),
+      archivoAdjunto: archivoSeleccionado 
+    });
+    
     await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   });
+  
   document.getElementById('cancelarLicencia').addEventListener('click', cerrarModal);
 }
 
@@ -496,7 +554,7 @@ function verHorarioClases(ip, ih) {
   document.getElementById('vista-detalle-profesor').innerHTML = `
     <header class="dashboard-topbar">
       <div class="d-flex align-center gap-3">
-        <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverCalendario">← Volver</button>
+        <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverCalendario">Volver</button>
         <div><h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1><p class="m-0 fs-md">Horario Semanal ${h.anio}</p></div>
       </div>
     </header>
@@ -509,12 +567,12 @@ function verHorarioClases(ip, ih) {
 
 function editarBloque(ip, ih, d, b) {
   if (document.querySelector('.modal')) return;
-  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><h3>Asignar bloque</h3><select id="sAsig" class="input-global mb-2"><option value="">Vacío</option>${ASIGNATURAS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select><select id="sCur" class="input-global"><option value="">Vacío</option>${CURSOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><div class="modal-botones"><button id="gAsig" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><h3>Asignar bloque</h3><select id="sAsig" class="input-global mb-2 w-100"><option value="">Vacío</option>${ASIGNATURAS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select><select id="sCur" class="input-global w-100"><option value="">Vacío</option>${CURSOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><div class="modal-botones"><button id="gAsig" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
   document.getElementById('gAsig').addEventListener('click', async () => { profesores[ip].horarios[ih].horarioClases[d][b] = document.getElementById('sAsig').value ? `${document.getElementById('sAsig').value} - ${document.getElementById('sCur').value}` : ''; await guardarDatosGlobales(); cerrarModal(); verHorarioClases(ip, ih); });
 }
 
 function editarHora(ip, ih, d, t) {
   if (document.querySelector('.modal')) return;
-  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><h3>Hora</h3><input type="time" id="iHora" class="input-global"><div class="modal-botones"><button id="gHora" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><h3>Hora</h3><input type="time" id="iHora" class="input-global w-100"><div class="modal-botones"><button id="gHora" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
   document.getElementById('gHora').addEventListener('click', async () => { profesores[ip].horarios[ih].horarioClases[d][t] = document.getElementById('iHora').value || ''; await guardarDatosGlobales(); cerrarModal(); verHorarioClases(ip, ih); });
 }
