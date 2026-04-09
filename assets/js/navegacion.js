@@ -6,16 +6,16 @@
 const menuInicio = document.getElementById('menuInicio');
 const menuProfesores = document.getElementById('menuProfesores');
 const menuResumen = document.getElementById('menuResumen');
-const menuConfiguracion = document.getElementById('menuConfiguracion');
+const menuInterferiados = document.getElementById('menuInterferiados');
 
 const vistaInicio = document.getElementById('vista-inicio');
 const vistaProfesores = document.getElementById('vista-profesores');
 const vistaDetalleProfesor = document.getElementById('vista-detalle-profesor');
 const vistaResumen = document.getElementById('vista-resumen');
-const vistaConfiguracion = document.getElementById('vista-configuracion');
+const vistaInterferiados = document.getElementById('vista-interferiados');
 
-const todasLasVistas = [vistaInicio, vistaProfesores, vistaDetalleProfesor, vistaResumen, vistaConfiguracion];
-const todosLosMenus = [menuInicio, menuProfesores, menuResumen, menuConfiguracion];
+const todasLasVistas = [vistaInicio, vistaProfesores, vistaDetalleProfesor, vistaResumen, vistaInterferiados];
+const todosLosMenus = [menuInicio, menuProfesores, menuResumen, menuInterferiados];
 
 window.cambiarVista = function(vistaDestino, menuActivo) {
   todasLasVistas.forEach(vista => {
@@ -47,7 +47,7 @@ window.cambiarVista = function(vistaDestino, menuActivo) {
 if (menuInicio) menuInicio.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaInicio, menuInicio); });
 if (menuProfesores) menuProfesores.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaProfesores, menuProfesores); if (typeof renderProfesores === 'function') renderProfesores(); });
 if (menuResumen) menuResumen.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaResumen, menuResumen); if (typeof renderListaDiaria === 'function') renderListaDiaria(); });
-if (menuConfiguracion) menuConfiguracion.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaConfiguracion, menuConfiguracion); });
+if (menuInterferiados) menuInterferiados.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaInterferiados, menuInterferiados); });
 
 const btnAccionProfesores = document.getElementById('btnAccionProfesores');
 if (btnAccionProfesores) btnAccionProfesores.addEventListener('click', () => { window.cambiarVista(vistaProfesores, menuProfesores); if (typeof renderProfesores === 'function') renderProfesores(); });

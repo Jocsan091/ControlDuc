@@ -9,7 +9,7 @@ const CURSOS = ['1°', '2°', '3°', '4°', '5°A', '5°B', '6°A', '6°B', '7°
 // IMPORTANTE: Se usa 'var' para que Electron y todos los scripts lo reconozcan globalmente.
 var profesores = [];
 var feriadosGlobales = []; // Aquí se guardan los Interferiados manuales
-var configuracion = {}; // NUEVO: Guarda la contraseña y datos del colegio
+var configuracion = {}; // Guarda la contraseña y datos del colegio
 
 // === FUNCIÓN PUENTE PARA EVITAR ERRORES DE LECTURA ===
 window.obtenerFeriados = function() {
@@ -84,18 +84,6 @@ async function cargarDatosIniciales() {
 }
 
 cargarDatosIniciales();
-
-window.borrarBaseDeDatos = async function() {
-  if(!confirm("⚠️ PELIGRO EXTREMO: Vas a borrar todos los profesores, horarios, faltas y feriados. ¿Confirmar?")) return;
-  if(!confirm("Esta acción es irreversible. ¿Destruir base de datos?")) return;
-  
-  // OJO: No borramos 'configuracion' para no perder la contraseña
-  profesores = [];
-  feriadosGlobales = [];
-  await guardarDatosGlobales();
-  alert("Base de datos purgada.");
-  window.location.reload();
-}
 
 window.formatearFechaGlobal = function(fechaStr) {
   if (!fechaStr) return '-';

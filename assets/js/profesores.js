@@ -1,8 +1,3 @@
-// ==========================================
-// ARCHIVO: assets/js/profesores.js
-// Propósito: CRUD Docentes, UI sin CSS Inline, Formulario Cuadrado (Sin Emojis)
-// ==========================================
-
 const btnAgregar = document.getElementById('btnAgregarProfesor');
 if (btnAgregar) btnAgregar.addEventListener('click', () => mostrarFormularioProfesor());
 
@@ -38,7 +33,6 @@ function formatearFecha(fechaStr) {
   return fechaStr;
 }
 
-// VALIDACIONES ESTRICTAS DE DATOS (CHILE)
 function formatearRUT(rut) {
   let actual = rut.replace(/^0+/, "");
   if (actual != '' && actual.length > 1) {
@@ -99,6 +93,7 @@ function mostrarFormularioProfesor(indexEdicion = null) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>${esEdicion ? 'Editar Ficha del Docente' : 'Nueva Ficha del Docente'}</h3>
         
         <h4 class="seccion-titulo">Datos Personales</h4>
@@ -217,6 +212,7 @@ function verFichaCompleta(index) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>Ficha Completa: ${p.nombre}</h3>
         <p class="text-muted mt-0 mb-3">RUT: ${p.rut}</p>
         
@@ -314,8 +310,6 @@ function verProfesor(index) {
   document.getElementById('btnAgregarHorario').addEventListener('click', () => mostrarFormularioHorario(index));
 }
 
-// --- HORARIOS ---
-
 function mostrarFormularioHorario(ip, ih = null) {
   if (document.querySelector('.modal')) return;
   document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
@@ -324,6 +318,7 @@ function mostrarFormularioHorario(ip, ih = null) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>${typeof ih === 'number' ? 'Editar Fechas' : 'Nuevo Horario'}</h3>
         <p class="fs-sm text-muted mt-0">Ingresa el año primero.</p>
         <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''} onkeypress="return soloNumeros(event)">
@@ -371,7 +366,6 @@ async function eliminarHorario(ip, ih) {
   }
 }
 
-// ADMINISTRACIÓN INCIDENCIAS
 window.borrarFalta = async function(ip, ih, iFalta) {
   if(confirm('¿Seguro de borrar esta falta/permiso? El día volverá a quedar limpio.')) {
     profesores[ip].horarios[ih].faltas.splice(iFalta, 1);
@@ -421,6 +415,7 @@ function mostrarAdministradorIncidencias(ip, ih) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>Administrar Registros de Asistencia</h3>
         <p class="fs-sm text-muted mt-0 mb-3">Borra registros ingresados por error. Los cambios se aplicarán de inmediato.</p>
         <h4 class="seccion-titulo">Faltas y Permisos</h4>${fHtml}
@@ -476,6 +471,7 @@ function mostrarFormularioFalta(ip, ih) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3 class="text-danger">Registrar Falta o Permiso</h3>
         <select id="tipoFalta" class="input-global mb-2"><option value="Inasistencia">Inasistencia</option><option value="Permiso">Permiso</option></select>
         <label class="d-block mb-1">Día</label><input type="date" id="fechaFalta" min="${anio}-01-01" max="${anio}-12-31" class="input-global w-100 mb-2">
@@ -501,6 +497,7 @@ function mostrarFormularioLicencia(ip, ih) {
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3 class="text-warning">Registrar Licencia Médica</h3>
         <div class="form-grid">
           <div><label class="d-block mb-1">Desde</label><input type="date" id="fILic" min="${anio}-01-01" max="${anio}-12-31" class="input-global w-100"></div>
@@ -567,12 +564,12 @@ function verHorarioClases(ip, ih) {
 
 function editarBloque(ip, ih, d, b) {
   if (document.querySelector('.modal')) return;
-  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><h3>Asignar bloque</h3><select id="sAsig" class="input-global mb-2 w-100"><option value="">Vacío</option>${ASIGNATURAS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select><select id="sCur" class="input-global w-100"><option value="">Vacío</option>${CURSOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><div class="modal-botones"><button id="gAsig" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button><h3>Asignar bloque</h3><select id="sAsig" class="input-global mb-2 w-100"><option value="">Vacío</option>${ASIGNATURAS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select><select id="sCur" class="input-global w-100"><option value="">Vacío</option>${CURSOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><div class="modal-botones"><button id="gAsig" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
   document.getElementById('gAsig').addEventListener('click', async () => { profesores[ip].horarios[ih].horarioClases[d][b] = document.getElementById('sAsig').value ? `${document.getElementById('sAsig').value} - ${document.getElementById('sCur').value}` : ''; await guardarDatosGlobales(); cerrarModal(); verHorarioClases(ip, ih); });
 }
 
 function editarHora(ip, ih, d, t) {
   if (document.querySelector('.modal')) return;
-  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><h3>Hora</h3><input type="time" id="iHora" class="input-global w-100"><div class="modal-botones"><button id="gHora" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button><h3>Hora</h3><input type="time" id="iHora" class="input-global w-100"><div class="modal-botones"><button id="gHora" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
   document.getElementById('gHora').addEventListener('click', async () => { profesores[ip].horarios[ih].horarioClases[d][t] = document.getElementById('iHora').value || ''; await guardarDatosGlobales(); cerrarModal(); verHorarioClases(ip, ih); });
 }

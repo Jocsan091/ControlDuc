@@ -73,13 +73,33 @@ body { font-family: Arial, sans-serif; background: var(--gris-fondo); color: #22
 .estado-morado { background: #e1bee7; color: #4a148c !important; }
 .estado-tachado { background: var(--gris-suave); color: #555; text-decoration: line-through; }
 
+/* LA BARRA FIJA CORRECTA Y POR ENCIMA */
+.barra-estados-fija { 
+  position: -webkit-sticky; 
+  position: sticky; 
+  top: 115px; 
+  z-index: 950; 
+  background: var(--blanco); 
+  border-radius: 16px; 
+  padding: 15px; 
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15); 
+  margin-bottom: 20px; 
+  display: flex; 
+  gap: 10px; 
+  flex-wrap: wrap; 
+  align-items: center; 
+}
+
 .meses-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
 .mes-card { padding: 22px; border-left: 6px solid var(--verde-principal); }
 .mes-card h3 { color: var(--verde-oscuro); font-size: 22px; margin-bottom: 14px; }
-.dias-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 12px; }
+
+/* AQUÍ ESTABA EL ERROR: AHORA SÍ ES DE 5 COLUMNAS PARA CUADRAR EL CALENDARIO */
+.dias-semana { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 12px; }
 .dias-semana div { text-align: center; font-weight: bold; color: var(--verde-oscuro); font-size: 14px; }
-.dias-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+.dias-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
 .dia-box { padding: 14px 10px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 15px; }
+
 .dia-verde { background: #c8e6c9; color: var(--verde-oscuro); }
 .dia-gris { background: #dddddd; color: #555; }
 .dia-tachado { background: var(--gris-suave); color: #777; text-decoration: line-through; }
@@ -102,8 +122,10 @@ body { font-family: Arial, sans-serif; background: var(--gris-fondo); color: #22
 .texto-vacio { color: #999; font-style: italic; }
 
 .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; z-index: 999; }
-.modal-content { background: var(--blanco); width: 100%; max-width: 470px; border-radius: 20px; padding: 28px; box-shadow: var(--sombra-media); display: flex; flex-direction: column; gap: 12px; }
-.modal-content h3 { color: var(--verde-oscuro); font-size: 24px; margin-bottom: 8px; }
+.modal-content { position: relative; background: var(--blanco); width: 100%; max-width: 470px; border-radius: 20px; padding: 28px; box-shadow: var(--sombra-media); display: flex; flex-direction: column; gap: 12px; }
+.btn-cerrar-modal { position: absolute; top: 18px; right: 18px; background: none; border: none; font-size: 28px; color: var(--gris-texto); cursor: pointer; line-height: 1; padding: 4px 10px; border-radius: 8px; transition: 0.2s; font-weight: bold; }
+.btn-cerrar-modal:hover { background: var(--rojo-suave); color: #c62828; }
+.modal-content h3 { color: var(--verde-oscuro); font-size: 24px; margin-bottom: 8px; padding-right: 30px; }
 .modal-content p { color: var(--gris-texto); }
 .modal-content label { font-size: 14px; color: var(--verde-oscuro); font-weight: bold; margin-top: 4px; }
 .modal-botones { display: flex; gap: 12px; margin-top: 10px; }
@@ -139,7 +161,6 @@ body { font-family: Arial, sans-serif; background: var(--gris-fondo); color: #22
 .filtro-btn.activo-faltas { background: var(--rojo-suave); color: #c62828; border-color: #c62828; }
 .filtro-btn.activo-licencias { background: var(--amarillo-suave); color: #e65100; border-color: #e65100; }
 
-/* === CLASES DE UTILIDAD (UTILITIES) === */
 .d-none { display: none !important; }
 .d-block { display: block !important; }
 .d-flex { display: flex !important; }

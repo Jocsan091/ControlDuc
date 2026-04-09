@@ -1,8 +1,3 @@
-// ==========================================
-// ARCHIVO: assets/js/horarios.js
-// Propósito: Motor de renderizado del calendario con Feriados/Interferiados
-// ==========================================
-
 function generarMesesHorario(anio, horario) {
   const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   let html = '';
@@ -10,60 +5,61 @@ function generarMesesHorario(anio, horario) {
   const hoyObj = new Date();
   const hoyStr = `${hoyObj.getFullYear()}-${String(hoyObj.getMonth() + 1).padStart(2, '0')}-${String(hoyObj.getDate()).padStart(2, '0')}`;
 
-  // Obtenemos los feriados de forma segura usando la función puente
   const listaFeriadosSegura = typeof window.obtenerFeriados === 'function' ? window.obtenerFeriados() : [];
 
   for (let m = 0; m < 12; m++) {
     let diasHtml = '';
     const diasEnMes = new Date(anio, m + 1, 0).getDate();
     const primerDiaSemana = new Date(anio, m, 1).getDay();
-    let espaciosVacion = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1;
+    
+    // Calculamos cuántos espacios vacíos se necesitan antes del día 1
+    let espaciosVacion = primerDiaSemana === 0 ? 0 : primerDiaSemana - 1;
+    if (primerDiaSemana === 6) espaciosVacion = 0;
 
+    // AÑADIDO: style="visibility: hidden;" asegura que el bloque tome espacio y empuje los días.
     for (let i = 0; i < espaciosVacion; i++) {
-      diasHtml += '<div class="dia-box dia-vacio"></div>';
+      diasHtml += '<div class="dia-box" style="visibility: hidden;"></div>';
     }
 
     for (let d = 1; d <= diasEnMes; d++) {
       const fechaActualStr = `${anio}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const fechaObj = new Date(anio, m, d);
       const diaSem = fechaObj.getDay();
-      const esFinde = diaSem === 0 || diaSem === 6;
+      
+      // Ignorar sábados y domingos
+      if (diaSem === 0 || diaSem === 6) continue;
 
       const enSemestre1 = fechaActualStr >= horario.inicioSemestre1 && fechaActualStr <= horario.finSemestre1;
       const enSemestre2 = fechaActualStr >= horario.inicioSemestre2 && fechaActualStr <= horario.finSemestre2;
       const enSemestreActivo = enSemestre1 || enSemestre2;
 
-      // 1. REVISIÓN DE INCIDENCIAS PERSONALES
       const tieneLicencia = horario.licencias && horario.licencias.some(lic => fechaActualStr >= lic.fechaInicio && fechaActualStr <= lic.fechaFin);
       const tieneFalta = horario.faltas && horario.faltas.some(fal => fal.fecha === fechaActualStr);
       
-      // 2. REVISIÓN DE FERIADOS NACIONALES (Automáticos de Chile)
       let feriadoNacional = null;
       if (typeof window.esFeriadoNacional === 'function') {
         feriadoNacional = window.esFeriadoNacional(fechaActualStr);
       }
 
-      // 3. REVISIÓN DE INTERFERIADOS (Manuales agregados por el Inspector)
       const feriadoManual = listaFeriadosSegura.find(f => f.fecha === fechaActualStr);
 
       let claseDia = '';
       let tooltip = '';
 
-      // JERARQUÍA ESTRICTA DE COLORES
       if (tieneLicencia) {
         claseDia = 'dia-amarillo';
       } else if (tieneFalta) {
         claseDia = 'dia-rojo';
       } else if (feriadoManual && feriadoManual.tipo === 'Interferiado') {
-        claseDia = 'dia-morado'; // Los interferiados del colegio mandan
+        claseDia = 'dia-morado'; 
         tooltip = `title="Interferiado: ${feriadoManual.desc}"`;
       } else if (feriadoNacional) {
-        claseDia = 'dia-tachado'; // Feriado Oficial de Chile
+        claseDia = 'dia-tachado'; 
         tooltip = `title="${feriadoNacional.desc}"`;
       } else if (feriadoManual && (feriadoManual.tipo === 'Feriado' || feriadoManual.tipo === 'Feriado Oficial')) {
-        claseDia = 'dia-tachado'; // Feriado manual extra
+        claseDia = 'dia-tachado'; 
         tooltip = `title="Día Libre: ${feriadoManual.desc}"`;
-      } else if (!enSemestreActivo || esFinde) {
+      } else if (!enSemestreActivo) {
         claseDia = 'dia-tachado';
       } else if (fechaActualStr > hoyStr) {
         claseDia = 'dia-gris'; 
@@ -78,7 +74,7 @@ function generarMesesHorario(anio, horario) {
       <div class="mes-card">
         <h3>${mesesNombres[m]} ${anio}</h3>
         <div class="dias-semana">
-          <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+          <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div>
         </div>
         <div class="dias-grid">
           ${diasHtml}
