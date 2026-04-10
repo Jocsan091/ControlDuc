@@ -1,6 +1,6 @@
 // ==========================================
 // ARCHIVO: assets/js/resumen.js
-// Propósito: Toma de Lista Dinámica sin CSS en línea
+// Propósito: Toma de Lista Dinámica y a prueba de errores lógicos
 // ==========================================
 
 let filtroActualResumen = 'todos';
@@ -22,20 +22,41 @@ window.aplicarFiltroResumen = function(filtro) {
 };
 
 function renderListaDiaria() {
+  const tbody = document.getElementById('listaAsistenciaDiaria');
+  if (!tbody) return;
+
   const hoyObj = new Date();
   const hoyStr = `${hoyObj.getFullYear()}-${String(hoyObj.getMonth() + 1).padStart(2, '0')}-${String(hoyObj.getDate()).padStart(2, '0')}`;
   const anioActual = hoyStr.split('-')[0];
 
   const fechaConsulta = hoyStr;
   const anioConsulta = anioActual;
+  
+  // Evaluar condiciones globales (Fines de semana y Feriados)
+  const diaSemana = hoyObj.getDay();
+  const esFinde = (diaSemana === 0 || diaSemana === 6);
+  
+  let feriadoNacional = null;
+  if (typeof window.esFeriadoNacional === 'function') feriadoNacional = window.esFeriadoNacional(fechaConsulta);
+  
+  const listaFeriadosSegura = typeof window.obtenerFeriados === 'function' ? window.obtenerFeriados() : [];
+  const feriadoManual = listaFeriadosSegura.find(f => f.fecha === fechaConsulta);
+
+  const esDiaLibreGlobal = esFinde || feriadoNacional || feriadoManual;
 
   const fechaVisual = `${String(hoyObj.getDate()).padStart(2, '0')}/${String(hoyObj.getMonth() + 1).padStart(2, '0')}/${hoyObj.getFullYear()}`;
   const labelFecha = document.getElementById('fechaHoyResumen');
-  if (labelFecha) labelFecha.innerText = `Fecha en curso: ${fechaVisual}`;
-
-  const tbody = document.getElementById('listaAsistenciaDiaria');
-  if (!tbody) return;
-  tbody.innerHTML = '';
+  
+  if (labelFecha) {
+    if (esFinde) {
+      labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-danger fw-bold ml-2">(Fin de semana - No hay clases)</span>`;
+    } else if (feriadoNacional || feriadoManual) {
+      const motivo = feriadoNacional ? feriadoNacional.desc : feriadoManual.desc;
+      labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-morado fw-bold ml-2">(Día Libre: ${motivo})</span>`;
+    } else {
+      labelFecha.innerText = `Fecha en curso: ${fechaVisual}`;
+    }
+  }
 
   if (profesores.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-muted">No hay profesores registrados en el sistema.</td></tr>';
@@ -58,11 +79,21 @@ function renderListaDiaria() {
       const h = p.horarios[indexH];
       const tieneFalta = h.faltas && h.faltas.some(f => f.fecha === fechaConsulta);
       const tieneLicencia = h.licencias && h.licencias.some(l => fechaConsulta >= l.fechaInicio && fechaConsulta <= l.fechaFin);
+      
+      const enSemestre1 = fechaConsulta >= h.inicioSemestre1 && fechaConsulta <= h.finSemestre1;
+      const enSemestre2 = fechaConsulta >= h.inicioSemestre2 && fechaConsulta <= h.finSemestre2;
+      const enSemestreActivo = enSemestre1 || enSemestre2;
 
+      // Jerarquía de estados
       if (tieneLicencia) {
         estadoFiltro = 'licencia';
         estadoStr = '<span class="estado-box estado-amarillo text-warning fs-sm py-1 px-2">En Licencia Médica</span>';
         botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Acción Bloqueada</button>';
+      } else if (esDiaLibreGlobal || !enSemestreActivo) {
+        estadoFiltro = 'inactivo'; // No cuenta en las estadísticas diarias operativas
+        let txtMotivo = esFinde ? 'Fin de semana' : (feriadoNacional ? 'Feriado' : (feriadoManual ? 'Interferiado' : 'Vacaciones'));
+        estadoStr = `<span class="estado-box estado-tachado fs-sm py-1 px-2">${txtMotivo}</span>`;
+        botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Día Inhábil</button>';
       } else if (tieneFalta) {
         estadoFiltro = 'falta';
         estadoStr = '<span class="estado-box estado-rojo text-danger fs-sm py-1 px-2">Ausente (Inasistencia)</span>';
@@ -99,9 +130,10 @@ function renderListaDiaria() {
     return;
   }
 
-  filasFiltradas.forEach(f => {
+  // Rendimiento optimizado: Concatenar en memoria y asignar una sola vez
+  const htmlFinal = filasFiltradas.map(f => {
     const btnVer = `<button class="btn-secundario btn-outline-muted py-1 px-2 fs-sm cursor-pointer border-radius-sm" onclick="verProfesorDesdeResumen(${f.indexP})">Ver Perfil</button>`;
-    tbody.innerHTML += `
+    return `
       <tr>
         <td class="text-left px-3 fw-bold text-primary">${f.p.nombre}</td>
         <td>${f.p.rut}</td>
@@ -109,7 +141,9 @@ function renderListaDiaria() {
         <td>${f.botonAccion}</td>
         <td>${btnVer}</td>
       </tr>`;
-  });
+  }).join('');
+
+  tbody.innerHTML = htmlFinal;
 }
 
 function verProfesorDesdeResumen(index) { if (typeof verProfesor === 'function') verProfesor(index); }

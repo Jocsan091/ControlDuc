@@ -73,7 +73,6 @@ body { font-family: Arial, sans-serif; background: var(--gris-fondo); color: #22
 .estado-morado { background: #e1bee7; color: #4a148c !important; }
 .estado-tachado { background: var(--gris-suave); color: #555; text-decoration: line-through; }
 
-/* LA BARRA FIJA CORRECTA Y POR ENCIMA */
 .barra-estados-fija { 
   position: -webkit-sticky; 
   position: sticky; 
@@ -94,7 +93,6 @@ body { font-family: Arial, sans-serif; background: var(--gris-fondo); color: #22
 .mes-card { padding: 22px; border-left: 6px solid var(--verde-principal); }
 .mes-card h3 { color: var(--verde-oscuro); font-size: 22px; margin-bottom: 14px; }
 
-/* AQUÍ ESTABA EL ERROR: AHORA SÍ ES DE 5 COLUMNAS PARA CUADRAR EL CALENDARIO */
 .dias-semana { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 12px; }
 .dias-semana div { text-align: center; font-weight: bold; color: var(--verde-oscuro); font-size: 14px; }
 .dias-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
@@ -108,18 +106,46 @@ body { font-family: Arial, sans-serif; background: var(--gris-fondo); color: #22
 .dia-amarillo { background: var(--amarillo-suave) !important; color: #e65100 !important; text-decoration: none !important; }
 .dia-morado { background: #e1bee7 !important; color: #4a148c !important; text-decoration: none !important; }
 
+/* ========================================================== */
+/* CONFIGURACIÓN ESTRICTA DE LA TABLA DE HORARIOS (CORREGIDA) */
+/* ========================================================== */
 .tabla-horario-contenedor { padding: 22px; overflow-x: auto; }
-.tabla-horario-clases { width: 100%; border-collapse: collapse; min-width: 900px; }
-.tabla-horario-clases th, .tabla-horario-clases td { border: 1px solid var(--gris-borde); padding: 12px; text-align: center; vertical-align: middle; height: 56px; }
+
+.tabla-horario-clases { 
+  width: 100%; 
+  border-collapse: collapse; 
+  min-width: 900px; 
+  table-layout: fixed; /* OBLIGA A LAS COLUMNAS A SER RÍGIDAS, NO ELÁSTICAS */
+}
+
+/* Achicamos la columna de 'Bloque' para que no ocupe espacio muerto */
+.tabla-horario-clases th:first-child { 
+  width: 100px; 
+}
+
+.tabla-horario-clases th, .tabla-horario-clases td { 
+  border: 1px solid var(--gris-borde); 
+  padding: 10px; 
+  text-align: center; 
+  vertical-align: middle; 
+  height: 56px; 
+  word-wrap: break-word; /* Obliga al texto largo a bajar de línea */
+  overflow-wrap: break-word; 
+}
+
 .tabla-horario-clases th { background: #f3f5ef; color: var(--verde-oscuro); font-size: 15px; }
-.tabla-horario-clases td { background: var(--blanco); }
-.celda-bloque { font-weight: bold; color: var(--verde-oscuro); background: #f9faf7 !important; min-width: 120px; }
-.celda-recreo { background: #dff0df !important; font-weight: bold; color: var(--verde-oscuro); }
-.celda-almuerzo { background: #dff0df !important; font-weight: bold; color: var(--verde-oscuro); }
+.tabla-horario-clases td { background: var(--blanco); font-size: 14px; }
+
+/* Quitamos el ancho mínimo que tenía esta celda para que obedezca al 'th' */
+.celda-bloque { font-weight: bold; color: var(--verde-oscuro); background: #f9faf7 !important; }
+
+.celda-recreo { background: #dff0df !important; font-weight: bold; color: var(--verde-oscuro); letter-spacing: 2px; }
+.celda-almuerzo { background: #dff0df !important; font-weight: bold; color: var(--verde-oscuro); letter-spacing: 2px; }
 .celda-viernes-bloqueado { background: var(--gris-suave) !important; color: #777; text-decoration: line-through; font-weight: bold; }
 .celda-editable { cursor: pointer; transition: 0.2s; }
 .celda-editable:hover { background: #eef6ee; }
 .texto-vacio { color: #999; font-style: italic; }
+/* ========================================================== */
 
 .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; z-index: 999; }
 .modal-content { position: relative; background: var(--blanco); width: 100%; max-width: 470px; border-radius: 20px; padding: 28px; box-shadow: var(--sombra-media); display: flex; flex-direction: column; gap: 12px; }

@@ -153,6 +153,14 @@ async function guardarProfesor(indexEdicion) {
   if (!nombre || !rut) { errorDiv.innerText = "Error: Nombre y RUT son obligatorios."; errorDiv.classList.remove('d-none'); errorDiv.classList.add('d-block'); return; }
   if (!validarRUT(rut)) { errorDiv.innerText = "Error: El RUT ingresado no es válido."; errorDiv.classList.remove('d-none'); errorDiv.classList.add('d-block'); return; }
   
+  const rutDuplicado = profesores.some((p, index) => p.rut === rut && index !== indexEdicion);
+  if (rutDuplicado) {
+    errorDiv.innerText = "Error: Este RUT ya se encuentra registrado a nombre de otro docente."; 
+    errorDiv.classList.remove('d-none'); 
+    errorDiv.classList.add('d-block'); 
+    return;
+  }
+
   errorDiv.classList.add('d-none'); errorDiv.classList.remove('d-block');
 
   const contactos = Array.from(document.querySelectorAll('.fila-emergencia')).map(fila => ({
@@ -320,10 +328,10 @@ function mostrarFormularioHorario(ip, ih = null) {
       <div class="modal-content">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>${typeof ih === 'number' ? 'Editar Fechas' : 'Nuevo Horario'}</h3>
-        <p class="fs-sm text-muted mt-0">Ingresa el año primero.</p>
+        <p class="fs-sm text-muted mt-0">Ingresa el año primero para configurar el calendario.</p>
         <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''} onkeypress="return soloNumeros(event)">
         <div id="contenedorFechas" class="${typeof ih === 'number' ? '' : 'opacidad-mitad'}">
-          <label class="d-block mb-1">Inicio/Fin Semestre 1</label>
+          <label class="d-block mb-1 mt-2">Inicio/Fin Semestre 1</label>
           <div class="d-flex gap-1 mb-2"><input type="date" class="input-global flex-1" id="is1" value="${h.inicioSemestre1 || ''}"><input type="date" class="input-global flex-1" id="fs1" value="${h.finSemestre1 || ''}"></div>
           <label class="d-block mb-1">Inicio/Fin Semestre 2</label>
           <div class="d-flex gap-1"><input type="date" class="input-global flex-1" id="is2" value="${h.inicioSemestre2 || ''}"><input type="date" class="input-global flex-1" id="fs2" value="${h.finSemestre2 || ''}"></div>
@@ -335,26 +343,64 @@ function mostrarFormularioHorario(ip, ih = null) {
 
   const anioInp = document.getElementById('anioHorario');
   const contF = document.getElementById('contenedorFechas');
-  const is1 = document.getElementById('is1'); const fs1 = document.getElementById('fs1');
-  const is2 = document.getElementById('is2'); const fs2 = document.getElementById('fs2');
+  const inputsFechas = [document.getElementById('is1'), document.getElementById('fs1'), document.getElementById('is2'), document.getElementById('fs2')];
 
-  anioInp.addEventListener('input', () => {
+  // Función para bloquear el año en los calendarios nativos
+  const actualizarLimites = () => {
     const val = anioInp.value.trim();
     if (val.length === 4) {
       contF.classList.remove('opacidad-mitad');
-      if (typeof ih !== 'number') { is1.value = `${val}-03-01`; fs1.value = `${val}-07-15`; is2.value = `${val}-07-30`; fs2.value = `${val}-12-15`; }
+      inputsFechas.forEach(inp => {
+        inp.min = `${val}-01-01`;
+        inp.max = `${val}-12-31`;
+      });
+    } else {
+      contF.classList.add('opacidad-mitad');
+      inputsFechas.forEach(inp => { inp.min = ''; inp.max = ''; });
     }
+  };
+
+  anioInp.addEventListener('input', actualizarLimites);
+
+  // Si es edición, se aplican los límites inmediatamente
+  if (typeof ih === 'number') actualizarLimites();
+
+  // Auto-corrección agresiva: Si el usuario teclea mal el año, forzamos el año principal
+  inputsFechas.forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const valAnio = anioInp.value.trim();
+      if (valAnio.length === 4 && e.target.value) {
+        let partes = e.target.value.split('-');
+        if (partes[0] !== valAnio) {
+          partes[0] = valAnio;
+          e.target.value = partes.join('-');
+        }
+      }
+    });
   });
 
   document.getElementById('guardarHorario').addEventListener('click', async () => {
-    if (!anioInp.value || !is1.value || !fs1.value || !is2.value || !fs2.value) return;
+    const is1 = document.getElementById('is1').value;
+    const fs1 = document.getElementById('fs1').value;
+    const is2 = document.getElementById('is2').value;
+    const fs2 = document.getElementById('fs2').value;
+
+    if (!anioInp.value || !is1 || !fs1 || !is2 || !fs2) {
+      return alert("Error: Debes completar todas las fechas de inicio y fin de ambos semestres.");
+    }
+
+    if (is1 > fs1 || is2 > fs2 || fs1 > is2) {
+      return alert("Error Lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
+    }
+
     if (typeof ih !== 'number') {
-      profesores[ip].horarios.push({ anio: anioInp.value, inicioSemestre1: is1.value, finSemestre1: fs1.value, inicioSemestre2: is2.value, finSemestre2: fs2.value, faltas: [], licencias: [], horarioClases: crearHorarioClasesBase() });
+      profesores[ip].horarios.push({ anio: anioInp.value, inicioSemestre1: is1, finSemestre1: fs1, inicioSemestre2: is2, finSemestre2: fs2, faltas: [], licencias: [], horarioClases: crearHorarioClasesBase() });
     } else {
-      const h = profesores[ip].horarios[ih]; h.inicioSemestre1 = is1.value; h.finSemestre1 = fs1.value; h.inicioSemestre2 = is2.value; h.finSemestre2 = fs2.value;
+      const h = profesores[ip].horarios[ih]; h.inicioSemestre1 = is1; h.finSemestre1 = fs1; h.inicioSemestre2 = is2; h.finSemestre2 = fs2;
     }
     await guardarDatosGlobales(); cerrarModal(); typeof ih !== 'number' ? verProfesor(ip) : verHorario(ip, ih);
   });
+  
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
 }
 
@@ -480,12 +526,27 @@ function mostrarFormularioFalta(ip, ih) {
       </div>
     </div>
   `);
+  
   document.getElementById('guardarFalta').addEventListener('click', async () => {
-    const t = document.getElementById('tipoFalta').value; const f = document.getElementById('fechaFalta').value;
-    if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida");
+    const t = document.getElementById('tipoFalta').value; 
+    const f = document.getElementById('fechaFalta').value;
+    
+    if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida o fuera del año escolar.");
+
+    // --- CANDADOS DE INTEGRIDAD ---
+    const h = profesores[ip].horarios[ih];
+    
+    const existeFalta = h.faltas.some(fal => fal.fecha === f);
+    if (existeFalta) return alert(`Ya existe un registro de Inasistencia/Permiso para el día ${formatearFecha(f)}.`);
+
+    const chocaConLicencia = h.licencias.some(lic => f >= lic.fechaInicio && f <= lic.fechaFin);
+    if (chocaConLicencia) return alert(`No puedes registrar una falta. El día ${formatearFecha(f)} está cubierto por una Licencia Médica.`);
+    // ------------------------------
+
     profesores[ip].horarios[ih].faltas.push({ tipo: t, fecha: f, motivo: document.getElementById('motivoFalta').value.trim() });
     await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   });
+  
   document.getElementById('cancelarFalta').addEventListener('click', cerrarModal);
 }
 
@@ -530,8 +591,25 @@ function mostrarFormularioLicencia(ip, ih) {
   });
 
   document.getElementById('guardarLicencia').addEventListener('click', async () => {
-    const fi = document.getElementById('fILic').value; const ff = document.getElementById('fFLic').value;
-    if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas");
+    const fi = document.getElementById('fILic').value; 
+    const ff = document.getElementById('fFLic').value;
+    
+    if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas o fuera del año escolar.");
+    if (fi > ff) return alert("Error Lógico: La fecha de inicio no puede ser mayor a la fecha de fin.");
+
+    // --- CANDADOS DE INTEGRIDAD ---
+    const h = profesores[ip].horarios[ih];
+
+    const chocaConOtraLicencia = h.licencias.some(lic => 
+      (fi >= lic.fechaInicio && fi <= lic.fechaFin) || 
+      (ff >= lic.fechaInicio && ff <= lic.fechaFin) ||
+      (fi <= lic.fechaInicio && ff >= lic.fechaFin)
+    );
+    if (chocaConOtraLicencia) return alert("Error: El rango de fechas ingresado se cruza con otra Licencia Médica ya registrada en el sistema.");
+
+    const chocaConFaltas = h.faltas.some(fal => fal.fecha >= fi && fal.fecha <= ff);
+    if (chocaConFaltas) return alert("Error: Hay registros de Inasistencia o Permisos en los días de esta licencia. Debes ir a 'Ajustes', borrar las faltas de esos días, y luego ingresar la licencia.");
+    // ------------------------------
     
     profesores[ip].horarios[ih].licencias.push({ 
       fechaInicio: fi, 
