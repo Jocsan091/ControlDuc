@@ -12,11 +12,9 @@ function generarMesesHorario(anio, horario) {
     const diasEnMes = new Date(anio, m + 1, 0).getDate();
     const primerDiaSemana = new Date(anio, m, 1).getDay();
     
-    // Calculamos cuántos espacios vacíos se necesitan antes del día 1
     let espaciosVacion = primerDiaSemana === 0 ? 0 : primerDiaSemana - 1;
     if (primerDiaSemana === 6) espaciosVacion = 0;
 
-    // AÑADIDO: style="visibility: hidden;" asegura que el bloque tome espacio y empuje los días.
     for (let i = 0; i < espaciosVacion; i++) {
       diasHtml += '<div class="dia-box" style="visibility: hidden;"></div>';
     }
@@ -26,7 +24,6 @@ function generarMesesHorario(anio, horario) {
       const fechaObj = new Date(anio, m, d);
       const diaSem = fechaObj.getDay();
       
-      // Ignorar sábados y domingos
       if (diaSem === 0 || diaSem === 6) continue;
 
       const enSemestre1 = fechaActualStr >= horario.inicioSemestre1 && fechaActualStr <= horario.finSemestre1;
@@ -50,17 +47,16 @@ function generarMesesHorario(anio, horario) {
         claseDia = 'dia-amarillo';
       } else if (tieneFalta) {
         claseDia = 'dia-rojo';
-      } else if (feriadoManual && feriadoManual.tipo === 'Interferiado') {
-        claseDia = 'dia-morado'; 
-        tooltip = `title="Interferiado: ${feriadoManual.desc}"`;
       } else if (feriadoNacional) {
-        claseDia = 'dia-tachado'; 
+        // FERIADOS NACIONALES AHORA SON MORADOS
+        claseDia = 'dia-morado'; 
         tooltip = `title="${feriadoNacional.desc}"`;
-      } else if (feriadoManual && (feriadoManual.tipo === 'Feriado' || feriadoManual.tipo === 'Feriado Oficial')) {
-        claseDia = 'dia-tachado'; 
-        tooltip = `title="Día Libre: ${feriadoManual.desc}"`;
+      } else if (feriadoManual) {
+        // FERIADOS MANUALES E INTERFERIADOS AHORA SON MORADOS
+        claseDia = 'dia-morado'; 
+        tooltip = `title="${feriadoManual.tipo}: ${feriadoManual.desc}"`;
       } else if (!enSemestreActivo) {
-        claseDia = 'dia-tachado';
+        claseDia = 'dia-tachado'; // Solo los días fuera de semestre quedan tachados
       } else if (fechaActualStr > hoyStr) {
         claseDia = 'dia-gris'; 
       } else {

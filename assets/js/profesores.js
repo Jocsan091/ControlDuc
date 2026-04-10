@@ -445,11 +445,11 @@ function verHorario(ip, ih) {
       </div>
     </header>
 
-    <div class="bg-white p-3 border-radius-lg mb-4 d-flex gap-2 flex-wrap align-center">
+    <div class="barra-estados-fija">
       <div class="estado-box estado-verde fs-sm py-2 px-2">Días asistidos</div>
       <div class="estado-box estado-gris border-muted fs-sm py-2 px-2">Días futuros</div>
-      <div class="estado-box estado-tachado border-dashed fs-sm py-2 px-2">Feriados / Finde</div>
-      <div class="estado-box estado-morado fs-sm py-2 px-2 border-morado">Interferiados</div>
+      <div class="estado-box estado-morado fs-sm py-2 px-2 border-morado">Feriados e Interferiados</div>
+      <div class="estado-box estado-tachado border-dashed fs-sm py-2 px-2">Inactivo</div>
       <div class="separador-vertical"></div>
       <div class="estado-box estado-rojo border-danger fs-sm py-2 px-2">Faltas: <strong>${totalFaltas}</strong></div>
       <div class="estado-box estado-amarillo border-warning fs-sm py-2 px-2">Licencias: <strong>${totalLicencias}</strong></div>
