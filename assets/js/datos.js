@@ -41,7 +41,7 @@ window.esFeriadoNacional = function(fechaStr) {
 
 function cerrarModal() {
   const modal = document.querySelector('.modal');
-  if (modal) modal.remove();
+  if (modal) modal.replaceWith();
 }
 
 async function guardarDatosGlobales() {

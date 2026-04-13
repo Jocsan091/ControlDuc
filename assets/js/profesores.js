@@ -17,13 +17,16 @@ function toggleMenuOpciones(event, idMenu) {
 
 function habilitarEnterEnModal(botonId) {
   const modal = document.querySelector('.modal');
-  if (modal) {
-    modal.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault(); document.getElementById(botonId).click();
-      }
-    });
-  }
+  if (!modal) return;
+
+  const handler = (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+      e.preventDefault();
+      document.getElementById(botonId).click();
+    }
+  };
+
+  modal.addEventListener('keydown', handler);
 }
 
 function formatearFecha(fechaStr) {
@@ -327,81 +330,111 @@ function mostrarFormularioHorario(ip, ih = null) {
   document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
 
   const h = typeof ih === 'number' ? profesores[ip].horarios[ih] : {};
+
+  function formatearFechaCorta(valor) {
+    if (!valor) return '';
+    const partes = valor.split('-'); // yyyy-mm-dd
+    return `${partes[2]}-${partes[1]}`; // dd-mm
+  }
+
+  function construirFechaCompleta(fechaCorta, anio) {
+    const partes = fechaCorta.split('-'); // dd-mm
+    if (partes.length !== 2) return '';
+    return `${anio}-${partes[1]}-${partes[0]}`; // yyyy-mm-dd
+  }
+
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>${typeof ih === 'number' ? 'Editar Fechas' : 'Nuevo Horario'}</h3>
-        <p class="fs-sm text-muted mt-0">Ingresa el año primero para configurar el calendario.</p>
-        <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''} onkeypress="return soloNumeros(event)">
-        <div id="contenedorFechas" class="${typeof ih === 'number' ? '' : 'opacidad-mitad'}">
-          <label class="d-block mb-1 mt-2">Inicio/Fin Semestre 1</label>
-          <div class="d-flex gap-1 mb-2"><input type="date" class="input-global flex-1" id="is1" value="${h.inicioSemestre1 || ''}"><input type="date" class="input-global flex-1" id="fs1" value="${h.finSemestre1 || ''}"></div>
-          <label class="d-block mb-1">Inicio/Fin Semestre 2</label>
-          <div class="d-flex gap-1"><input type="date" class="input-global flex-1" id="is2" value="${h.inicioSemestre2 || ''}"><input type="date" class="input-global flex-1" id="fs2" value="${h.finSemestre2 || ''}"></div>
+
+        <p class="fs-sm text-muted mt-0">Ingresa el año primero.</p>
+        <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''}>
+
+        <div id="contenedorFechas">
+          <label class="d-block mb-1 mt-2">Semestre 1 (dd-mm)</label>
+          <div class="d-flex gap-1 mb-2">
+            <input type="text" class="input-global flex-1 fecha-corta" id="is1" placeholder="dd-mm" value="${formatearFechaCorta(h.inicioSemestre1)}">
+            <input type="text" class="input-global flex-1 fecha-corta" id="fs1" placeholder="dd-mm" value="${formatearFechaCorta(h.finSemestre1)}">
+          </div>
+
+          <label class="d-block mb-1">Semestre 2 (dd-mm)</label>
+          <div class="d-flex gap-1">
+            <input type="text" class="input-global flex-1 fecha-corta" id="is2" placeholder="dd-mm" value="${formatearFechaCorta(h.inicioSemestre2)}">
+            <input type="text" class="input-global flex-1 fecha-corta" id="fs2" placeholder="dd-mm" value="${formatearFechaCorta(h.finSemestre2)}">
+          </div>
         </div>
-        <div class="modal-botones mt-3"><button id="guardarHorario" class="btn-principal">Guardar</button><button id="cancelar" class="btn-secundario">Cancelar</button></div>
+
+        <div class="modal-botones mt-3">
+          <button id="guardarHorario" class="btn-principal">Guardar</button>
+          <button id="cancelar" class="btn-secundario">Cancelar</button>
+        </div>
       </div>
     </div>
   `);
 
   const anioInp = document.getElementById('anioHorario');
-  const contF = document.getElementById('contenedorFechas');
-  const inputsFechas = [document.getElementById('is1'), document.getElementById('fs1'), document.getElementById('is2'), document.getElementById('fs2')];
+  const inputsFechas = [
+    document.getElementById('is1'),
+    document.getElementById('fs1'),
+    document.getElementById('is2'),
+    document.getElementById('fs2')
+  ];
 
-  const actualizarLimites = () => {
-    const val = anioInp.value.trim();
-    if (val.length === 4) {
-      contF.classList.remove('opacidad-mitad');
-      inputsFechas.forEach(inp => {
-        inp.min = `${val}-01-01`;
-        inp.max = `${val}-12-31`;
-      });
-    } else {
-      contF.classList.add('opacidad-mitad');
-      inputsFechas.forEach(inp => { inp.min = ''; inp.max = ''; });
-    }
-  };
-
-  anioInp.addEventListener('input', actualizarLimites);
-
-  if (typeof ih === 'number') actualizarLimites();
-
+  // 🔹 FORMATO AUTOMÁTICO dd-mm
   inputsFechas.forEach(inp => {
-    inp.addEventListener('change', (e) => {
-      const valAnio = anioInp.value.trim();
-      if (valAnio.length === 4 && e.target.value) {
-        let partes = e.target.value.split('-');
-        if (partes[0] !== valAnio) {
-          partes[0] = valAnio;
-          e.target.value = partes.join('-');
-        }
+    inp.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/[^0-9]/g, '');
+
+      if (val.length >= 3) {
+        val = val.slice(0,2) + '-' + val.slice(2,4);
       }
+
+      e.target.value = val.slice(0,5);
     });
   });
 
   document.getElementById('guardarHorario').addEventListener('click', async () => {
-    const is1 = document.getElementById('is1').value;
-    const fs1 = document.getElementById('fs1').value;
-    const is2 = document.getElementById('is2').value;
-    const fs2 = document.getElementById('fs2').value;
+    const anio = anioInp.value;
 
-    if (!anioInp.value || !is1 || !fs1 || !is2 || !fs2) {
-      return alert("Error: Debes completar todas las fechas de inicio y fin de ambos semestres.");
+    const is1 = construirFechaCompleta(document.getElementById('is1').value, anio);
+    const fs1 = construirFechaCompleta(document.getElementById('fs1').value, anio);
+    const is2 = construirFechaCompleta(document.getElementById('is2').value, anio);
+    const fs2 = construirFechaCompleta(document.getElementById('fs2').value, anio);
+
+    if (!anio || !is1 || !fs1 || !is2 || !fs2) {
+      return alert("Completa todo en formato dd-mm.");
     }
 
     if (is1 > fs1 || is2 > fs2 || fs1 > is2) {
-      return alert("Error Lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
+      return alert("Error en el orden de fechas.");
     }
 
     if (typeof ih !== 'number') {
-      profesores[ip].horarios.push({ anio: anioInp.value, inicioSemestre1: is1, finSemestre1: fs1, inicioSemestre2: is2, finSemestre2: fs2, faltas: [], licencias: [], horarioClases: crearHorarioClasesBase() });
+      profesores[ip].horarios.push({
+        anio: anio,
+        inicioSemestre1: is1,
+        finSemestre1: fs1,
+        inicioSemestre2: is2,
+        finSemestre2: fs2,
+        faltas: [],
+        licencias: [],
+        horarioClases: crearHorarioClasesBase()
+      });
     } else {
-      const h = profesores[ip].horarios[ih]; h.inicioSemestre1 = is1; h.finSemestre1 = fs1; h.inicioSemestre2 = is2; h.finSemestre2 = fs2;
+      const h = profesores[ip].horarios[ih];
+      h.inicioSemestre1 = is1;
+      h.finSemestre1 = fs1;
+      h.inicioSemestre2 = is2;
+      h.finSemestre2 = fs2;
     }
-    await guardarDatosGlobales(); cerrarModal(); typeof ih !== 'number' ? verProfesor(ip) : verHorario(ip, ih);
+
+    await guardarDatosGlobales();
+    cerrarModal();
+    typeof ih !== 'number' ? verProfesor(ip) : verHorario(ip, ih);
   });
-  
+
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
 }
 
