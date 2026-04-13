@@ -1,8 +1,7 @@
 // ==========================================
 // ARCHIVO: assets/js/login.js
-// Propósito: Asistente de Primer Inicio (Setup) y Autenticación (Usuario + Clave)
+// Propósito: Autenticación directa y segura contra el motor principal
 // ==========================================
-
 document.addEventListener('DOMContentLoaded', async () => {
   const pantallaLogin = document.getElementById('pantallaLogin');
   const pantallaSetup = document.getElementById('pantallaSetup');
@@ -13,33 +12,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errorLogin = document.getElementById('errorLogin');
   const errorSetup = document.getElementById('errorSetup');
 
-  // 1. LEER LA BASE DE DATOS
-  let dbConfig = {};
-  if (window.apiBaseDatos) {
-    const bd = await window.apiBaseDatos.leer();
-    dbConfig = bd.configuracion || {};
+  // 1. Verificar si ya hay credenciales creadas (Sin exponer la clave)
+  let config = { existeUsuario: false };
+  if (window.apiAuth) {
+    config = await window.apiAuth.verificarConfiguracion();
   }
 
-  // 2. DECIDIR QUÉ PANTALLA MOSTRAR (Si existe usuario y clave, mostramos login normal)
-  if (dbConfig.usuario && dbConfig.password) {
+  if (config.existeUsuario) {
     pantallaLogin.classList.remove('d-none');
-    if (dbConfig.nombreColegio) {
-      document.getElementById('subtituloLogin').innerText = dbConfig.nombreColegio;
-    }
+    const subtitulo = document.getElementById('subtituloLogin');
+    if(subtitulo) subtitulo.innerText = "Escuela Esperanza";
   } else {
     pantallaSetup.classList.remove('d-none');
   }
 
-  // --- LÓGICA DE LOGIN NORMAL ---
+  // 2. LÓGICA DE LOGIN SEGURO
   if (formLogin) {
-    formLogin.addEventListener('submit', (e) => {
+    formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       const inputUser = document.getElementById('loginUsuario').value.trim();
       const inputPass = document.getElementById('loginPassword').value;
 
-      // Validación doble: Usuario Y Contraseña deben coincidir con la BD
-      if (inputUser === dbConfig.usuario && inputPass === dbConfig.password) {
+      const res = await window.apiAuth.login({ usuario: inputUser, password: inputPass });
+
+      if (res.exito) {
         sessionStorage.setItem('sesionActiva', 'true');
         window.location.href = 'dashboard.html';
       } else {
@@ -49,12 +46,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // --- LÓGICA DE SETUP DE PRIMER INICIO ---
+  // 3. LÓGICA DE SETUP DE PRIMER INICIO
   if (formSetup) {
     formSetup.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const colegio = document.getElementById('setupColegio').value.trim();
       const nuevoUsuario = document.getElementById('setupUsuario').value.trim();
       const pass1 = document.getElementById('setupPass').value;
       const pass2 = document.getElementById('setupPassConfirm').value;
@@ -73,20 +69,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Guardar la configuración en la base de datos
-      if (window.apiBaseDatos) {
-        const bdFull = await window.apiBaseDatos.leer();
-        
-        bdFull.configuracion = {
-          nombreColegio: colegio,
-          usuario: nuevoUsuario, // Guardamos el usuario creado
-          password: pass1      // Guardamos la clave creada
-        };
-        
-        const exito = await window.apiBaseDatos.guardar({
-          profesores: bdFull.profesores || [],
-          feriadosGlobales: bdFull.feriadosGlobales || [],
-          configuracion: bdFull.configuracion
+      if (window.apiAuth) {
+        const exito = await window.apiAuth.crearUsuarioInicial({
+          usuario: nuevoUsuario,
+          password: pass1 
         });
 
         if (exito) {
@@ -95,8 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
           alert("Error crítico al guardar la configuración inicial.");
         }
-      } else {
-        alert("La base de datos no está conectada. Inicia desde Electron.");
       }
     });
   }

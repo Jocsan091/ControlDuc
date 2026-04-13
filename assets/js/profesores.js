@@ -484,7 +484,7 @@ function verHorario(ip, ih) {
         <div><h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1><p class="m-0 fs-md">RUT: ${p.rut} | Calendario ${h.anio}</p></div>
       </div>
       <div class="d-flex gap-1 align-center">
-        <button class="btn-secundario btn-outline-muted" id="btnAdministrarIncidencias">Ajustes</button>
+        <button class="btn-secundario btn-outline-muted" id="btnAdministrarIncidencias">Resgistros</button>
         <button class="btn-secundario" id="btnHorarioClases">Ver Horario Clases</button>
         <button class="btn-principal bg-danger-light border-danger text-danger" id="btnRegistrarFalta">Registrar Falta/Permiso</button>
         <button class="btn-principal bg-warning-light border-warning text-warning" id="btnRegistrarLicencia">Registrar Licencia</button>

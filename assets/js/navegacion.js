@@ -55,9 +55,7 @@ if (btnAccionProfesores) btnAccionProfesores.addEventListener('click', () => { w
 const btnAccionResumen = document.getElementById('btnAccionResumen');
 if (btnAccionResumen) btnAccionResumen.addEventListener('click', () => { window.cambiarVista(vistaResumen, menuResumen); if (typeof renderListaDiaria === 'function') renderListaDiaria(); });
 
-// ==========================================
-// ENRUTAMIENTO AVANZADO DESDE TARJETAS ESTADÍSTICAS
-// ==========================================
+// Enrutamiento desde Tarjetas
 function navegarYFiltrarResumen(filtro) {
   window.cambiarVista(vistaResumen, menuResumen);
   if (typeof window.aplicarFiltroResumen === 'function') {
@@ -74,3 +72,12 @@ if (cardTotalProfesores) cardTotalProfesores.addEventListener('click', () => nav
 if (cardLicenciasHoy) cardLicenciasHoy.addEventListener('click', () => navegarYFiltrarResumen('licencia'));
 if (cardFaltasHoy) cardFaltasHoy.addEventListener('click', () => navegarYFiltrarResumen('falta'));
 if (cardAsistentesHoy) cardAsistentesHoy.addEventListener('click', () => navegarYFiltrarResumen('presente'));
+
+// ==========================================
+// GATILLO INICIAL: Dispara la vista de inicio al cargar
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  if (menuInicio && vistaInicio) {
+    window.cambiarVista(vistaInicio, menuInicio);
+  }
+});
