@@ -48,15 +48,13 @@ function generarMesesHorario(anio, horario) {
       } else if (tieneFalta) {
         claseDia = 'dia-rojo';
       } else if (feriadoNacional) {
-        // FERIADOS NACIONALES AHORA SON MORADOS
         claseDia = 'dia-morado'; 
         tooltip = `title="${feriadoNacional.desc}"`;
       } else if (feriadoManual) {
-        // FERIADOS MANUALES E INTERFERIADOS AHORA SON MORADOS
         claseDia = 'dia-morado'; 
         tooltip = `title="${feriadoManual.tipo}: ${feriadoManual.desc}"`;
       } else if (!enSemestreActivo) {
-        claseDia = 'dia-tachado'; // Solo los días fuera de semestre quedan tachados
+        claseDia = 'dia-tachado';
       } else if (fechaActualStr > hoyStr) {
         claseDia = 'dia-gris'; 
       } else {

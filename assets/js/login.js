@@ -1,7 +1,3 @@
-// ==========================================
-// ARCHIVO: assets/js/login.js
-// Propósito: Autenticación directa y segura contra el motor principal
-// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
   const pantallaLogin = document.getElementById('pantallaLogin');
   const pantallaSetup = document.getElementById('pantallaSetup');
@@ -12,7 +8,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errorLogin = document.getElementById('errorLogin');
   const errorSetup = document.getElementById('errorSetup');
 
-  // 1. Verificar si ya hay credenciales creadas (Sin exponer la clave)
   let config = { existeUsuario: false };
   if (window.apiAuth) {
     config = await window.apiAuth.verificarConfiguracion();
@@ -26,7 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     pantallaSetup.classList.remove('d-none');
   }
 
-  // 2. LÓGICA DE LOGIN SEGURO
   if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -46,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 3. LÓGICA DE SETUP DE PRIMER INICIO
   if (formSetup) {
     formSetup.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -61,13 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorSetup.classList.add('d-block');
         return;
       }
-      
-      if (nuevoUsuario.includes(' ')) {
-        errorSetup.innerText = "Error: El nombre de usuario no puede tener espacios.";
-        errorSetup.classList.remove('d-none');
-        errorSetup.classList.add('d-block');
-        return;
-      }
+
 
       if (window.apiAuth) {
         const exito = await window.apiAuth.crearUsuarioInicial({

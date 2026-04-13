@@ -1,7 +1,3 @@
-// ==========================================
-// ARCHIVO: preload.js
-// Propósito: Puente seguro entre la vista (HTML) y el sistema (Node.js)
-// ==========================================
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('apiBaseDatos', {
@@ -14,7 +10,6 @@ contextBridge.exposeInMainWorld('apiArchivos', {
   abrirLicencia: (nombreArchivo) => ipcRenderer.invoke('abrir-licencia', nombreArchivo)
 });
 
-// NUEVO: Exposición de la API de seguridad
 contextBridge.exposeInMainWorld('apiAuth', {
   verificarConfiguracion: () => ipcRenderer.invoke('verificar-configuracion'),
   crearUsuarioInicial: (datos) => ipcRenderer.invoke('crear-usuario-inicial', datos),

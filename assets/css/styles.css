@@ -1,6 +1,3 @@
-/* ========================================================== */
-/* 1. VARIABLES GLOBALES */
-/* ========================================================== */
 :root {
   --verde-principal: #2e7d32;
   --verde-oscuro: #145a1f;
@@ -17,9 +14,6 @@
   --sombra-media: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
-/* ========================================================== */
-/* 2. RESET Y ESTILOS BASE */
-/* ========================================================== */
 * { 
   margin: 0; 
   padding: 0; 
@@ -50,9 +44,6 @@ body {
   margin: 0 5px; 
 }
 
-/* ========================================================== */
-/* 3. LAYOUT PRINCIPAL (DASHBOARD) */
-/* ========================================================== */
 .dashboard-layout { 
   display: flex; 
   min-height: 100vh; 
@@ -110,9 +101,6 @@ body {
   font-size: 18px; 
 }
 
-/* ========================================================== */
-/* 4. COMPONENTES: SIDEBAR */
-/* ========================================================== */
 .sidebar-brand { 
   margin-bottom: 34px; 
   padding-bottom: 26px; 
@@ -127,13 +115,11 @@ body {
   object-fit: contain; 
 }
 
-/* Busca esta regla */
 .sidebar-brand h2 { 
   font-size: 34px; 
   color: var(--amarillo-principal); 
   margin-bottom: 8px; 
-  /* AÑADE ESTA LÍNEA */
-  line-height: 1.1; /* Un valor bajo como 1.1 o 1.2 juntará las palabras */
+  line-height: 1.1; 
 }
 
 .sidebar-brand p { 
@@ -166,9 +152,6 @@ body {
   color: #1f2a1f; 
 }
 
-/* ========================================================== */
-/* 5. COMPONENTES: TARJETAS Y CONTENEDORES GENÉRICOS */
-/* ========================================================== */
 .container { 
   width: 100%; 
   max-width: 500px; 
@@ -187,7 +170,6 @@ body {
   font-size: 38px; 
 }
 
-/* Agrupación de clases con estilos idénticos */
 .dashboard-welcome, 
 .stat-card, 
 .action-card, 
@@ -267,9 +249,6 @@ body {
   right: 15px; 
 }
 
-/* ========================================================== */
-/* 6. COMPONENTES: BOTONES */
-/* ========================================================== */
 .btn-principal, 
 .btn-secundario { 
   padding: 12px 18px; 
@@ -352,9 +331,6 @@ body {
   border-color: #e65100; 
 }
 
-/* ========================================================== */
-/* 7. COMPONENTES: PROFESORES Y HORARIOS */
-/* ========================================================== */
 .modulo-profesores { 
   display: flex; 
   flex-direction: column; 
@@ -422,9 +398,6 @@ body {
   text-align: center; 
 }
 
-/* ========================================================== */
-/* 8. COMPONENTES: CALENDARIO Y ESTADOS */
-/* ========================================================== */
 .barra-estados-fija { 
   position: -webkit-sticky; 
   position: sticky; 
@@ -561,9 +534,6 @@ body {
   text-decoration: none !important; 
 }
 
-/* ========================================================== */
-/* 9. COMPONENTES: TABLA DE HORARIOS */
-/* ========================================================== */
 .tabla-horario-contenedor { 
   padding: 22px; 
   overflow-x: auto; 
@@ -643,9 +613,6 @@ body {
   font-style: italic; 
 }
 
-/* ========================================================== */
-/* 10. MODALES Y MENÚS FLOTANTES */
-/* ========================================================== */
 .modal { 
   position: fixed; 
   inset: 0; 
@@ -776,9 +743,6 @@ body {
   color: #b71c1c; 
 }
 
-/* ========================================================== */
-/* 11. FORMULARIOS Y FICHAS */
-/* ========================================================== */
 .seccion-titulo { 
   margin: 15px 0 10px 0; 
   padding-bottom: 5px; 
@@ -821,9 +785,6 @@ body {
   color: var(--verde-oscuro); 
 }
 
-/* ========================================================== */
-/* 12. MEDIA QUERIES */
-/* ========================================================== */
 @media (max-width: 1200px) { 
   .stats-grid, 
   .lista-profesores, 
@@ -848,17 +809,10 @@ body {
   } 
 }
 
-/* ========================================================== */
-/* 13. CLASES DE ESTADO Y VISIBILIDAD */
-/* ========================================================== */
 .vista-oculta { display: none !important; }
 .vista-activa { display: block; }
 .opacidad-mitad { opacity: 0.4; pointer-events: none; }
 
-/* ========================================================== */
-/* 14. CLASES DE UTILIDAD (UTILITIES) */
-/* (Se mantienen en una línea al ser de propiedad única)     */
-/* ========================================================== */
 .d-none { display: none !important; }
 .d-block { display: block !important; }
 .d-flex { display: flex !important; }

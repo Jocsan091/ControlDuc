@@ -1,9 +1,3 @@
-// ==========================================
-// ARCHIVO: assets/js/auth.js
-// Propósito: Manejo de sesión y seguridad (Protección de rutas)
-// ==========================================
-
-// Validar que la llave exista en sessionStorage, no en localStorage
 if (sessionStorage.getItem('sesionActiva') !== 'true') {
   window.location.href = 'login.html';
 }

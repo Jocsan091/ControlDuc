@@ -1,8 +1,3 @@
-// ==========================================
-// ARCHIVO: assets/js/resumen.js
-// Propósito: Toma de Lista Dinámica y a prueba de errores lógicos
-// ==========================================
-
 let filtroActualResumen = 'todos';
 let busquedaActualResumen = '';
 
@@ -32,7 +27,6 @@ function renderListaDiaria() {
   const fechaConsulta = hoyStr;
   const anioConsulta = anioActual;
   
-  // Evaluar condiciones globales (Fines de semana y Feriados)
   const diaSemana = hoyObj.getDay();
   const esFinde = (diaSemana === 0 || diaSemana === 6);
   
@@ -84,13 +78,12 @@ function renderListaDiaria() {
       const enSemestre2 = fechaConsulta >= h.inicioSemestre2 && fechaConsulta <= h.finSemestre2;
       const enSemestreActivo = enSemestre1 || enSemestre2;
 
-      // Jerarquía de estados
       if (tieneLicencia) {
         estadoFiltro = 'licencia';
         estadoStr = '<span class="estado-box estado-amarillo text-warning fs-sm py-1 px-2">En Licencia Médica</span>';
         botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Acción Bloqueada</button>';
       } else if (esDiaLibreGlobal || !enSemestreActivo) {
-        estadoFiltro = 'inactivo'; // No cuenta en las estadísticas diarias operativas
+        estadoFiltro = 'inactivo';
         let txtMotivo = esFinde ? 'Fin de semana' : (feriadoNacional ? 'Feriado' : (feriadoManual ? 'Interferiado' : 'Vacaciones'));
         estadoStr = `<span class="estado-box estado-tachado fs-sm py-1 px-2">${txtMotivo}</span>`;
         botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Día Inhábil</button>';
@@ -130,7 +123,6 @@ function renderListaDiaria() {
     return;
   }
 
-  // Rendimiento optimizado: Concatenar en memoria y asignar una sola vez
   const htmlFinal = filasFiltradas.map(f => {
     const btnVer = `<button class="btn-secundario btn-outline-muted py-1 px-2 fs-sm cursor-pointer border-radius-sm" onclick="verProfesorDesdeResumen(${f.indexP})">Ver Perfil</button>`;
     return `

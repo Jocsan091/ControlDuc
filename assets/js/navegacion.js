@@ -1,8 +1,3 @@
-// ==========================================
-// ARCHIVO: assets/js/navegacion.js
-// Propósito: Manejar el cambio de pantallas y enrutamiento avanzado
-// ==========================================
-
 const menuInicio = document.getElementById('menuInicio');
 const menuProfesores = document.getElementById('menuProfesores');
 const menuResumen = document.getElementById('menuResumen');
@@ -43,7 +38,6 @@ window.cambiarVista = function(vistaDestino, menuActivo) {
   }
 };
 
-// Navegación Básica del Menú Lateral
 if (menuInicio) menuInicio.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaInicio, menuInicio); });
 if (menuProfesores) menuProfesores.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaProfesores, menuProfesores); if (typeof renderProfesores === 'function') renderProfesores(); });
 if (menuResumen) menuResumen.addEventListener('click', (e) => { e.preventDefault(); window.cambiarVista(vistaResumen, menuResumen); if (typeof renderListaDiaria === 'function') renderListaDiaria(); });
@@ -55,7 +49,6 @@ if (btnAccionProfesores) btnAccionProfesores.addEventListener('click', () => { w
 const btnAccionResumen = document.getElementById('btnAccionResumen');
 if (btnAccionResumen) btnAccionResumen.addEventListener('click', () => { window.cambiarVista(vistaResumen, menuResumen); if (typeof renderListaDiaria === 'function') renderListaDiaria(); });
 
-// Enrutamiento desde Tarjetas
 function navegarYFiltrarResumen(filtro) {
   window.cambiarVista(vistaResumen, menuResumen);
   if (typeof window.aplicarFiltroResumen === 'function') {
@@ -73,11 +66,10 @@ if (cardLicenciasHoy) cardLicenciasHoy.addEventListener('click', () => navegarYF
 if (cardFaltasHoy) cardFaltasHoy.addEventListener('click', () => navegarYFiltrarResumen('falta'));
 if (cardAsistentesHoy) cardAsistentesHoy.addEventListener('click', () => navegarYFiltrarResumen('presente'));
 
-// ==========================================
-// GATILLO INICIAL: Dispara la vista de inicio al cargar
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   if (menuInicio && vistaInicio) {
     window.cambiarVista(vistaInicio, menuInicio);
   }
 });
+
+

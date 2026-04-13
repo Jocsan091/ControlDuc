@@ -345,7 +345,6 @@ function mostrarFormularioHorario(ip, ih = null) {
   const contF = document.getElementById('contenedorFechas');
   const inputsFechas = [document.getElementById('is1'), document.getElementById('fs1'), document.getElementById('is2'), document.getElementById('fs2')];
 
-  // Función para bloquear el año en los calendarios nativos
   const actualizarLimites = () => {
     const val = anioInp.value.trim();
     if (val.length === 4) {
@@ -362,10 +361,8 @@ function mostrarFormularioHorario(ip, ih = null) {
 
   anioInp.addEventListener('input', actualizarLimites);
 
-  // Si es edición, se aplican los límites inmediatamente
   if (typeof ih === 'number') actualizarLimites();
 
-  // Auto-corrección agresiva: Si el usuario teclea mal el año, forzamos el año principal
   inputsFechas.forEach(inp => {
     inp.addEventListener('change', (e) => {
       const valAnio = anioInp.value.trim();
@@ -533,7 +530,6 @@ function mostrarFormularioFalta(ip, ih) {
     
     if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida o fuera del año escolar.");
 
-    // --- CANDADOS DE INTEGRIDAD ---
     const h = profesores[ip].horarios[ih];
     
     const existeFalta = h.faltas.some(fal => fal.fecha === f);
@@ -541,8 +537,6 @@ function mostrarFormularioFalta(ip, ih) {
 
     const chocaConLicencia = h.licencias.some(lic => f >= lic.fechaInicio && f <= lic.fechaFin);
     if (chocaConLicencia) return alert(`No puedes registrar una falta. El día ${formatearFecha(f)} está cubierto por una Licencia Médica.`);
-    // ------------------------------
-
     profesores[ip].horarios[ih].faltas.push({ tipo: t, fecha: f, motivo: document.getElementById('motivoFalta').value.trim() });
     await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   });
@@ -597,7 +591,6 @@ function mostrarFormularioLicencia(ip, ih) {
     if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas o fuera del año escolar.");
     if (fi > ff) return alert("Error Lógico: La fecha de inicio no puede ser mayor a la fecha de fin.");
 
-    // --- CANDADOS DE INTEGRIDAD ---
     const h = profesores[ip].horarios[ih];
 
     const chocaConOtraLicencia = h.licencias.some(lic => 
@@ -609,8 +602,6 @@ function mostrarFormularioLicencia(ip, ih) {
 
     const chocaConFaltas = h.faltas.some(fal => fal.fecha >= fi && fal.fecha <= ff);
     if (chocaConFaltas) return alert("Error: Hay registros de Inasistencia o Permisos en los días de esta licencia. Debes ir a 'Ajustes', borrar las faltas de esos días, y luego ingresar la licencia.");
-    // ------------------------------
-    
     profesores[ip].horarios[ih].licencias.push({ 
       fechaInicio: fi, 
       fechaFin: ff, 

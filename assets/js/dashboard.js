@@ -1,21 +1,13 @@
-// ==========================================
-// ARCHIVO: assets/js/dashboard.js
-// Propósito: Panel Principal y Configuración de Feriados/Interferiados
-// ==========================================
-// ==========================================
-// SEGURIDAD: Bloqueo de puerta trasera
-// ==========================================
 if (sessionStorage.getItem('sesionActiva') !== 'true') {
-  window.location.replace('login.html'); // Expulsa al intruso inmediatamente
+  window.location.replace('login.html'); 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Lógica del botón Cerrar Sesión
   const btnLogout = document.getElementById('logout');
   if (btnLogout) {
     btnLogout.addEventListener('click', (e) => {
       e.preventDefault();
-      sessionStorage.removeItem('sesionActiva'); // Destruye el pase
+      sessionStorage.removeItem('sesionActiva');
       window.location.replace('login.html');
     });
   }
@@ -54,7 +46,6 @@ function actualizarDashboardInicio() {
   statAsistentes.innerText = totalAsistentes >= 0 ? totalAsistentes : 0;
 }
 
-// LOGICA DE FERIADOS GLOBALES
 window.agregarFeriado = async function() {
   const fecha = document.getElementById('inputFeriado').value;
   const tipo = document.getElementById('tipoFeriado').value;

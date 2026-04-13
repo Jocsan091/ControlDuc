@@ -1,7 +1,3 @@
-// ==========================================
-// ARCHIVO: main.js
-// Propósito: Motor de Electron, conexión con el SO, Gestión de Archivos y Seguridad
-// ==========================================
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -34,9 +30,6 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-// ==========================================
-// AUTENTICACIÓN SEGURA EN EL MOTOR
-// ==========================================
 ipcMain.handle('verificar-configuracion', async () => {
   try {
     if (!fs.existsSync(dbPath)) return { existeUsuario: false };
@@ -71,9 +64,6 @@ ipcMain.handle('intentar-login', async (event, { usuario, password }) => {
   } catch (error) { return { exito: false }; }
 });
 
-// ==========================================
-// BASE DE DATOS Y RESPALDOS
-// ==========================================
 ipcMain.handle('leer-datos', async () => {
   try {
     const data = fs.readFileSync(dbPath, 'utf-8');
@@ -105,9 +95,6 @@ ipcMain.handle('guardar-datos', async (event, datosNuevos) => {
   } catch (error) { return false; }
 });
 
-// ==========================================
-// ARCHIVOS FÍSICOS
-// ==========================================
 ipcMain.handle('adjuntar-licencia', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     title: 'Seleccionar Documento',
