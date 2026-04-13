@@ -119,7 +119,7 @@ function createWindow() {
 
     event.preventDefault();
   });
-  win.loadFile('views/login.html');
+  win.loadFile(path.join(__dirname, 'views', 'login.html'));
 }
 
 app.whenReady().then(() => {
