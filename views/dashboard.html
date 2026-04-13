@@ -1,172 +1,167 @@
-  <!DOCTYPE html>
-  <html lang="es">
-  <head>
-    <meta charset="UTF-8">
-    <title>ControlDocentes - Asistencia Docente</title>
-    <link rel="stylesheet" href="../assets/css/styles.css">
-  </head>
-  <body>
-    <div class="dashboard-layout">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ControlDocentes - Asistencia Docente</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/img/logo.png" alt="Logo del sistema" class="sidebar-logo">
+        <h2>Control<br>Docentes</h2>
+        <p>Gestión de asistencia docente</p>
+        <p>Escuela Esperanza</p>
+      </div>
 
-      <aside class="dashboard-sidebar">
-        <div class="sidebar-brand">
-          <img src="../assets/img/logo.png" alt="Logo del sistema" class="sidebar-logo">
-          <h2>Control<br>Docentes</h2>
-          <p>Gestión de asistencia docente</p>
-          <p>Escuela Esperanza</p>
-        </div>
+      <nav class="sidebar-menu">
+        <a href="#" class="menu-item active" id="menuInicio">Inicio</a>
+        <a href="#" class="menu-item" id="menuProfesores">Profesores</a>
+        <a href="#" class="menu-item" id="menuResumen">Resumen Diario</a>
+        <a href="#" class="menu-item" id="menuInterferiados">Interferiados</a>
+        <a href="#" class="menu-item" id="logout">Cerrar sesión</a>
+      </nav>
+    </aside>
 
-        <nav class="sidebar-menu">
-          <a href="#" class="menu-item active" id="menuInicio">Inicio</a>
-          <a href="#" class="menu-item" id="menuProfesores">Profesores</a>
-          <a href="#" class="menu-item" id="menuResumen">Resumen Diario</a>
-          <a href="#" class="menu-item" id="menuInterferiados">Interferiados</a>
-          <a href="#" class="menu-item" id="logout">Cerrar sesión</a>
-        </nav>
-      </aside>
+    <main class="dashboard-main">
+      <section id="contenido-dashboard">
+        <section id="vista-inicio" class="vista-activa">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Panel Principal</h1>
+              <p>Bienvenido al sistema de asistencia docente de la Escuela Esperanza</p>
+            </div>
+            <div class="topbar-user">
+              <span id="topbarUsuario">Administrador</span>
+            </div>
+          </header>
 
-      <main class="dashboard-main">
-        <section id="contenido-dashboard">
-          
-          <section id="vista-inicio" class="vista-activa">
-            <header class="dashboard-topbar">
-              <div>
-                <h1>Panel Principal</h1>
-                <p>Bienvenido al sistema de asistencia docente de la Escuela Esperanza</p>
-              </div>
-              <div class="topbar-user">
-                <span>Administrador</span>
-              </div>
-            </header>
-
-            <section class="stats-grid">
-              <div class="stat-card clickable-card" id="cardTotalProfesores">
-                <span class="stat-title">Total Profesores</span>
-                <strong id="statProfesores">0</strong>
-              </div>
-              <div class="stat-card clickable-card border-top-warning" id="cardLicenciasHoy">
-                <span class="stat-title">Licencias Hoy</span>
-                <strong id="statLicencias" class="text-warning">0</strong>
-              </div>
-              <div class="stat-card clickable-card border-top-danger" id="cardFaltasHoy">
-                <span class="stat-title">Faltas Hoy</span>
-                <strong id="statFaltas" class="text-danger">0</strong>
-              </div>
-              <div class="stat-card clickable-card border-top-success" id="cardAsistentesHoy">
-                <span class="stat-title">Asistentes Hoy</span>
-                <strong id="statAsistentes" class="text-success">0</strong>
-              </div>
-            </section>
-            
-            <section class="quick-actions">
-              <div class="action-card" id="btnAccionProfesores">
-                <h3>Gestión de Profesores</h3>
-                <p>Administrar fichas, crear horarios y registrar licencias médicas.</p>
-              </div>
-              <div class="action-card" id="btnAccionResumen">
-                <h3>Toma de Lista Diaria</h3>
-                <p>Registrar rápidamente la asistencia del día actual para todo el personal.</p>
-              </div>
-            </section>
+          <section class="stats-grid">
+            <div class="stat-card clickable-card" id="cardTotalProfesores">
+              <span class="stat-title">Total Profesores</span>
+              <strong id="statProfesores">0</strong>
+            </div>
+            <div class="stat-card clickable-card border-top-warning" id="cardLicenciasHoy">
+              <span class="stat-title">Licencias Hoy</span>
+              <strong id="statLicencias" class="text-warning">0</strong>
+            </div>
+            <div class="stat-card clickable-card border-top-danger" id="cardFaltasHoy">
+              <span class="stat-title">Faltas Hoy</span>
+              <strong id="statFaltas" class="text-danger">0</strong>
+            </div>
+            <div class="stat-card clickable-card border-top-success" id="cardAsistentesHoy">
+              <span class="stat-title">Asistentes Hoy</span>
+              <strong id="statAsistentes" class="text-success">0</strong>
+            </div>
           </section>
 
-          <section id="vista-profesores" class="vista-oculta">
-            <header class="dashboard-topbar">
-              <div>
-                <h1>Gestión de Profesores</h1>
-                <p>Administra los profesores registrados dentro del sistema.</p>
-              </div>
-              <div class="d-flex gap-2 align-center">
-                <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
-              </div>
-            </header>
-            
-            <section class="modulo-profesores">
-              <div class="profesores-barra mt-0">
-                <input type="text" id="buscadorProfesores" class="input-global w-100 max-w-420" placeholder="Buscar profesor por nombre o rut...">
-              </div>
-              <div id="listaProfesores" class="lista-profesores"></div>
-            </section>
+          <section class="quick-actions">
+            <div class="action-card" id="btnAccionProfesores">
+              <h3>Gestión de Profesores</h3>
+              <p>Administrar fichas, crear horarios y registrar licencias médicas.</p>
+            </div>
+            <div class="action-card" id="btnAccionResumen">
+              <h3>Toma de Lista Diaria</h3>
+              <p>Registrar rápidamente la asistencia del día actual para todo el personal.</p>
+            </div>
           </section>
-
-          <section id="vista-detalle-profesor" class="vista-oculta"></section>
-
-          <section id="vista-resumen" class="vista-oculta">
-            <header class="dashboard-topbar">
-              <div>
-                <h1>Toma de Lista Diaria</h1>
-                <p id="fechaHoyResumen" class="fs-md text-muted mt-1">Cargando fecha...</p>
-              </div>
-            </header>
-            <section class="modulo-profesores">
-              <div class="profesores-superior p-3 d-flex flex-column align-left gap-2">
-                <input type="text" id="buscadorResumen" class="input-global w-100 max-w-420" placeholder="Buscar por nombre o RUT...">
-                
-                <div class="filtros-resumen d-flex gap-1 flex-wrap">
-                  <button class="filtro-btn activo-todos" data-filtro="todos">Todos: <span id="countTodos">0</span></button>
-                  <button class="filtro-btn" data-filtro="presente">Presentes: <span id="countPresentes">0</span></button>
-                  <button class="filtro-btn" data-filtro="falta">Faltas/Permisos: <span id="countFaltas">0</span></button>
-                  <button class="filtro-btn" data-filtro="licencia">Licencias: <span id="countLicencias">0</span></button>
-                </div>
-              </div>
-
-              <div class="tabla-horario-contenedor">
-                <table class="tabla-horario-clases w-100">
-                  <thead>
-                    <tr>
-                      <th class="text-left px-3">Profesor</th>
-                      <th>RUT</th>
-                      <th>Estado Actual</th>
-                      <th>Acción Rápida</th>
-                      <th>Perfil</th>
-                    </tr>
-                  </thead>
-                  <tbody id="listaAsistenciaDiaria"></tbody>
-                </table>
-              </div>
-            </section>
-          </section>
-
-          <section id="vista-interferiados" class="vista-oculta">
-            <header class="dashboard-topbar">
-              <div>
-                <h1>Gestión de Interferiados</h1>
-                <p>Administra los días feriados y jornadas especiales del año.</p>
-              </div>
-            </header>
-            <section class="modulo-profesores">
-              
-              <div class="ficha-resumen">
-                <div class="col-span-full">
-                  <h3 class="mb-2 text-primary">Calendario de Feriados e Interferiados</h3>
-                  <p class="mb-3 text-muted">Agrega los días en los que el colegio no tendrá clases por razones oficiales. El sistema los tachará automáticamente en los calendarios de todos los docentes.</p>
-                  
-                  <div class="d-flex gap-1 mb-3 flex-wrap">
-                    <input type="date" id="inputFeriado" class="input-global">
-                    <select id="tipoFeriado" class="input-global w-auto">
-                      <option value="Feriado">Feriado Oficial</option>
-                      <option value="Interferiado">Interferiado</option>
-                    </select>
-                    <input type="text" id="descFeriado" class="input-global flex-1" placeholder="Motivo (Ej: Fiestas Patrias)" maxlength="50">
-                    <button class="btn-principal" onclick="window.agregarFeriado()">+ Agregar Día Libre</button>
-                  </div>
-                  
-                  <ul id="listaFeriados" class="list-none p-0 d-flex flex-column gap-1"></ul>
-                </div>
-              </div>
-              
-            </section>
-          </section>
-
         </section>
-      </main>
-    </div>
 
-    <script src="../assets/js/datos.js"></script>
-    <script src="../assets/js/horarios.js"></script>
-    <script src="../assets/js/profesores.js"></script>
-    <script src="../assets/js/resumen.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
-    <script src="../assets/js/navegacion.js"></script>
-  </body>
-  </html>
+        <section id="vista-profesores" class="vista-oculta">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Gestión de Profesores</h1>
+              <p>Administra los profesores registrados dentro del sistema.</p>
+            </div>
+            <div class="d-flex gap-2 align-center">
+              <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
+            </div>
+          </header>
+
+          <section class="modulo-profesores">
+            <div class="profesores-barra mt-0">
+              <input type="text" id="buscadorProfesores" class="input-global w-100 max-w-420" placeholder="Buscar profesor por nombre o rut...">
+            </div>
+            <div id="listaProfesores" class="lista-profesores"></div>
+          </section>
+        </section>
+
+        <section id="vista-detalle-profesor" class="vista-oculta"></section>
+
+        <section id="vista-resumen" class="vista-oculta">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Toma de Lista Diaria</h1>
+              <p id="fechaHoyResumen" class="fs-md text-muted mt-1">Cargando fecha...</p>
+            </div>
+          </header>
+          <section class="modulo-profesores">
+            <div class="profesores-superior p-3 d-flex flex-column align-left gap-2">
+              <input type="text" id="buscadorResumen" class="input-global w-100 max-w-420" placeholder="Buscar por nombre o RUT...">
+
+              <div class="filtros-resumen d-flex gap-1 flex-wrap">
+                <button class="filtro-btn activo-todos" data-filtro="todos">Todos: <span id="countTodos">0</span></button>
+                <button class="filtro-btn" data-filtro="presente">Presentes: <span id="countPresentes">0</span></button>
+                <button class="filtro-btn" data-filtro="falta">Faltas/Permisos: <span id="countFaltas">0</span></button>
+                <button class="filtro-btn" data-filtro="licencia">Licencias: <span id="countLicencias">0</span></button>
+              </div>
+            </div>
+
+            <div class="tabla-horario-contenedor">
+              <table class="tabla-horario-clases w-100">
+                <thead>
+                  <tr>
+                    <th class="text-left px-3">Profesor</th>
+                    <th>RUT</th>
+                    <th>Estado Actual</th>
+                    <th>Acción Rápida</th>
+                    <th>Perfil</th>
+                  </tr>
+                </thead>
+                <tbody id="listaAsistenciaDiaria"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="vista-interferiados" class="vista-oculta">
+          <header class="dashboard-topbar">
+            <div>
+              <h1>Gestión de Interferiados</h1>
+              <p>Administra los días feriados y jornadas especiales del año.</p>
+            </div>
+          </header>
+          <section class="modulo-profesores">
+            <div class="ficha-resumen">
+              <div class="col-span-full">
+                <h3 class="mb-2 text-primary">Calendario de Feriados e Interferiados</h3>
+                <p class="mb-3 text-muted">Agrega los días en los que el colegio no tendrá clases por razones oficiales. El sistema los tachará automáticamente en los calendarios de todos los docentes.</p>
+
+                <div class="d-flex gap-1 mb-3 flex-wrap">
+                  <input type="date" id="inputFeriado" class="input-global">
+                  <select id="tipoFeriado" class="input-global w-auto">
+                    <option value="Feriado">Feriado Oficial</option>
+                    <option value="Interferiado">Interferiado</option>
+                  </select>
+                  <input type="text" id="descFeriado" class="input-global flex-1" placeholder="Motivo (Ej: Fiestas Patrias)" maxlength="50">
+                  <button class="btn-principal" onclick="window.agregarFeriado()">+ Agregar Día Libre</button>
+                </div>
+
+                <ul id="listaFeriados" class="list-none p-0 d-flex flex-column gap-1"></ul>
+              </div>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/datos.js"></script>
+  <script src="../assets/js/horarios.js"></script>
+  <script src="../assets/js/profesores.js"></script>
+  <script src="../assets/js/resumen.js"></script>
+  <script src="../assets/js/dashboard.js"></script>
+  <script src="../assets/js/navegacion.js"></script>
+</body>
+</html>

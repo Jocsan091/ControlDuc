@@ -2,8 +2,8 @@ const ASIGNATURAS = ['Artes visuales', 'Ciencias naturales', 'Comunicación', 'E
 const CURSOS = ['1°', '2°', '3°', '4°', '5°A', '5°B', '6°A', '6°B', '7°A', '7°B', '8°'];
 
 var profesores = [];
-var feriadosGlobales = []; 
-var configuracion = {}; 
+var feriadosGlobales = [];
+var configuracion = {};
 
 window.obtenerFeriados = function() {
   return feriadosGlobales;
@@ -38,6 +38,7 @@ window.esFeriadoNacional = function(fechaStr) {
   if (FERIADOS_MOBILES.includes(fechaStr)) return { tipo: 'Feriado Oficial', desc: 'Feriado Religioso' };
   return null;
 }
+
 function cerrarModal() {
   const modal = document.querySelector('.modal');
   if (modal) modal.remove();
@@ -45,27 +46,39 @@ function cerrarModal() {
 
 async function guardarDatosGlobales() {
   if (window.apiBaseDatos) {
-    const exito = await window.apiBaseDatos.guardar({ 
-      profesores: profesores, 
-      feriadosGlobales: feriadosGlobales,
-      configuracion: configuracion
+    const exito = await window.apiBaseDatos.guardar({
+      profesores: profesores,
+      feriadosGlobales: feriadosGlobales
     });
     if (!exito) console.error("Error crítico guardando.");
   }
 }
 
 async function cargarDatosIniciales() {
+  const enLogin = window.location.pathname.includes('login.html');
+  if (enLogin) return;
+
   if (window.apiBaseDatos) {
     const bd = await window.apiBaseDatos.leer();
+    if (bd.auth === false) {
+      window.location.replace('login.html');
+      return;
+    }
+
     profesores = bd.profesores || [];
     feriadosGlobales = bd.feriadosGlobales || [];
-    configuracion = bd.configuracion || {};
-    
+    configuracion = window.apiConfiguracion ? await window.apiConfiguracion.obtenerPublica() : {};
+
     if (window.location.pathname.includes('dashboard.html') && configuracion.nombreColegio) {
       const brandP = document.querySelector('.sidebar-brand p');
       if (brandP) brandP.innerText = configuracion.nombreColegio;
     }
-    
+
+    if (window.location.pathname.includes('dashboard.html') && configuracion.usuario) {
+      const usuarioTopbar = document.getElementById('topbarUsuario');
+      if (usuarioTopbar) usuarioTopbar.innerText = configuracion.usuario;
+    }
+
     if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
     if (typeof renderProfesores === 'function' && document.getElementById('listaProfesores')) renderProfesores();
     if (typeof window.renderFeriados === 'function') window.renderFeriados();

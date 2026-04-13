@@ -193,7 +193,11 @@ async function eliminarProfesor(index) {
 function renderProfesores(filtro = '') {
   const lista = document.getElementById('listaProfesores');
   if (!lista) return;
-  const filtrados = profesores.filter(p => p.nombre.toLowerCase().includes(filtro) || p.rut.toLowerCase().includes(filtro));
+  const filtroNormalizado = filtro.replace(/\./g, '');
+  const filtrados = profesores.filter(p => {
+    const rutNormalizado = p.rut.toLowerCase().replace(/\./g, '');
+    return p.nombre.toLowerCase().includes(filtro) || p.rut.toLowerCase().includes(filtro) || rutNormalizado.includes(filtroNormalizado);
+  });
   if (filtrados.length === 0) return lista.innerHTML = `<div class="sin-profesores">Sin registros.</div>`;
 
   lista.innerHTML = filtrados.map(prof => {

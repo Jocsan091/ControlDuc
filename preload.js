@@ -13,5 +13,11 @@ contextBridge.exposeInMainWorld('apiArchivos', {
 contextBridge.exposeInMainWorld('apiAuth', {
   verificarConfiguracion: () => ipcRenderer.invoke('verificar-configuracion'),
   crearUsuarioInicial: (datos) => ipcRenderer.invoke('crear-usuario-inicial', datos),
-  login: (credenciales) => ipcRenderer.invoke('intentar-login', credenciales)
+  login: (credenciales) => ipcRenderer.invoke('intentar-login', credenciales),
+  logout: () => ipcRenderer.invoke('cerrar-sesion'),
+  estadoSesion: () => ipcRenderer.invoke('estado-sesion')
+});
+
+contextBridge.exposeInMainWorld('apiConfiguracion', {
+  obtenerPublica: () => ipcRenderer.invoke('obtener-configuracion-publica')
 });

@@ -5,7 +5,7 @@ window.aplicarFiltroResumen = function(filtro) {
   filtroActualResumen = filtro;
   const botonesFiltro = document.querySelectorAll('.filtro-btn');
   if (botonesFiltro) botonesFiltro.forEach(b => b.classList.remove('activo-todos', 'activo-presentes', 'activo-faltas', 'activo-licencias'));
-  
+
   const target = document.querySelector(`.filtro-btn[data-filtro="${filtro}"]`);
   if (target) {
     if (filtro === 'todos') target.classList.add('activo-todos');
@@ -26,13 +26,13 @@ function renderListaDiaria() {
 
   const fechaConsulta = hoyStr;
   const anioConsulta = anioActual;
-  
+
   const diaSemana = hoyObj.getDay();
   const esFinde = (diaSemana === 0 || diaSemana === 6);
-  
+
   let feriadoNacional = null;
   if (typeof window.esFeriadoNacional === 'function') feriadoNacional = window.esFeriadoNacional(fechaConsulta);
-  
+
   const listaFeriadosSegura = typeof window.obtenerFeriados === 'function' ? window.obtenerFeriados() : [];
   const feriadoManual = listaFeriadosSegura.find(f => f.fecha === fechaConsulta);
 
@@ -40,7 +40,7 @@ function renderListaDiaria() {
 
   const fechaVisual = `${String(hoyObj.getDate()).padStart(2, '0')}/${String(hoyObj.getMonth() + 1).padStart(2, '0')}/${hoyObj.getFullYear()}`;
   const labelFecha = document.getElementById('fechaHoyResumen');
-  
+
   if (labelFecha) {
     if (esFinde) {
       labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-danger fw-bold ml-2">(Fin de semana - No hay clases)</span>`;
@@ -73,7 +73,7 @@ function renderListaDiaria() {
       const h = p.horarios[indexH];
       const tieneFalta = h.faltas && h.faltas.some(f => f.fecha === fechaConsulta);
       const tieneLicencia = h.licencias && h.licencias.some(l => fechaConsulta >= l.fechaInicio && fechaConsulta <= l.fechaFin);
-      
+
       const enSemestre1 = fechaConsulta >= h.inicioSemestre1 && fechaConsulta <= h.finSemestre1;
       const enSemestre2 = fechaConsulta >= h.inicioSemestre2 && fechaConsulta <= h.finSemestre2;
       const enSemestreActivo = enSemestre1 || enSemestre2;
@@ -102,10 +102,10 @@ function renderListaDiaria() {
     return { p, indexP, indexH, estadoFiltro, estadoStr, botonAccion };
   });
 
-  const cTodos = document.getElementById('countTodos'); if(cTodos) cTodos.innerText = countTodos;
-  const cPres = document.getElementById('countPresentes'); if(cPres) cPres.innerText = countPresentes;
-  const cFalt = document.getElementById('countFaltas'); if(cFalt) cFalt.innerText = countFaltas;
-  const cLic = document.getElementById('countLicencias'); if(cLic) cLic.innerText = countLicencias;
+  const cTodos = document.getElementById('countTodos'); if (cTodos) cTodos.innerText = countTodos;
+  const cPres = document.getElementById('countPresentes'); if (cPres) cPres.innerText = countPresentes;
+  const cFalt = document.getElementById('countFaltas'); if (cFalt) cFalt.innerText = countFaltas;
+  const cLic = document.getElementById('countLicencias'); if (cLic) cLic.innerText = countLicencias;
 
   const filasFiltradas = filas.filter(f => {
     if (filtroActualResumen !== 'todos' && f.estadoFiltro !== filtroActualResumen) return false;
@@ -157,7 +157,7 @@ async function revertirFaltaRapida(indexP, indexH, fecha) {
 document.addEventListener('DOMContentLoaded', () => {
   const buscadorResumen = document.getElementById('buscadorResumen');
   if (buscadorResumen) buscadorResumen.addEventListener('input', (e) => { busquedaActualResumen = e.target.value.trim().toLowerCase(); renderListaDiaria(); });
-  
+
   const botonesFiltro = document.querySelectorAll('.filtro-btn');
   botonesFiltro.forEach(btn => {
     btn.addEventListener('click', (e) => {
