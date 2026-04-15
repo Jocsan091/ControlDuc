@@ -19,13 +19,16 @@ function toggleMenuOpciones(event, idMenu) {
 
 function habilitarEnterEnModal(botonId) {
   const modal = document.querySelector('.modal');
-  if (modal) {
-    modal.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault(); document.getElementById(botonId).click();
-      }
-    });
-  }
+  if (!modal) return;
+
+  const handler = (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+      e.preventDefault();
+      document.getElementById(botonId).click();
+    }
+  };
+
+  modal.addEventListener('keydown', handler);
 }
 
 function formatearFecha(fechaStr) {
@@ -462,174 +465,82 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
   if (document.querySelector('.modal')) return;
   document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
 
-  const esEdicion = typeof ih === 'number';
-  const horarioActual = esEdicion ? profesores[ip].horarios[ih] : {};
-  const camposEdicion = esEdicion ? crearCamposFechaHorario('edicion', horarioActual) : [];
-  const camposPersonalizados = !esEdicion ? crearCamposFechaHorario('personalizado', {}) : [];
-
-  const tituloModal = esEdicion
-    ? 'Editar Fechas del Horario'
-    : modoInicial === 'personalizado'
-      ? 'Agregar horario personalizado'
-      : modoInicial === 'precargado'
-        ? 'Agregar horario sobrecargado'
-        : 'Nuevo Horario';
-
-  const mostrarBloquePrecargado = !esEdicion && modoInicial === 'precargado';
-  const mostrarBloquePersonalizado = !esEdicion && modoInicial === 'personalizado';
-  const mostrarSelector = !esEdicion && !modoInicial;
-
+  const h = typeof ih === 'number' ? profesores[ip].horarios[ih] : {};
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
-        <h3>${tituloModal}</h3>
-        ${esEdicion ? `
-          <p class="fs-sm text-muted mt-0">Puedes ajustar este horario aunque haya sido creado desde un año precargado.</p>
-          <div>
-            <label class="d-block mb-1">Año *</label>
-            <input type="number" id="anioHorarioEdicion" class="input-global w-100 bg-gray-light" value="${horarioActual.anio || ''}" readonly>
-          </div>
-          ${renderCamposFechaHorario(camposEdicion)}
-        ` : modoInicial === 'precargado' ? `
-          <div id="bloqueHorarioPrecargado" class="bloque-horario-opcion mt-3">
-            <div id="bloquePrecargadoOpciones"></div>
-          </div>
-        ` : `
-          ${mostrarSelector ? `<p class="fs-sm text-muted mt-0">Primero elige el tipo de horario que quieres crear.</p>` : ''}
-          ${mostrarSelector ? renderSelectorModoHorario() : ''}
-          ${modoInicial === 'personalizado' ? `
-            <div>
-              <label class="d-block mb-1">Año *</label>
-              <input type="number" id="anioHorarioPersonalizado" class="input-global w-100" min="2024" max="2099" onkeypress="return soloNumeros(event)">
-            </div>
-            ${renderCamposFechaHorario(camposPersonalizados)}
-          ` : ''}
-        `}
-        <div id="errorHorarioProfesor" class="text-danger fw-bold fs-md mt-3 text-center d-none"></div>
+        <h3>${typeof ih === 'number' ? 'Editar Fechas' : 'Nuevo Horario'}</h3>
+        <p class="fs-sm text-muted mt-0">Ingresa el año primero para configurar el calendario.</p>
+        <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''} onkeypress="return soloNumeros(event)">
+        <div id="contenedorFechas" class="${typeof ih === 'number' ? '' : 'opacidad-mitad'}">
+          <label class="d-block mb-1 mt-2">Inicio/Fin Semestre 1</label>
+          <div class="d-flex gap-1 mb-2"><input type="date" class="input-global flex-1" id="is1" value="${h.inicioSemestre1 || ''}"><input type="date" class="input-global flex-1" id="fs1" value="${h.finSemestre1 || ''}"></div>
+          <label class="d-block mb-1">Inicio/Fin Semestre 2</label>
+          <div class="d-flex gap-1"><input type="date" class="input-global flex-1" id="is2" value="${h.inicioSemestre2 || ''}"><input type="date" class="input-global flex-1" id="fs2" value="${h.finSemestre2 || ''}"></div>
+        </div>
         <div class="modal-botones mt-3"><button id="guardarHorario" class="btn-principal">Guardar</button><button id="cancelar" class="btn-secundario">Cancelar</button></div>
       </div>
     </div>
   `);
 
-  if (esEdicion) {
-    window.inicializarCamposFechaConAnio(camposEdicion, () => horarioActual.anio);
-  } else if (modoInicial === 'personalizado') {
-    const anioPersonalizado = document.getElementById('anioHorarioPersonalizado');
-    const controladorPersonalizado = window.inicializarCamposFechaConAnio(camposPersonalizados, () => anioPersonalizado.value.trim());
-    anioPersonalizado.addEventListener('input', () => controladorPersonalizado.actualizarAnioEnCampos(anioPersonalizado.value.trim()));
-  } else if (modoInicial === 'precargado') {
-    actualizarFormularioPrecargado(ip);
-  } else {
-    const anioPersonalizado = document.getElementById('anioHorarioPersonalizado');
-    const controladorPersonalizado = window.inicializarCamposFechaConAnio(camposPersonalizados, () => anioPersonalizado ? anioPersonalizado.value.trim() : '');
-    if (anioPersonalizado) {
-      anioPersonalizado.addEventListener('input', () => controladorPersonalizado.actualizarAnioEnCampos(anioPersonalizado.value.trim()));
+  const anioInp = document.getElementById('anioHorario');
+  const contF = document.getElementById('contenedorFechas');
+  const inputsFechas = [document.getElementById('is1'), document.getElementById('fs1'), document.getElementById('is2'), document.getElementById('fs2')];
+
+  const actualizarLimites = () => {
+    const val = anioInp.value.trim();
+    if (val.length === 4) {
+      contF.classList.remove('opacidad-mitad');
+      inputsFechas.forEach(inp => {
+        inp.min = `${val}-01-01`;
+        inp.max = `${val}-12-31`;
+      });
+    } else {
+      contF.classList.add('opacidad-mitad');
+      inputsFechas.forEach(inp => { inp.min = ''; inp.max = ''; });
     }
+  };
 
-    document.querySelectorAll('input[name="modoHorarioProfesor"]').forEach((input) => {
-      input.addEventListener('change', () => {
-        if (input.value === 'precargado') actualizarFormularioPrecargado(ip);
-        activarModoHorario(input.value);
-        ocultarErrorHorario();
-      });
-    });
+  anioInp.addEventListener('input', actualizarLimites);
 
-    if (modoInicial) {
-      const radioInicial = document.querySelector(`input[name="modoHorarioProfesor"][value="${modoInicial}"]`);
-      if (radioInicial) {
-        radioInicial.checked = true;
-        radioInicial.dispatchEvent(new Event('change'));
+  if (typeof ih === 'number') actualizarLimites();
+
+  inputsFechas.forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const valAnio = anioInp.value.trim();
+      if (valAnio.length === 4 && e.target.value) {
+        let partes = e.target.value.split('-');
+        if (partes[0] !== valAnio) {
+          partes[0] = valAnio;
+          e.target.value = partes.join('-');
+        }
       }
-
-      if (modoInicial === 'precargado') {
-        actualizarFormularioPrecargado(ip);
-      }
-    }
-
-    document.querySelectorAll('.opcion-modo-anio').forEach((opcion) => {
-      opcion.addEventListener('click', () => {
-        const input = opcion.querySelector('input');
-        input.checked = true;
-        input.dispatchEvent(new Event('change'));
-      });
-      opcion.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        const input = opcion.querySelector('input');
-        input.checked = true;
-        input.dispatchEvent(new Event('change'));
-      });
     });
-  }
+  });
 
   document.getElementById('guardarHorario').addEventListener('click', async () => {
-    ocultarErrorHorario();
+    const is1 = document.getElementById('is1').value;
+    const fs1 = document.getElementById('fs1').value;
+    const is2 = document.getElementById('is2').value;
+    const fs2 = document.getElementById('fs2').value;
 
-    if (esEdicion) {
-      const [inicio1, fin1, inicio2, fin2] = obtenerValoresFechasHorario(camposEdicion);
-      if (![inicio1, fin1, inicio2, fin2].every(window.validarDiaMes)) return mostrarErrorHorario('Completa las 4 fechas usando el selector de fecha.');
-
-      const [inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha] = obtenerValoresFechasHorarioCompleta(camposEdicion, horarioActual.anio);
-      if (![inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha].every(window.validarFechaISO)) return mostrarErrorHorario('Completa las 4 fechas usando el selector de fecha.');
-
-      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres estan en orden incorrecto.');
-
-      const horarioEditado = profesores[ip].horarios[ih];
-      horarioEditado.inicioSemestre1 = inicio1Fecha;
-      horarioEditado.finSemestre1 = fin1Fecha;
-      horarioEditado.inicioSemestre2 = inicio2Fecha;
-      horarioEditado.finSemestre2 = fin2Fecha;
-
-      await guardarDatosGlobales();
-      cerrarModal();
-      return verHorario(ip, ih);
+    if (!anioInp.value || !is1 || !fs1 || !is2 || !fs2) {
+      return alert("Error: Debes completar todas las fechas de inicio y fin de ambos semestres.");
     }
 
-    const modo = modoInicial || document.querySelector('input[name="modoHorarioProfesor"]:checked')?.value || 'precargado';
-    let nuevoHorario = null;
+    if (is1 > fs1 || is2 > fs2 || fs1 > is2) {
+      return alert("Error Lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
+    }
 
-    if (modo === 'precargado') {
-      const select = document.getElementById('selectHorarioPrecargado');
-      const anio = select ? select.value.trim() : '';
-      const plantilla = window.obtenerHorarioAnualPorAnio(anio);
-
-      if (!anio || !plantilla) return mostrarErrorHorario('Selecciona un año precargado.');
-      if (window.profesorTieneHorarioAnio(ip, anio)) return mostrarErrorHorario(`Este docente ya tiene un horario para el año ${anio}.`);
-
-      nuevoHorario = window.crearHorarioClonadoDesdePlantilla(plantilla);
+    if (typeof ih !== 'number') {
+      profesores[ip].horarios.push({ anio: anioInp.value, inicioSemestre1: is1, finSemestre1: fs1, inicioSemestre2: is2, finSemestre2: fs2, faltas: [], licencias: [], horarioClases: crearHorarioClasesBase() });
     } else {
-      const anio = document.getElementById('anioHorarioPersonalizado').value.trim();
-      const [inicio1, fin1, inicio2, fin2] = obtenerValoresFechasHorario(camposPersonalizados);
-
-      if (!anio || ![inicio1, fin1, inicio2, fin2].every((valor) => window.validarDiaMes(valor) || window.validarFechaISO(valor))) return mostrarErrorHorario('Ingresa el año y completa las 4 fechas usando el selector de fecha.');
-      if (window.profesorTieneHorarioAnio(ip, anio)) return mostrarErrorHorario(`Este docente ya tiene un horario para el año ${anio}.`);
-
-      const [inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha] = obtenerValoresFechasHorarioCompleta(camposPersonalizados, anio);
-      if (![inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha].every(window.validarFechaISO)) return mostrarErrorHorario('Ingresa el año y completa las 4 fechas usando el selector de fecha.');
-
-      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres estan en orden incorrecto.');
-
-      nuevoHorario = {
-        anio,
-        inicioSemestre1: inicio1Fecha,
-        finSemestre1: fin1Fecha,
-        inicioSemestre2: inicio2Fecha,
-        finSemestre2: fin2Fecha,
-        faltas: [],
-        licencias: [],
-        horarioClases: crearHorarioClasesBase()
-      };
+      const h = profesores[ip].horarios[ih]; h.inicioSemestre1 = is1; h.finSemestre1 = fs1; h.inicioSemestre2 = is2; h.finSemestre2 = fs2;
     }
-
-    profesores[ip].horarios.push(nuevoHorario);
-    profesores[ip].horarios.sort((a, b) => a.anio.localeCompare(b.anio));
-
-    await guardarDatosGlobales();
-    cerrarModal();
-    verProfesor(ip);
+    await guardarDatosGlobales(); cerrarModal(); typeof ih !== 'number' ? verProfesor(ip) : verHorario(ip, ih);
   });
-  
+
   document.getElementById('cancelar').addEventListener('click', cerrarModal);
   habilitarEnterEnModal('guardarHorario');
 }
