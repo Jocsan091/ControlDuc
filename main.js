@@ -13,7 +13,7 @@ let sesionActiva = false;
 
 function leerBaseDatos() {
   if (!fs.existsSync(dbPath)) {
-    return { profesores: [], feriadosGlobales: [] };
+    return { profesores: [], feriadosGlobales: [], horariosAnuales: [] };
   }
 
   return JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
@@ -48,14 +48,15 @@ function existeUsuarioConfigurado(data) {
 }
 
 function respuestaSinAuth() {
-  return { auth: false, profesores: [], feriadosGlobales: [] };
+  return { auth: false, profesores: [], feriadosGlobales: [], horariosAnuales: [] };
 }
 
 function obtenerDatosSeguros(data) {
   return {
     auth: true,
     profesores: data.profesores || [],
-    feriadosGlobales: data.feriadosGlobales || []
+    feriadosGlobales: data.feriadosGlobales || [],
+    horariosAnuales: data.horariosAnuales || []
   };
 }
 
@@ -124,7 +125,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   if (!fs.existsSync(dbPath)) {
-    escribirBaseDatos({ profesores: [], feriadosGlobales: [] });
+    escribirBaseDatos({ profesores: [], feriadosGlobales: [], horariosAnuales: [] });
   }
 
   if (!fs.existsSync(licenciasPath)) fs.mkdirSync(licenciasPath, { recursive: true });
@@ -241,6 +242,7 @@ ipcMain.handle('guardar-datos', async (event, datosNuevos) => {
     const dataFinal = {
       profesores: datosNuevos.profesores || [],
       feriadosGlobales: datosNuevos.feriadosGlobales || [],
+      horariosAnuales: datosNuevos.horariosAnuales || [],
       configuracion: dataActual.configuracion || {}
     };
 

@@ -1,0 +1,15 @@
+:root {
+  --verde-principal: #2e7d32;
+  --verde-oscuro: #145a1f;
+  --verde-suave: #dff0df;
+  --amarillo-principal: #f4c430;
+  --rojo-suave: #f8c9cf;
+  --amarillo-suave: #f5e4b8;
+  --gris-fondo: #edf0ea;
+  --gris-borde: #d8d8d8;
+  --gris-texto: #555;
+  --gris-suave: #f1f1f1;
+  --blanco: #ffffff;
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --sombra-media: 0 6px 18px rgba(0, 0, 0, 0.12);
+}

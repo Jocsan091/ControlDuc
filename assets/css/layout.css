@@ -1,0 +1,107 @@
+.dashboard-layout { 
+  display: flex; 
+  min-height: 100vh; 
+}
+
+.dashboard-sidebar { 
+  position: sticky; 
+  top: 0; 
+  width: 285px; 
+  height: 100vh; 
+  padding: 26px 20px; 
+  background: linear-gradient(180deg, var(--verde-oscuro), var(--verde-principal)); 
+  color: var(--blanco); 
+  flex-shrink: 0; 
+  overflow-y: auto; 
+}
+
+.dashboard-main { 
+  flex: 1; 
+  padding: 0 28px 28px 28px; 
+}
+
+.dashboard-topbar { 
+  position: sticky; 
+  top: 0; 
+  z-index: 900; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 26px; 
+  padding: 26px 32px; 
+  background: var(--blanco); 
+  border-left: 6px solid var(--amarillo-principal); 
+  border-radius: 0 0 22px 22px; 
+  box-shadow: var(--sombra-media); 
+}
+
+.dashboard-topbar h1 { 
+  margin-bottom: 8px; 
+  color: var(--verde-oscuro); 
+  font-size: 46px; 
+}
+
+.dashboard-topbar p { 
+  color: var(--gris-texto); 
+  font-size: 18px; 
+}
+
+.topbar-user { 
+  padding: 14px 22px; 
+  background: var(--verde-suave); 
+  color: var(--verde-oscuro); 
+  border-radius: 16px; 
+  font-weight: bold; 
+  font-size: 18px; 
+}
+
+.sidebar-brand { 
+  margin-bottom: 34px; 
+  padding-bottom: 26px; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15); 
+}
+
+.sidebar-logo { 
+  display: block; 
+  width: 74px; 
+  height: 74px; 
+  margin-bottom: 14px; 
+  object-fit: contain; 
+}
+
+.sidebar-brand h2 { 
+  font-size: 34px; 
+  color: var(--amarillo-principal); 
+  margin-bottom: 8px; 
+  line-height: 1.1; 
+}
+
+.sidebar-brand p { 
+  font-size: 16px; 
+  line-height: 1.35; 
+}
+
+.sidebar-menu { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+}
+
+.menu-item { 
+  padding: 14px 18px; 
+  color: var(--blanco); 
+  text-decoration: none; 
+  border-radius: 14px; 
+  font-size: 17px; 
+  font-weight: bold; 
+  transition: 0.2s; 
+}
+
+.menu-item:hover { 
+  background: rgba(255, 255, 255, 0.10); 
+}
+
+.menu-item.active { 
+  background: var(--amarillo-principal); 
+  color: #1f2a1f; 
+}

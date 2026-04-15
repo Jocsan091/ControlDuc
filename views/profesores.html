@@ -1,34 +1,16 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Profesores</title>
-  <link rel="stylesheet" href="../assets/css/styles.css">
-</head>
-<body>
-
-  <div class="container">
-    <h2>Gestión de Profesores</h2>
-
-    <button id="btnAgregar">Agregar Profesor</button>
-
-    <table border="1" width="100%" style="margin-top:20px;">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Asignaturas</th>
-          <th>Año</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="tablaProfesores">
-      </tbody>
-    </table>
-
-    <br>
-    <button onclick="window.location.href='dashboard.html'">Volver</button>
+<header class="dashboard-topbar">
+  <div>
+    <h1>Gestión de Profesores</h1>
+    <p>Administra los profesores registrados dentro del sistema.</p>
   </div>
+  <div class="d-flex gap-2 align-center">
+    <button class="btn-principal" id="btnAgregarProfesor">+ Agregar Nuevo</button>
+  </div>
+</header>
 
-  <script src="../assets/js/profesores.js"></script>
-</body>
-</html>
+<section class="modulo-profesores">
+  <div class="profesores-barra mt-0">
+    <input type="text" id="buscadorProfesores" class="input-global w-100 max-w-420" placeholder="Buscar profesor por nombre o rut...">
+  </div>
+  <div id="listaProfesores" class="lista-profesores"></div>
+</section>

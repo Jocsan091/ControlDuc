@@ -1,4 +1,25 @@
-document.addEventListener('DOMContentLoaded', async () => {
+async function cargarVistaParcial(idVista, archivo) {
+  const contenedor = document.getElementById(idVista);
+  if (!contenedor) return;
+
+  const url = new URL(archivo, window.location.href);
+  const respuesta = await fetch(url);
+  contenedor.innerHTML = await respuesta.text();
+}
+
+function inicializarLogout() {
+  const btnLogout = document.getElementById('logout');
+  if (!btnLogout || btnLogout.dataset.inicializado === 'true') return;
+
+  btnLogout.dataset.inicializado = 'true';
+  btnLogout.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (window.apiAuth) await window.apiAuth.logout();
+    window.location.replace('login.html');
+  });
+}
+
+async function inicializarDashboard() {
   if (window.apiAuth) {
     const sesion = await window.apiAuth.estadoSesion();
     if (!sesion.autenticado) {
@@ -7,14 +28,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  const btnLogout = document.getElementById('logout');
-  if (btnLogout) {
-    btnLogout.addEventListener('click', async (e) => {
-      e.preventDefault();
-      if (window.apiAuth) await window.apiAuth.logout();
-      window.location.replace('login.html');
-    });
-  }
+  await Promise.all([
+    cargarVistaParcial('vista-inicio', 'inicio.html'),
+    cargarVistaParcial('vista-profesores', 'profesores.html'),
+    cargarVistaParcial('vista-horariosanuales', 'horariosanuales.html'),
+    cargarVistaParcial('vista-resumen', 'resumen.html'),
+    cargarVistaParcial('vista-interferiados', 'interferiados.html')
+  ]);
+
+  inicializarLogout();
+  if (typeof window.inicializarVistaProfesores === 'function') window.inicializarVistaProfesores();
+  if (typeof window.inicializarVistaResumen === 'function') window.inicializarVistaResumen();
+  if (typeof window.inicializarNavegacion === 'function') window.inicializarNavegacion();
+  if (typeof window.cargarDatosIniciales === 'function') await window.cargarDatosIniciales();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  inicializarDashboard();
 });
 
 function actualizarDashboardInicio() {

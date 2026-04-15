@@ -182,7 +182,7 @@ async function guardarProfesor(indexEdicion) {
 }
 
 async function eliminarProfesor(index) {
-  if (confirm(`¿Eliminar al profesor ${profesores[index].nombre} y todo su historial?`)) {
+  if (confirm(`�Eliminar al profesor ${profesores[index].nombre} y todo su historial?`)) {
     document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
     profesores.splice(index, 1);
     await guardarDatosGlobales(); 
@@ -273,13 +273,8 @@ function verProfesor(index) {
       <div class="horario-card clickable-card" onclick="verHorario(${index}, ${i})">
         <div class="horario-info">
           <h3 class="mb-2">Horario ${h.anio}</h3>
-          
-          <div>
-            <p>Semestre 1: ${formatearFecha(h.inicioSemestre1)} a ${formatearFecha(h.finSemestre1)}</p>
-            <p>Semestre 2: ${formatearFecha(h.inicioSemestre2)} a ${formatearFecha(h.finSemestre2)}</p>
-          </div>
-          <br>
-          
+          <p>Semestre 1: ${formatearFecha(h.inicioSemestre1)} a ${formatearFecha(h.finSemestre1)}</p>
+          <p>Semestre 2: ${formatearFecha(h.inicioSemestre2)} a ${formatearFecha(h.finSemestre2)}</p>
         </div>
         <div class="acciones-tarjeta">
           <button class="btn-opciones" onclick="toggleMenuOpciones(event, 'menu-horario-${i}')">&#8942;</button>
@@ -302,8 +297,7 @@ function verProfesor(index) {
         </div>
       </div>
       <div class="d-flex gap-1 align-center">
-        <button class="btn-principal" id="btnAgregarHorarioPersonalizado">Agregar horario personalizado</button>
-        <button class="btn-principal btn-secundario" id="btnAgregarHorarioSobreCargado">Agregar horario sobrecargado</button>
+        <button class="btn-principal" id="btnAgregarHorario">Nuevo Horario</button>
       </div>
     </header>
 
@@ -327,33 +321,16 @@ function verProfesor(index) {
   `;
   window.cambiarVista(vistaDetalle, document.getElementById('menuProfesores'));
   document.getElementById('btnVolverProfesores').addEventListener('click', () => { window.cambiarVista(document.getElementById('vista-profesores'), document.getElementById('menuProfesores')); renderProfesores(); });
-  const btnAgregarHorarioPersonalizado = document.getElementById('btnAgregarHorarioPersonalizado');
-  const btnAgregarHorarioSobreCargado = document.getElementById('btnAgregarHorarioSobreCargado');
-  if (btnAgregarHorarioPersonalizado) btnAgregarHorarioPersonalizado.addEventListener('click', () => mostrarFormularioHorario(index, null, 'personalizado'));
-  if (btnAgregarHorarioSobreCargado) btnAgregarHorarioSobreCargado.addEventListener('click', () => mostrarFormularioHorario(index, null, 'precargado'));
-}
- 
-function crearCamposFechaHorario(prefix, horario = {}) {
-  return [
-    { label: 'Inicio Semestre 1 *', visibleId: `${prefix}Inicio1`, hiddenId: `${prefix}HiddenInicio1`, suffixId: `${prefix}SuffixInicio1`, visibleValue: formatearFechaParaInput(horario.inicioSemestre1), hiddenValue: formatearFechaParaInput(horario.inicioSemestre1), anio: horario.anio || '' },
-    { label: 'Fin Semestre 1 *', visibleId: `${prefix}Fin1`, hiddenId: `${prefix}HiddenFin1`, suffixId: `${prefix}SuffixFin1`, visibleValue: formatearFechaParaInput(horario.finSemestre1), hiddenValue: formatearFechaParaInput(horario.finSemestre1), anio: horario.anio || '' },
-    { label: 'Inicio Semestre 2 *', visibleId: `${prefix}Inicio2`, hiddenId: `${prefix}HiddenInicio2`, suffixId: `${prefix}SuffixInicio2`, visibleValue: formatearFechaParaInput(horario.inicioSemestre2), hiddenValue: formatearFechaParaInput(horario.inicioSemestre2), anio: horario.anio || '' },
-    { label: 'Fin Semestre 2 *', visibleId: `${prefix}Fin2`, hiddenId: `${prefix}HiddenFin2`, suffixId: `${prefix}SuffixFin2`, visibleValue: formatearFechaParaInput(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
-  ];
+  document.getElementById('btnAgregarHorario').addEventListener('click', () => mostrarFormularioHorario(index));
 }
 
-function obtenerValoresFechasHorarioCompleta(campos, anio = '') {
-  return campos.map((campo) => {
-    const hiddenInput = document.getElementById(campo.hiddenId);
-    const visibleInput = document.getElementById(campo.visibleId);
-    if (hiddenInput && hiddenInput.value.trim()) return hiddenInput.value.trim();
-    if (visibleInput) {
-      const visibleValue = visibleInput.value.trim();
-      if (window.validarFechaISO(visibleValue)) return visibleValue;
-      if (anio && window.validarDiaMes(visibleValue)) return window.construirFechaDesdeDiaMes(visibleValue, anio);
-    }
-    return '';
-  });
+function crearCamposFechaHorario(prefix, horario = {}) {
+  return [
+    { label: 'Inicio Semestre 1 *', visibleId: `${prefix}Inicio1`, hiddenId: `${prefix}HiddenInicio1`, suffixId: `${prefix}SuffixInicio1`, visibleValue: obtenerDiaMes(horario.inicioSemestre1), hiddenValue: formatearFechaParaInput(horario.inicioSemestre1), anio: horario.anio || '' },
+    { label: 'Fin Semestre 1 *', visibleId: `${prefix}Fin1`, hiddenId: `${prefix}HiddenFin1`, suffixId: `${prefix}SuffixFin1`, visibleValue: obtenerDiaMes(horario.finSemestre1), hiddenValue: formatearFechaParaInput(horario.finSemestre1), anio: horario.anio || '' },
+    { label: 'Inicio Semestre 2 *', visibleId: `${prefix}Inicio2`, hiddenId: `${prefix}HiddenInicio2`, suffixId: `${prefix}SuffixInicio2`, visibleValue: obtenerDiaMes(horario.inicioSemestre2), hiddenValue: formatearFechaParaInput(horario.inicioSemestre2), anio: horario.anio || '' },
+    { label: 'Fin Semestre 2 *', visibleId: `${prefix}Fin2`, hiddenId: `${prefix}HiddenFin2`, suffixId: `${prefix}SuffixFin2`, visibleValue: obtenerDiaMes(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
+  ];
 }
 
 function renderCamposFechaHorario(campos) {
@@ -387,15 +364,15 @@ function actualizarFormularioPrecargado(ip) {
 
   const disponibles = window.obtenerAniosPrecargadosDisponibles(ip);
   if (!disponibles.length) {
-    contenedor.innerHTML = '<div class="ficha-resumen col-span-full"><p>No hay años precargados disponibles para este docente.</p></div>';
+    contenedor.innerHTML = '<div class="ficha-resumen col-span-full"><p>No hay a�os precargados disponibles para este docente.</p></div>';
     return;
   }
 
   contenedor.innerHTML = `
     <div>
-      <label class="d-block mb-1">Año precargado *</label>
+      <label class="d-block mb-1">A�o precargado *</label>
       <select id="selectHorarioPrecargado" class="input-global w-100">
-        <option value="">Selecciona un año</option>
+        <option value="">Selecciona un a�o</option>
         ${disponibles.map((horario) => `<option value="${horario.anio}">${horario.anio}</option>`).join('')}
       </select>
     </div>
@@ -414,19 +391,33 @@ function actualizarFormularioPrecargado(ip) {
       return;
     }
 
-    destino.innerHTML = `
-      <div class="ficha-resumen ficha-resumen-simple col-span-full">
-        <p class="mb-2"><strong>Horario seleccionado: ${anio}</strong></p>
-        <p class="mb-1">Semestre 1: ${formatearFecha(plantilla.inicioSemestre1)} a ${formatearFecha(plantilla.finSemestre1)}</p>
-        <p>Semestre 2: ${formatearFecha(plantilla.inicioSemestre2)} a ${formatearFecha(plantilla.finSemestre2)}</p>
-      </div>
-    `;
+    const campos = crearCamposFechaHorario('precargado', plantilla);
+    destino.innerHTML = renderCamposFechaHorario(campos);
     destino.classList.remove('oculto');
+    window.inicializarCamposFechaConAnio(campos, () => select.value.trim());
   });
 }
 
+function actualizarFormularioPersonalizado() {
+  const contenedor = document.getElementById('bloqueHorarioPersonalizado');
+  if (!contenedor) return;
+
+  const camposPersonalizados = crearCamposFechaHorario('personalizado', {});
+  contenedor.innerHTML = `
+    <div>
+      <label class="d-block mb-1">A�o *</label>
+      <input type="number" id="anioHorarioPersonalizado" class="input-global w-100" min="2024" max="2099" onkeypress="return soloNumeros(event)">
+    </div>
+    ${renderCamposFechaHorario(camposPersonalizados)}
+  `;
+
+  const anioPersonalizado = document.getElementById('anioHorarioPersonalizado');
+  const controladorPersonalizado = window.inicializarCamposFechaConAnio(camposPersonalizados, () => anioPersonalizado.value.trim());
+  anioPersonalizado.addEventListener('input', () => controladorPersonalizado.actualizarAnioEnCampos(anioPersonalizado.value.trim()));
+}
+
 function activarModoHorario(modo) {
-  document.querySelectorAll('.opcion-modo-anio').forEach((opcion) => {
+  document.querySelectorAll('.opcion-modo-anio-boton').forEach((opcion) => {
     opcion.classList.toggle('activo', opcion.dataset.modo === modo);
   });
 
@@ -439,72 +430,45 @@ function activarModoHorario(modo) {
 
 function renderSelectorModoHorario() {
   return `
-    <div class="lista-profesores lista-opciones-horario">
-      <label class="horario-card clickable-card opcion-modo-anio" data-modo="precargado" tabindex="0">
+    <div class="d-flex gap-2 flex-wrap">
+      <label class="btn-secundario opcion-modo-anio-boton" data-modo="precargado" tabindex="0">
         <input type="radio" name="modoHorarioProfesor" value="precargado">
-        <div class="horario-info">
-          <h3 class="mb-2">Año precargado</h3>
-          <p>Carga un año ya creado en Horarios Anuales y luego puedes ajustarlo si hace falta.</p>
-        </div>
+        <span>A�o precargado</span>
       </label>
-      <label class="horario-card clickable-card opcion-modo-anio" data-modo="personalizado" tabindex="0">
+      <label class="btn-secundario opcion-modo-anio-boton" data-modo="personalizado" tabindex="0">
         <input type="radio" name="modoHorarioProfesor" value="personalizado">
-        <div class="horario-info">
-          <h3 class="mb-2">Año personalizado</h3>
-          <p>Crea un calendario propio para ese docente ingresando el año y las 4 fechas.</p>
-        </div>
+        <span>A�o personalizado</span>
       </label>
     </div>
   `;
 }
 
-function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
+function mostrarFormularioHorario(ip, ih = null) {
   if (document.querySelector('.modal')) return;
   document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
 
   const esEdicion = typeof ih === 'number';
   const horarioActual = esEdicion ? profesores[ip].horarios[ih] : {};
   const camposEdicion = esEdicion ? crearCamposFechaHorario('edicion', horarioActual) : [];
-  const camposPersonalizados = !esEdicion ? crearCamposFechaHorario('personalizado', {}) : [];
-
-  const tituloModal = esEdicion
-    ? 'Editar Fechas del Horario'
-    : modoInicial === 'personalizado'
-      ? 'Agregar horario personalizado'
-      : modoInicial === 'precargado'
-        ? 'Agregar horario sobrecargado'
-        : 'Nuevo Horario';
-
-  const mostrarBloquePrecargado = !esEdicion && modoInicial === 'precargado';
-  const mostrarBloquePersonalizado = !esEdicion && modoInicial === 'personalizado';
-  const mostrarSelector = !esEdicion && !modoInicial;
-
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
-        <h3>${tituloModal}</h3>
+        <h3>${esEdicion ? 'Editar Fechas del Horario' : 'Nuevo Horario'}</h3>
         ${esEdicion ? `
-          <p class="fs-sm text-muted mt-0">Puedes ajustar este horario aunque haya sido creado desde un año precargado.</p>
+          <p class="fs-sm text-muted mt-0">Puedes ajustar este horario aunque haya sido creado desde un a�o precargado.</p>
           <div>
-            <label class="d-block mb-1">Año *</label>
+            <label class="d-block mb-1">A�o *</label>
             <input type="number" id="anioHorarioEdicion" class="input-global w-100 bg-gray-light" value="${horarioActual.anio || ''}" readonly>
           </div>
           ${renderCamposFechaHorario(camposEdicion)}
-        ` : modoInicial === 'precargado' ? `
-          <div id="bloqueHorarioPrecargado" class="bloque-horario-opcion mt-3">
+        ` : `
+          <p class="fs-sm text-muted mt-0">Primero elige el tipo de horario que quieres crear.</p>
+          ${renderSelectorModoHorario()}
+          <div id="bloqueHorarioPrecargado" class="bloque-horario-opcion mt-3 oculto">
             <div id="bloquePrecargadoOpciones"></div>
           </div>
-        ` : `
-          ${mostrarSelector ? `<p class="fs-sm text-muted mt-0">Primero elige el tipo de horario que quieres crear.</p>` : ''}
-          ${mostrarSelector ? renderSelectorModoHorario() : ''}
-          ${modoInicial === 'personalizado' ? `
-            <div>
-              <label class="d-block mb-1">Año *</label>
-              <input type="number" id="anioHorarioPersonalizado" class="input-global w-100" min="2024" max="2099" onkeypress="return soloNumeros(event)">
-            </div>
-            ${renderCamposFechaHorario(camposPersonalizados)}
-          ` : ''}
+          <div id="bloqueHorarioPersonalizado" class="bloque-horario-opcion mt-3 oculto"></div>
         `}
         <div id="errorHorarioProfesor" class="text-danger fw-bold fs-md mt-3 text-center d-none"></div>
         <div class="modal-botones mt-3"><button id="guardarHorario" class="btn-principal">Guardar</button><button id="cancelar" class="btn-secundario">Cancelar</button></div>
@@ -514,40 +478,17 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
 
   if (esEdicion) {
     window.inicializarCamposFechaConAnio(camposEdicion, () => horarioActual.anio);
-  } else if (modoInicial === 'personalizado') {
-    const anioPersonalizado = document.getElementById('anioHorarioPersonalizado');
-    const controladorPersonalizado = window.inicializarCamposFechaConAnio(camposPersonalizados, () => anioPersonalizado.value.trim());
-    anioPersonalizado.addEventListener('input', () => controladorPersonalizado.actualizarAnioEnCampos(anioPersonalizado.value.trim()));
-  } else if (modoInicial === 'precargado') {
-    actualizarFormularioPrecargado(ip);
   } else {
-    const anioPersonalizado = document.getElementById('anioHorarioPersonalizado');
-    const controladorPersonalizado = window.inicializarCamposFechaConAnio(camposPersonalizados, () => anioPersonalizado ? anioPersonalizado.value.trim() : '');
-    if (anioPersonalizado) {
-      anioPersonalizado.addEventListener('input', () => controladorPersonalizado.actualizarAnioEnCampos(anioPersonalizado.value.trim()));
-    }
-
     document.querySelectorAll('input[name="modoHorarioProfesor"]').forEach((input) => {
       input.addEventListener('change', () => {
         if (input.value === 'precargado') actualizarFormularioPrecargado(ip);
+        if (input.value === 'personalizado') actualizarFormularioPersonalizado();
         activarModoHorario(input.value);
         ocultarErrorHorario();
       });
     });
 
-    if (modoInicial) {
-      const radioInicial = document.querySelector(`input[name="modoHorarioProfesor"][value="${modoInicial}"]`);
-      if (radioInicial) {
-        radioInicial.checked = true;
-        radioInicial.dispatchEvent(new Event('change'));
-      }
-
-      if (modoInicial === 'precargado') {
-        actualizarFormularioPrecargado(ip);
-      }
-    }
-
-    document.querySelectorAll('.opcion-modo-anio').forEach((opcion) => {
+    document.querySelectorAll('.opcion-modo-anio-boton').forEach((opcion) => {
       opcion.addEventListener('click', () => {
         const input = opcion.querySelector('input');
         input.checked = true;
@@ -568,12 +509,14 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
 
     if (esEdicion) {
       const [inicio1, fin1, inicio2, fin2] = obtenerValoresFechasHorario(camposEdicion);
-      if (![inicio1, fin1, inicio2, fin2].every(window.validarDiaMes)) return mostrarErrorHorario('Completa las 4 fechas usando el selector de fecha.');
+      if (![inicio1, fin1, inicio2, fin2].every(window.validarDiaMes)) return mostrarErrorHorario('Completa las 4 fechas usando el formato dd-mm.');
 
-      const [inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha] = obtenerValoresFechasHorarioCompleta(camposEdicion, horarioActual.anio);
-      if (![inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha].every(window.validarFechaISO)) return mostrarErrorHorario('Completa las 4 fechas usando el selector de fecha.');
+      const inicio1Fecha = window.construirFechaDesdeDiaMes(inicio1, horarioActual.anio);
+      const fin1Fecha = window.construirFechaDesdeDiaMes(fin1, horarioActual.anio);
+      const inicio2Fecha = window.construirFechaDesdeDiaMes(inicio2, horarioActual.anio);
+      const fin2Fecha = window.construirFechaDesdeDiaMes(fin2, horarioActual.anio);
 
-      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres estan en orden incorrecto.');
+      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres est�n en orden incorrecto.');
 
       const horarioEditado = profesores[ip].horarios[ih];
       horarioEditado.inicioSemestre1 = inicio1Fecha;
@@ -586,7 +529,7 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
       return verHorario(ip, ih);
     }
 
-    const modo = modoInicial || document.querySelector('input[name="modoHorarioProfesor"]:checked')?.value || 'precargado';
+    const modo = document.querySelector('input[name="modoHorarioProfesor"]:checked')?.value || 'precargado';
     let nuevoHorario = null;
 
     if (modo === 'precargado') {
@@ -594,21 +537,39 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
       const anio = select ? select.value.trim() : '';
       const plantilla = window.obtenerHorarioAnualPorAnio(anio);
 
-      if (!anio || !plantilla) return mostrarErrorHorario('Selecciona un año precargado.');
-      if (window.profesorTieneHorarioAnio(ip, anio)) return mostrarErrorHorario(`Este docente ya tiene un horario para el año ${anio}.`);
+      if (!anio || !plantilla) return mostrarErrorHorario('Selecciona un a�o precargado.');
+      if (window.profesorTieneHorarioAnio(ip, anio)) return mostrarErrorHorario(`Este docente ya tiene un horario para el a�o ${anio}.`);
+
+      const camposPrecargados = crearCamposFechaHorario('precargado', plantilla);
+      const [inicio1, fin1, inicio2, fin2] = obtenerValoresFechasHorario(camposPrecargados);
+      if (![inicio1, fin1, inicio2, fin2].every(window.validarDiaMes)) return mostrarErrorHorario('Completa las 4 fechas usando el formato dd-mm.');
+
+      const inicio1Fecha = window.construirFechaDesdeDiaMes(inicio1, anio);
+      const fin1Fecha = window.construirFechaDesdeDiaMes(fin1, anio);
+      const inicio2Fecha = window.construirFechaDesdeDiaMes(inicio2, anio);
+      const fin2Fecha = window.construirFechaDesdeDiaMes(fin2, anio);
+
+      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres están en orden incorrecto.');
 
       nuevoHorario = window.crearHorarioClonadoDesdePlantilla(plantilla);
+      nuevoHorario.inicioSemestre1 = inicio1Fecha;
+      nuevoHorario.finSemestre1 = fin1Fecha;
+      nuevoHorario.inicioSemestre2 = inicio2Fecha;
+      nuevoHorario.finSemestre2 = fin2Fecha;
     } else {
       const anio = document.getElementById('anioHorarioPersonalizado').value.trim();
+      const camposPersonalizados = crearCamposFechaHorario('personalizado', {});
       const [inicio1, fin1, inicio2, fin2] = obtenerValoresFechasHorario(camposPersonalizados);
 
-      if (!anio || ![inicio1, fin1, inicio2, fin2].every((valor) => window.validarDiaMes(valor) || window.validarFechaISO(valor))) return mostrarErrorHorario('Ingresa el año y completa las 4 fechas usando el selector de fecha.');
-      if (window.profesorTieneHorarioAnio(ip, anio)) return mostrarErrorHorario(`Este docente ya tiene un horario para el año ${anio}.`);
+      if (!anio || ![inicio1, fin1, inicio2, fin2].every(window.validarDiaMes)) return mostrarErrorHorario('Ingresa el a�o y completa las 4 fechas usando el formato dd-mm.');
+      if (window.profesorTieneHorarioAnio(ip, anio)) return mostrarErrorHorario(`Este docente ya tiene un horario para el a�o ${anio}.`);
 
-      const [inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha] = obtenerValoresFechasHorarioCompleta(camposPersonalizados, anio);
-      if (![inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha].every(window.validarFechaISO)) return mostrarErrorHorario('Ingresa el año y completa las 4 fechas usando el selector de fecha.');
+      const inicio1Fecha = window.construirFechaDesdeDiaMes(inicio1, anio);
+      const fin1Fecha = window.construirFechaDesdeDiaMes(fin1, anio);
+      const inicio2Fecha = window.construirFechaDesdeDiaMes(inicio2, anio);
+      const fin2Fecha = window.construirFechaDesdeDiaMes(fin2, anio);
 
-      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres estan en orden incorrecto.');
+      if (!window.validarSemestres(inicio1Fecha, fin1Fecha, inicio2Fecha, fin2Fecha)) return mostrarErrorHorario('Las fechas de los semestres están en orden incorrecto.');
 
       nuevoHorario = {
         anio,
@@ -634,7 +595,7 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
   habilitarEnterEnModal('guardarHorario');
 }
 async function eliminarHorario(ip, ih) {
-  if (confirm(`¿Seguro de eliminar el horario ${profesores[ip].horarios[ih].anio}?`)) {
+  if (confirm(`�Seguro de eliminar el horario ${profesores[ip].horarios[ih].anio}?`)) {
     document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
     profesores[ip].horarios.splice(ih, 1);
     await guardarDatosGlobales(); verProfesor(ip); 
@@ -642,14 +603,14 @@ async function eliminarHorario(ip, ih) {
 }
 
 window.borrarFalta = async function(ip, ih, iFalta) {
-  if(confirm('¿Seguro de borrar esta falta/permiso? El día volverá a quedar limpio.')) {
+  if(confirm('�Seguro de borrar esta falta/permiso? El día volverá a quedar limpio.')) {
     profesores[ip].horarios[ih].faltas.splice(iFalta, 1);
     await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); mostrarAdministradorIncidencias(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   }
 }
 
 window.borrarLicencia = async function(ip, ih, iLic) {
-  if(confirm('¿Seguro de borrar esta licencia médica?')) {
+  if(confirm('�Seguro de borrar esta licencia médica?')) {
     profesores[ip].horarios[ih].licencias.splice(iLic, 1);
     await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); mostrarAdministradorIncidencias(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   }
@@ -672,7 +633,7 @@ function mostrarAdministradorIncidencias(ip, ih) {
     <div class="d-flex justify-between align-center p-2 bg-gray-light border-muted border-radius-md mb-2">
       <div><strong class="text-primary">${formatearFecha(f.fecha)}</strong> - <span class="text-danger fw-bold">${f.tipo}</span><br><span class="fs-sm text-muted">Motivo: ${f.motivo || '-'}</span></div>
       <button class="btn-danger py-1 px-2 fs-xs border-none cursor-pointer" onclick="borrarFalta(${ip}, ${ih}, ${i})">Borrar</button>
-    </div>`).join('') || '<p class="text-muted fs-sm">No hay faltas registradas este año.</p>';
+    </div>`).join('') || '<p class="text-muted fs-sm">No hay faltas registradas este a�o.</p>';
 
   let lHtml = (h.licencias || []).map((l, i) => {
     const btnArchivo = l.archivoAdjunto ? `<button class="btn-principal bg-success-light text-success border-success py-1 px-2 fs-xs border-none cursor-pointer mr-2" style="margin-right: 8px;" onclick="window.abrirLicenciaPDF('${l.archivoAdjunto}')">Ver Documento</button>` : '';
@@ -685,7 +646,7 @@ function mostrarAdministradorIncidencias(ip, ih) {
         <button class="btn-danger py-1 px-2 fs-xs border-none cursor-pointer" onclick="borrarLicencia(${ip}, ${ih}, ${i})">Borrar</button>
       </div>
     </div>`
-  }).join('') || '<p class="text-muted fs-sm">No hay licencias registradas este año.</p>';
+  }).join('') || '<p class="text-muted fs-sm">No hay licencias registradas este a�o.</p>';
 
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
@@ -760,7 +721,7 @@ function mostrarFormularioFalta(ip, ih) {
     const t = document.getElementById('tipoFalta').value; 
     const f = document.getElementById('fechaFalta').value;
     
-    if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida o fuera del año escolar.");
+    if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida o fuera del a�o escolar.");
 
     const h = profesores[ip].horarios[ih];
     
@@ -820,7 +781,7 @@ function mostrarFormularioLicencia(ip, ih) {
     const fi = document.getElementById('fILic').value; 
     const ff = document.getElementById('fFLic').value;
     
-    if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas o fuera del año escolar.");
+    if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas o fuera del a�o escolar.");
     if (fi > ff) return alert("Error Lógico: La fecha de inicio no puede ser mayor a la fecha de fin.");
 
     const h = profesores[ip].horarios[ih];
@@ -874,4 +835,5 @@ function editarHora(ip, ih, d, t) {
   document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button><h3>Hora</h3><input type="time" id="iHora" class="input-global w-100"><div class="modal-botones"><button id="gHora" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
   document.getElementById('gHora').addEventListener('click', async () => { profesores[ip].horarios[ih].horarioClases[d][t] = document.getElementById('iHora').value || ''; await guardarDatosGlobales(); cerrarModal(); verHorarioClases(ip, ih); });
 }
+
 

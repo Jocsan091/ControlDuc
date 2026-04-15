@@ -1,0 +1,27 @@
+<header class="dashboard-topbar">
+  <div>
+    <h1>Gestión de Interferiados</h1>
+    <p>Administra los días feriados y jornadas especiales del año.</p>
+  </div>
+</header>
+
+<section class="modulo-profesores">
+  <div class="ficha-resumen">
+    <div class="col-span-full">
+      <h3 class="mb-2 text-primary">Calendario de Feriados e Interferiados</h3>
+      <p class="mb-3 text-muted">Agrega los días en los que el colegio no tendrá clases por razones oficiales. El sistema los tachará automáticamente en los calendarios de todos los docentes.</p>
+
+      <div class="d-flex gap-1 mb-3 flex-wrap">
+        <input type="date" id="inputFeriado" class="input-global">
+        <select id="tipoFeriado" class="input-global w-auto">
+          <option value="Feriado">Feriado Oficial</option>
+          <option value="Interferiado">Interferiado</option>
+        </select>
+        <input type="text" id="descFeriado" class="input-global flex-1" placeholder="Motivo (Ej: Fiestas Patrias)" maxlength="50">
+        <button class="btn-principal" onclick="window.agregarFeriado()">+ Agregar Día Libre</button>
+      </div>
+
+      <ul id="listaFeriados" class="list-none p-0 d-flex flex-column gap-1"></ul>
+    </div>
+  </div>
+</section>

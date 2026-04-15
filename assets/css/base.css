@@ -1,0 +1,40 @@
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+body { 
+  font-family: Arial, sans-serif; 
+  background: var(--gris-fondo); 
+  color: #222; 
+}
+
+.login-body { 
+  background: var(--gris-fondo); 
+}
+
+.input-global { 
+  padding: 12px 14px; 
+  border: 1px solid var(--gris-borde); 
+  border-radius: 10px; 
+  font-size: 15px; 
+}
+
+.container { 
+  width: 100%; 
+  max-width: 500px; 
+  margin: 90px auto; 
+  padding: 35px; 
+  background: var(--blanco); 
+  border-radius: 20px; 
+  border-top: 6px solid var(--verde-principal); 
+  box-shadow: var(--sombra-suave); 
+  text-align: center; 
+}
+
+.container h2 { 
+  margin-bottom: 20px; 
+  color: var(--verde-oscuro); 
+  font-size: 38px; 
+}

@@ -1,0 +1,34 @@
+<header class="dashboard-topbar">
+  <div>
+    <h1>Toma de Lista Diaria</h1>
+    <p id="fechaHoyResumen" class="fs-md text-muted mt-1">Cargando fecha...</p>
+  </div>
+</header>
+
+<section class="modulo-profesores">
+  <div class="profesores-superior p-3 d-flex flex-column align-left gap-2">
+    <input type="text" id="buscadorResumen" class="input-global w-100 max-w-420" placeholder="Buscar por nombre o RUT...">
+
+    <div class="filtros-resumen d-flex gap-1 flex-wrap">
+      <button class="filtro-btn activo-todos" data-filtro="todos">Todos: <span id="countTodos">0</span></button>
+      <button class="filtro-btn" data-filtro="presente">Presentes: <span id="countPresentes">0</span></button>
+      <button class="filtro-btn" data-filtro="falta">Faltas/Permisos: <span id="countFaltas">0</span></button>
+      <button class="filtro-btn" data-filtro="licencia">Licencias: <span id="countLicencias">0</span></button>
+    </div>
+  </div>
+
+  <div class="tabla-horario-contenedor">
+    <table class="tabla-horario-clases w-100">
+      <thead>
+        <tr>
+          <th class="text-left px-3">Profesor</th>
+          <th>RUT</th>
+          <th>Estado Actual</th>
+          <th>Acción Rápida</th>
+          <th>Perfil</th>
+        </tr>
+      </thead>
+      <tbody id="listaAsistenciaDiaria"></tbody>
+    </table>
+  </div>
+</section>

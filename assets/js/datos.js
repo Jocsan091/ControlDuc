@@ -3,6 +3,7 @@ const CURSOS = ['1°', '2°', '3°', '4°', '5°A', '5°B', '6°A', '6°B', '7°
 
 var profesores = [];
 var feriadosGlobales = [];
+var horariosAnuales = [];
 var configuracion = {};
 
 window.obtenerFeriados = function() {
@@ -44,17 +45,24 @@ function cerrarModal() {
   if (modal) modal.remove();
 }
 
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  if (!document.querySelector('.modal')) return;
+  cerrarModal();
+});
+
 async function guardarDatosGlobales() {
   if (window.apiBaseDatos) {
     const exito = await window.apiBaseDatos.guardar({
       profesores: profesores,
-      feriadosGlobales: feriadosGlobales
+      feriadosGlobales: feriadosGlobales,
+      horariosAnuales: horariosAnuales
     });
     if (!exito) console.error("Error crítico guardando.");
   }
 }
 
-async function cargarDatosIniciales() {
+window.cargarDatosIniciales = async function() {
   const enLogin = window.location.pathname.includes('login.html');
   if (enLogin) return;
 
@@ -67,6 +75,7 @@ async function cargarDatosIniciales() {
 
     profesores = bd.profesores || [];
     feriadosGlobales = bd.feriadosGlobales || [];
+    horariosAnuales = bd.horariosAnuales || [];
     configuracion = window.apiConfiguracion ? await window.apiConfiguracion.obtenerPublica() : {};
 
     if (window.location.pathname.includes('dashboard.html') && configuracion.nombreColegio) {
@@ -81,11 +90,11 @@ async function cargarDatosIniciales() {
 
     if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
     if (typeof renderProfesores === 'function' && document.getElementById('listaProfesores')) renderProfesores();
+    if (typeof window.renderHorariosAnuales === 'function') window.renderHorariosAnuales();
     if (typeof window.renderFeriados === 'function') window.renderFeriados();
+    if (typeof renderListaDiaria === 'function' && document.getElementById('listaAsistenciaDiaria')) renderListaDiaria();
   }
 }
-
-cargarDatosIniciales();
 
 window.formatearFechaGlobal = function(fechaStr) {
   if (!fechaStr) return '-';

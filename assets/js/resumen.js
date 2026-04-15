@@ -16,7 +16,7 @@ window.aplicarFiltroResumen = function(filtro) {
   renderListaDiaria();
 };
 
-function renderListaDiaria() {
+window.renderListaDiaria = function() {
   const tbody = document.getElementById('listaAsistenciaDiaria');
   if (!tbody) return;
 
@@ -154,7 +154,7 @@ async function revertirFaltaRapida(indexP, indexH, fecha) {
   await guardarDatosGlobales(); renderListaDiaria(); if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+window.inicializarVistaResumen = function() {
   const buscadorResumen = document.getElementById('buscadorResumen');
   if (buscadorResumen) buscadorResumen.addEventListener('input', (e) => { busquedaActualResumen = e.target.value.trim().toLowerCase(); renderListaDiaria(); });
 
@@ -166,4 +166,4 @@ document.addEventListener('DOMContentLoaded', () => {
       window.aplicarFiltroResumen(target.dataset.filtro);
     });
   });
-});
+};
