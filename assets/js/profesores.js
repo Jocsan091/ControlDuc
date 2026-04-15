@@ -466,6 +466,74 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
   document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
 
   const h = typeof ih === 'number' ? profesores[ip].horarios[ih] : {};
+  const modo = modoInicial || (typeof ih === 'number' ? 'editar' : 'personalizado');
+
+  if (modo === 'precargado' && typeof ih !== 'number') {
+    const disponibles = window.obtenerAniosPrecargadosDisponibles(ip);
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="modal">
+        <div class="modal-content modal-largo">
+          <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
+          <h3>Agregar horario sobrecargado</h3>
+          <p class="fs-sm text-muted mt-0">Selecciona un año precargado para clonar sus fechas.</p>
+          <div>
+            <label class="d-block mb-1">Año precargado *</label>
+            <select id="selectHorarioPrecargado" class="input-global w-100">
+              <option value="">Selecciona un año</option>
+              ${disponibles.map((horario) => `<option value="${horario.anio}">${horario.anio}</option>`).join('')}
+            </select>
+          </div>
+          <div id="previewHorarioPrecargado" class="oculto mt-3"></div>
+          <div class="modal-botones mt-3"><button id="guardarHorarioPrecargado" class="btn-principal">Agregar horario</button><button id="cancelar" class="btn-secundario">Cancelar</button></div>
+        </div>
+      </div>
+    `);
+
+    const select = document.getElementById('selectHorarioPrecargado');
+    const preview = document.getElementById('previewHorarioPrecargado');
+    const guardarBtn = document.getElementById('guardarHorarioPrecargado');
+
+    const actualizarPreview = () => {
+      const anio = select.value;
+      const plantilla = window.obtenerHorarioAnualPorAnio(anio);
+      if (!anio || !plantilla) {
+        preview.classList.add('oculto');
+        preview.innerHTML = '';
+        guardarBtn.disabled = true;
+        return;
+      }
+      preview.innerHTML = `
+        <div class="ficha-resumen ficha-resumen-simple col-span-full">
+          <p class="mb-2"><strong>Horario seleccionado: ${anio}</strong></p>
+          <p class="mb-1">Semestre 1: ${formatearFecha(plantilla.inicioSemestre1)} a ${formatearFecha(plantilla.finSemestre1)}</p>
+          <p>Semestre 2: ${formatearFecha(plantilla.inicioSemestre2)} a ${formatearFecha(plantilla.finSemestre2)}</p>
+        </div>
+      `;
+      preview.classList.remove('oculto');
+      guardarBtn.disabled = false;
+    };
+
+    select.addEventListener('change', actualizarPreview);
+    if (!disponibles.length) {
+      preview.classList.remove('oculto');
+      preview.innerHTML = '<div class="ficha-resumen col-span-full"><p>No hay años precargados disponibles para este docente.</p></div>';
+      guardarBtn.disabled = true;
+    }
+
+    guardarBtn.addEventListener('click', async () => {
+      const anio = select.value;
+      if (!anio) return alert('Selecciona un año precargado para continuar.');
+      const plantilla = window.obtenerHorarioAnualPorAnio(anio);
+      if (!plantilla) return alert('El año seleccionado no es válido.');
+      profesores[ip].horarios.push(window.crearHorarioClonadoDesdePlantilla(plantilla));
+      await guardarDatosGlobales(); cerrarModal(); verProfesor(ip);
+    });
+
+    document.getElementById('cancelar').addEventListener('click', cerrarModal);
+    habilitarEnterEnModal('guardarHorarioPrecargado');
+    return;
+  }
+
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
