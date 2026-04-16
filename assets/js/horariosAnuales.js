@@ -2,6 +2,51 @@ function formatearFechaParaInput(fechaStr) {
   return fechaStr || '';
 }
 
+window.obtenerDiasActivosPorDefecto = function() {
+  return {
+    lunes: true,
+    martes: true,
+    miercoles: true,
+    jueves: true,
+    viernes: true
+  };
+};
+
+window.renderDiasActivosSelector = function(prefix, diasActivos = {}) {
+  const dias = [
+    { key: 'lunes', abbr: 'LU' },
+    { key: 'martes', abbr: 'MA' },
+    { key: 'miercoles', abbr: 'MI' },
+    { key: 'jueves', abbr: 'JU' },
+    { key: 'viernes', abbr: 'VI' }
+  ];
+
+  return `
+    <div class="dias-activos-grid">
+      <div class="dias-activos-nombres">
+        ${dias.map(d => `<div>${d.abbr}</div>`).join('')}
+      </div>
+      <div class="dias-activos-toggles">
+        ${dias.map(d => `
+          <label class="toggle-dia" for="${prefix}dia-${d.key}">
+            <input type="checkbox" id="${prefix}dia-${d.key}" data-dia="${d.key}" class="dias-activos-checkbox" ${diasActivos[d.key] ? 'checked' : ''}>
+            <span></span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `;
+};
+
+window.obtenerDiasActivosDeModal = function(prefix = '') {
+  const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+  return dias.reduce((resultado, dia) => {
+    const input = document.getElementById(`${prefix}dia-${dia}`);
+    resultado[dia] = !!(input && input.checked);
+    return resultado;
+  }, {});
+};
+
 function obtenerDiaMes(fechaStr) {
   if (!fechaStr) return '';
   const partes = fechaStr.split('-');
@@ -43,13 +88,14 @@ window.profesorTieneHorarioAnio = function(indexProfesor, anio, indexHorarioActu
   return profesores[indexProfesor].horarios.some((horario, index) => horario.anio === anio && index !== indexHorarioActual);
 };
 
-window.crearHorarioClonadoDesdePlantilla = function(plantilla) {
+window.crearHorarioClonadoDesdePlantilla = function(plantilla, diasActivos) {
   return {
     anio: plantilla.anio,
     inicioSemestre1: plantilla.inicioSemestre1,
     finSemestre1: plantilla.finSemestre1,
     inicioSemestre2: plantilla.inicioSemestre2,
     finSemestre2: plantilla.finSemestre2,
+    diasActivos: diasActivos || plantilla.diasActivos || window.obtenerDiasActivosPorDefecto(),
     faltas: [],
     licencias: [],
     horarioClases: crearHorarioClasesBase()
@@ -152,11 +198,13 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
     { label: 'Fin Semestre 2 *', visibleId: 'finSemestre2Anual', hiddenId: 'hiddenFinSemestre2Anual', suffixId: 'suffixFinSemestre2Anual', visibleValue: formatearFechaParaInput(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
   ];
 
+  const diasActivosIniciales = horario.diasActivos || window.obtenerDiasActivosPorDefecto();
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal">
       <div class="modal-content modal-largo">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>${typeof indexEdicion === 'number' ? 'Editar Horario Anual' : 'Nuevo Horario Anual'}</h3>
+        ${window.renderDiasActivosSelector('anual-', diasActivosIniciales)}
         <div class="form-grid formulario-anual-grid">
           <div class="col-span-full">
             <label class="d-block mb-1">Año *</label>
@@ -217,12 +265,14 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
       return;
     }
 
+    const diasActivos = window.obtenerDiasActivosDeModal('anual-');
     const horarioNuevo = {
       anio,
       inicioSemestre1: inicio1Fecha,
       finSemestre1: fin1Fecha,
       inicioSemestre2: inicio2Fecha,
-      finSemestre2: fin2Fecha
+      finSemestre2: fin2Fecha,
+      diasActivos
     };
 
     if (typeof indexEdicion === 'number') {

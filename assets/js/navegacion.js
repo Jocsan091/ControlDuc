@@ -70,10 +70,21 @@ window.inicializarNavegacion = function() {
     if (typeof renderProfesores === 'function') renderProfesores();
   });
 
+  const btnAccionHorariosAnuales = document.getElementById('btnAccionHorariosAnuales');
+  if (btnAccionHorariosAnuales) btnAccionHorariosAnuales.addEventListener('click', () => {
+    window.cambiarVista(vistaHorariosAnuales, menuHorariosAnuales);
+    if (typeof window.renderHorariosAnuales === 'function') window.renderHorariosAnuales();
+  });
+
   const btnAccionResumen = document.getElementById('btnAccionResumen');
   if (btnAccionResumen) btnAccionResumen.addEventListener('click', () => {
     window.cambiarVista(vistaResumen, menuResumen);
     if (typeof renderListaDiaria === 'function') renderListaDiaria();
+  });
+
+  const btnAccionInterferiados = document.getElementById('btnAccionInterferiados');
+  if (btnAccionInterferiados) btnAccionInterferiados.addEventListener('click', () => {
+    window.cambiarVista(vistaInterferiados, menuInterferiados);
   });
 
   function navegarYFiltrarResumen(filtro) {

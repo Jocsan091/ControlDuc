@@ -466,6 +466,7 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
   document.querySelectorAll('.menu-opciones').forEach(m => m.classList.remove('mostrar'));
 
   const h = typeof ih === 'number' ? profesores[ip].horarios[ih] : {};
+  const diasActivosIniciales = h.diasActivos || window.obtenerDiasActivosPorDefecto();
   const modo = modoInicial || (typeof ih === 'number' ? 'editar' : 'personalizado');
 
   if (modo === 'precargado' && typeof ih !== 'number') {
@@ -483,7 +484,12 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
               ${disponibles.map((horario) => `<option value="${horario.anio}">${horario.anio}</option>`).join('')}
             </select>
           </div>
-          <div id="previewHorarioPrecargado" class="oculto mt-3"></div>
+          <div class="mt-2">
+            <p class="fs-sm text-muted mb-1">Escoge los días que el docente bajará durante la semana.</p>
+            ${window.renderDiasActivosSelector('precargado-', window.obtenerDiasActivosPorDefecto())}
+            <p class="fs-xs text-muted mt-1">Después de seleccionar el año precargado verás la información de semestres y podrás avanzar a la carga del horario de clases.</p>
+          </div>
+          <div id="previewHorarioPrecargado" class="oculto mt-2"></div>
           <div class="modal-botones mt-3"><button id="guardarHorarioPrecargado" class="btn-principal">Agregar horario</button><button id="cancelar" class="btn-secundario">Cancelar</button></div>
         </div>
       </div>
@@ -502,6 +508,11 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
         guardarBtn.disabled = true;
         return;
       }
+      const diasActivosPlantilla = plantilla.diasActivos || window.obtenerDiasActivosPorDefecto();
+      Object.entries(diasActivosPlantilla).forEach(([dia, activo]) => {
+        const input = document.getElementById(`precargado-dia-${dia}`);
+        if (input) input.checked = activo;
+      });
       preview.innerHTML = `
         <div class="ficha-resumen ficha-resumen-simple col-span-full">
           <p class="mb-2"><strong>Horario seleccionado: ${anio}</strong></p>
@@ -525,7 +536,8 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
       if (!anio) return alert('Selecciona un año precargado para continuar.');
       const plantilla = window.obtenerHorarioAnualPorAnio(anio);
       if (!plantilla) return alert('El año seleccionado no es válido.');
-      profesores[ip].horarios.push(window.crearHorarioClonadoDesdePlantilla(plantilla));
+      const diasActivos = window.obtenerDiasActivosDeModal('precargado-');
+      profesores[ip].horarios.push(window.crearHorarioClonadoDesdePlantilla(plantilla, diasActivos));
       await guardarDatosGlobales(); cerrarModal(); verProfesor(ip);
     });
 
@@ -539,7 +551,9 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
       <div class="modal-content modal-largo">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>${typeof ih === 'number' ? 'Editar Fechas' : 'Nuevo Horario'}</h3>
-        <p class="fs-sm text-muted mt-0">Ingresa el año primero para configurar el calendario.</p>
+        <p class="fs-sm text-muted mt-0">Escoge los días que el docente bajará durante la semana.</p>
+        ${window.renderDiasActivosSelector('horario-', diasActivosIniciales)}
+        <p class="fs-xs text-muted mb-2">A continuación ingresa el año y las fechas de los semestres que formarán el calendario.</p>
         <input type="number" id="anioHorario" class="input-global" value="${h.anio || ''}" ${typeof ih === 'number' ? 'readonly class="bg-gray-light"' : ''} onkeypress="return soloNumeros(event)">
         <div id="contenedorFechas" class="${typeof ih === 'number' ? '' : 'opacidad-mitad'}">
           <label class="d-block mb-1 mt-2">Inicio/Fin Semestre 1</label>
@@ -601,10 +615,11 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
       return alert("Error Lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
     }
 
+    const diasActivos = window.obtenerDiasActivosDeModal('horario-');
     if (typeof ih !== 'number') {
-      profesores[ip].horarios.push({ anio: anioInp.value, inicioSemestre1: is1, finSemestre1: fs1, inicioSemestre2: is2, finSemestre2: fs2, faltas: [], licencias: [], horarioClases: crearHorarioClasesBase() });
+      profesores[ip].horarios.push({ anio: anioInp.value, inicioSemestre1: is1, finSemestre1: fs1, inicioSemestre2: is2, finSemestre2: fs2, diasActivos, faltas: [], licencias: [], horarioClases: crearHorarioClasesBase() });
     } else {
-      const h = profesores[ip].horarios[ih]; h.inicioSemestre1 = is1; h.finSemestre1 = fs1; h.inicioSemestre2 = is2; h.finSemestre2 = fs2;
+      const h = profesores[ip].horarios[ih]; h.inicioSemestre1 = is1; h.finSemestre1 = fs1; h.inicioSemestre2 = is2; h.finSemestre2 = fs2; h.diasActivos = diasActivos;
     }
     await guardarDatosGlobales(); cerrarModal(); typeof ih !== 'number' ? verProfesor(ip) : verHorario(ip, ih);
   });
@@ -742,7 +757,19 @@ function mostrarFormularioFalta(ip, ih) {
     if (!f || f.split('-')[0] !== anio) return alert("Fecha inválida o fuera del año escolar.");
 
     const h = profesores[ip].horarios[ih];
-    
+    const fechaObj = new Date(f);
+    const diaSemana = fechaObj.getDay();
+    const nombreDia = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][diaSemana];
+    const diasActivos = h.diasActivos || window.obtenerDiasActivosPorDefecto();
+    const enSemestre1 = f >= h.inicioSemestre1 && f <= h.finSemestre1;
+    const enSemestre2 = f >= h.inicioSemestre2 && f <= h.finSemestre2;
+    const enSemestreActivo = enSemestre1 || enSemestre2;
+    const esDiaActivo = diasActivos[nombreDia] !== false;
+
+    if (diaSemana === 0 || diaSemana === 6 || !enSemestreActivo || !esDiaActivo) {
+      return alert('No puedes registrar una falta en un día inactivo o fuera del calendario de clases.');
+    }
+
     const existeFalta = h.faltas.some(fal => fal.fecha === f);
     if (existeFalta) return alert(`Ya existe un registro de Inasistencia/Permiso para el día ${formatearFecha(f)}.`);
 
@@ -832,9 +859,15 @@ function verHorarioClases(ip, ih) {
     <header class="dashboard-topbar">
       <div class="d-flex align-center gap-3">
         <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverCalendario">Volver</button>
-        <div><h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1><p class="m-0 fs-md">Horario Semanal ${h.anio}</p></div>
+        <div>
+          <h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1>
+          <p class="m-0 fs-lg text-muted">Horario Semanal ${h.anio}</p>
+        </div>
       </div>
     </header>
+    <div class="barra-estados-fija mt-2">
+      <div class="estado-box estado-gris fs-sm py-2 px-2">Horario semanal</div>
+    </div>
     <section class="modulo-profesores">
       <section class="tabla-horario-contenedor"><table class="tabla-horario-clases"><thead><tr><th>Bloque</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr></thead><tbody>${generarFilasHorarioClases(ip, ih)}</tbody></table></section>
     </section>

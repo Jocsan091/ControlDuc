@@ -761,6 +761,70 @@ body {
   align-items: start;
 }
 
+.dias-activos-grid {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.dias-activos-nombres,
+.dias-activos-toggles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, min-content));
+  gap: 4px;
+  align-items: center;
+  justify-content: start;
+}
+
+.dias-activos-nombres div {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gris-oscuro);
+  line-height: 1.1;
+}
+
+.toggle-dia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gris-borde);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  position: relative;
+  justify-self: start;
+}
+
+.toggle-dia input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-dia span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid #bbb;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.toggle-dia:hover {
+  border-color: var(--verde-principal);
+}
+
+.toggle-dia input:checked + span {
+  background: var(--verde-principal);
+  border-color: var(--verde-principal);
+  box-shadow: 0 0 0 4px rgba(56, 142, 60, 0.15);
+}
+
 .bloque-horario-opcion {
   padding: 18px;
   border: 1px solid var(--gris-borde);

@@ -26,6 +26,10 @@ function generarMesesHorario(anio, horario) {
       
       if (diaSem === 0 || diaSem === 6) continue;
 
+      const diasActivos = horario.diasActivos || (typeof window.obtenerDiasActivosPorDefecto === 'function' ? window.obtenerDiasActivosPorDefecto() : { lunes: true, martes: true, miercoles: true, jueves: true, viernes: true });
+      const nombreDia = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][diaSem];
+      const esDiaActivo = diasActivos[nombreDia] !== false;
+
       const enSemestre1 = fechaActualStr >= horario.inicioSemestre1 && fechaActualStr <= horario.finSemestre1;
       const enSemestre2 = fechaActualStr >= horario.inicioSemestre2 && fechaActualStr <= horario.finSemestre2;
       const enSemestreActivo = enSemestre1 || enSemestre2;
@@ -53,7 +57,7 @@ function generarMesesHorario(anio, horario) {
       } else if (feriadoManual) {
         claseDia = 'dia-morado'; 
         tooltip = `title="${feriadoManual.tipo}: ${feriadoManual.desc}"`;
-      } else if (!enSemestreActivo) {
+      } else if (!enSemestreActivo || !esDiaActivo) {
         claseDia = 'dia-tachado';
       } else if (fechaActualStr > hoyStr) {
         claseDia = 'dia-gris'; 
