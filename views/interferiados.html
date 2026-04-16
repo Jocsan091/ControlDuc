@@ -1,25 +1,25 @@
 <header class="dashboard-topbar">
   <div>
-    <h1>Gestión de Días No Hábiles</h1>
-    <p>Administra días en los que no habrá clases por feriados, interferencias, paros o incidentes de contingencia.</p>
+    <h1>Gesti&oacute;n de D&iacute;as No H&aacute;biles</h1>
+    <p>Administra d&iacute;as en los que no habr&aacute; clases por feriados, interferencias, paros o incidentes de contingencia.</p>
   </div>
 </header>
 
 <section class="modulo-profesores">
   <div class="ficha-resumen">
     <div class="col-span-full">
-      <h3 class="mb-2 text-primary">Calendario de Días No Hábiles</h3>
-      <p class="mb-3 text-muted">Registra días donde el colegio no funcionará y los docentes no deben asistir. No se contarán como presentes ni como ausentes.</p>
+      <h3 class="mb-2 text-primary">Calendario de D&iacute;as No H&aacute;biles</h3>
+      <p class="mb-3 text-muted">Registra d&iacute;as donde el colegio no funcionar&aacute; y los docentes no deben asistir. No se contar&aacute;n como presentes ni como ausentes.</p>
 
       <div class="d-flex gap-1 mb-3 flex-wrap">
         <input type="date" id="inputFeriado" class="input-global">
         <select id="tipoFeriado" class="input-global w-auto">
           <option value="Feriado">Feriado Oficial</option>
           <option value="Interferiado">Interferiado</option>
-          <option value="Día no hábil">Día no hábil / Contingencia</option>
+          <option value="D&iacute;a no h&aacute;bil">D&iacute;a no h&aacute;bil / Contingencia</option>
         </select>
         <input type="text" id="descFeriado" class="input-global flex-1" placeholder="Motivo (Ej: Paro docente, accidente)" maxlength="50">
-        <button class="btn-principal" onclick="window.agregarFeriado()">+ Agregar Día No Hábil</button>
+        <button class="btn-principal" onclick="window.agregarFeriado()">+ Agregar D&iacute;a No H&aacute;bil</button>
       </div>
 
       <ul id="listaFeriados" class="list-none p-0 d-flex flex-column gap-1"></ul>

@@ -1,4 +1,4 @@
-window.inicializarVistaProfesores = function() {
+﻿window.inicializarVistaProfesores = function() {
   const btnAgregar = document.getElementById('btnAgregarProfesor');
   if (btnAgregar) btnAgregar.addEventListener('click', () => mostrarFormularioProfesor());
 
@@ -59,7 +59,7 @@ function formatearRUT(rut) {
 }
 
 function validarRUT(rut) {
-  if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut.replace(/\./g, ''))) return false;
+  if (!/^[0-9]+[-|â€]{1}[0-9kK]{1}$/.test(rut.replace(/\./g, ''))) return false;
   let tmp = rut.split('-');
   let digv = tmp[1].toLowerCase();
   let rutNum = tmp[0].replace(/\./g, '');
@@ -612,7 +612,7 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
     }
 
     if (is1 > fs1 || is2 > fs2 || fs1 > is2) {
-      return alert("Error Lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
+      return alert("Error lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
     }
 
     const diasActivos = window.obtenerDiasActivosDeModal('horario-');
@@ -760,8 +760,8 @@ function verHorario(ip, ih) {
         <div><h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1><p class="m-0 fs-md">RUT: ${p.rut} | Calendario ${h.anio}</p></div>
       </div>
       <div class="d-flex gap-1 align-center">
-        <button class="btn-secundario btn-outline-muted" id="btnAdministrarIncidencias">Resgistros</button>
-        <button class="btn-secundario" id="btnHorarioClases">Ver Horario Clases</button>
+        <button class="btn-secundario btn-outline-muted" id="btnAdministrarIncidencias">Registros</button>
+        <button class="btn-secundario" id="btnHorarioClases">Ver Horario de Clases</button>
         <button class="btn-principal bg-danger-light border-danger text-danger" id="btnRegistrarFalta">Registrar Falta/Permiso</button>
         <button class="btn-principal bg-warning-light border-warning text-warning" id="btnRegistrarLicencia">Registrar Licencia</button>
       </div>
@@ -770,7 +770,7 @@ function verHorario(ip, ih) {
     <div class="barra-estados-fija">
       <div class="estado-box estado-verde fs-sm py-2 px-2">Días asistidos: <strong>${estados.asistidos}</strong></div>
       <div class="estado-box estado-gris border-muted fs-sm py-2 px-2">Días futuros: <strong>${estados.futuros}</strong></div>
-      <div class="estado-box estado-morado fs-sm py-2 px-2 border-morado">Feriados e Interferiores: <strong>${estados.feriadosInterferencias}</strong></div>
+      <div class="estado-box estado-morado fs-sm py-2 px-2 border-morado">Feriados e interferiados: <strong>${estados.feriadosInterferencias}</strong></div>
       <div class="estado-box bg-azul-light text-azul border-azul fs-sm py-2 px-2">Días no hábiles: <strong>${estados.diasNoHabiles}</strong></div>
       <div class="estado-box estado-tachado border-dashed fs-sm py-2 px-2">Inactivo: <strong>${estados.inactivos}</strong></div>
       <div class="separador-vertical"></div>
@@ -828,7 +828,7 @@ function mostrarFormularioFalta(ip, ih) {
     if (existeFalta) return alert(`Ya existe un registro de Inasistencia/Permiso para el día ${formatearFecha(f)}.`);
 
     const chocaConLicencia = h.licencias.some(lic => f >= lic.fechaInicio && f <= lic.fechaFin);
-    if (chocaConLicencia) return alert(`No puedes registrar una falta. El día ${formatearFecha(f)} está cubierto por una Licencia Médica.`);
+    if (chocaConLicencia) return alert(`No puedes registrar una falta. El día ${formatearFecha(f)} está cubierto por una licencia médica.`);
     profesores[ip].horarios[ih].faltas.push({ tipo: t, fecha: f, motivo: document.getElementById('motivoFalta').value.trim() });
     await guardarDatosGlobales(); cerrarModal(); verHorario(ip, ih); if(typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
   });
@@ -881,7 +881,7 @@ function mostrarFormularioLicencia(ip, ih) {
     const ff = document.getElementById('fFLic').value;
     
     if (!fi || !ff || fi.split('-')[0] !== anio) return alert("Fechas inválidas o fuera del año escolar.");
-    if (fi > ff) return alert("Error Lógico: La fecha de inicio no puede ser mayor a la fecha de fin.");
+    if (fi > ff) return alert("Error lógico: La fecha de inicio no puede ser mayor a la fecha de fin.");
 
     const h = profesores[ip].horarios[ih];
 
@@ -890,7 +890,7 @@ function mostrarFormularioLicencia(ip, ih) {
       (ff >= lic.fechaInicio && ff <= lic.fechaFin) ||
       (fi <= lic.fechaInicio && ff >= lic.fechaFin)
     );
-    if (chocaConOtraLicencia) return alert("Error: El rango de fechas ingresado se cruza con otra Licencia Médica ya registrada en el sistema.");
+    if (chocaConOtraLicencia) return alert("Error: el rango de fechas ingresado se cruza con otra licencia médica ya registrada en el sistema.");
 
     const chocaConFaltas = h.faltas.some(fal => fal.fecha >= fi && fal.fecha <= ff);
     if (chocaConFaltas) return alert("Error: Hay registros de Inasistencia o Permisos en los días de esta licencia. Debes ir a 'Ajustes', borrar las faltas de esos días, y luego ingresar la licencia.");
@@ -915,7 +915,7 @@ function verHorarioClases(ip, ih) {
         <button class="btn-secundario border-radius-lg py-2 px-3 fs-sm" id="btnVolverCalendario">Volver</button>
         <div>
           <h1 class="mb-1 fs-xxl line-height-1">${p.nombre}</h1>
-          <p class="m-0 fs-lg text-muted">Horario Semanal ${h.anio}</p>
+          <p class="m-0 fs-lg text-muted">Horario de clases ${h.anio}</p>
         </div>
       </div>
       <div class="d-flex gap-1 align-center">
@@ -923,7 +923,7 @@ function verHorarioClases(ip, ih) {
       </div>
     </header>
     <div class="barra-estados-fija mt-2">
-      <div class="estado-box estado-gris fs-sm py-2 px-2">Horario semanal</div>
+      <div class="estado-box estado-gris fs-sm py-2 px-2">Horario de clases</div>
       <div class="estado-box estado-gris fs-sm py-2 px-2">Incluye llegada y salida de lunes a viernes</div>
     </div>
     <section class="modulo-profesores">
@@ -1023,9 +1023,9 @@ function construirHtmlHorarioClasesPdf(profesor, horario) {
     </head>
     <body>
       <h1>${profesor.nombre}</h1>
-      <p>RUT: ${profesor.rut} | Horario semanal ${horario.anio}</p>
+      <p>RUT: ${profesor.rut} | Horario de clases ${horario.anio}</p>
       <div class="banda">
-        <span class="pill">Horario semanal</span>
+        <span class="pill">Horario de clases</span>
         <span class="pill">Incluye llegada y salida de lunes a viernes</span>
       </div>
       <table>
@@ -1034,7 +1034,7 @@ function construirHtmlHorarioClasesPdf(profesor, horario) {
             <th>Bloque</th>
             <th>Lunes</th>
             <th>Martes</th>
-            <th>Miercoles</th>
+            <th>Miércoles</th>
             <th>Jueves</th>
             <th>Viernes</th>
           </tr>
@@ -1056,7 +1056,7 @@ async function exportarHorarioClasesPdf(ip, ih) {
   }
 
   if (!window.apiExportacion || typeof window.apiExportacion.exportarHorarioClasesPdf !== 'function') {
-    alert('La exportacion PDF solo funciona en la aplicacion de escritorio.');
+    alert('La exportación PDF solo funciona en la aplicación de escritorio.');
     return;
   }
 
@@ -1081,4 +1081,8 @@ function editarHora(ip, ih, d, t) {
   document.body.insertAdjacentHTML('beforeend', `<div class="modal"><div class="modal-content"><button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button><h3>Hora</h3><input type="time" id="iHora" class="input-global w-100"><div class="modal-botones"><button id="gHora" class="btn-principal">Guardar</button><button onclick="cerrarModal()" class="btn-secundario">Cancelar</button></div></div></div>`);
   document.getElementById('gHora').addEventListener('click', async () => { profesores[ip].horarios[ih].horarioClases[d][t] = document.getElementById('iHora').value || ''; await guardarDatosGlobales(); cerrarModal(); verHorarioClases(ip, ih); });
 }
+
+
+
+
 

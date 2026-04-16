@@ -144,7 +144,7 @@ function verProfesorDesdeResumen(index) { if (typeof verProfesor === 'function')
 async function marcarFaltaRapida(indexP, indexH, fecha) {
   if (indexH === -1) return;
   if (!profesores[indexP].horarios[indexH].faltas) profesores[indexP].horarios[indexH].faltas = [];
-  profesores[indexP].horarios[indexH].faltas.push({ tipo: 'Inasistencia', fecha: fecha, motivo: 'Falta r\u00e1pida registrada desde la Toma de Lista Diaria', registro: new Date().toISOString().split('T')[0] });
+  profesores[indexP].horarios[indexH].faltas.push({ tipo: 'Inasistencia', fecha: fecha, motivo: 'Falta rápida registrada desde Resumen Diario', registro: new Date().toISOString().split('T')[0] });
   await guardarDatosGlobales(); renderListaDiaria(); if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
 }
 

@@ -1,4 +1,4 @@
-const ESTADO_RESUMEN_META = {
+﻿const ESTADO_RESUMEN_META = {
   presente: {
     label: 'Presente',
     clase: 'resumen-estado-presente',
@@ -17,7 +17,7 @@ const ESTADO_RESUMEN_META = {
   licencia: {
     label: 'Licencia',
     clase: 'resumen-estado-licencia',
-    detalle: 'Rango medico cargado.'
+    detalle: 'Rango médico cargado.'
   },
   feriado: {
     label: 'Feriado',
@@ -25,9 +25,9 @@ const ESTADO_RESUMEN_META = {
     detalle: 'Feriado oficial o interferiado.'
   },
   noHabil: {
-    label: 'No habil',
+    label: 'No hábil',
     clase: 'resumen-estado-nohabil',
-    detalle: 'Dia marcado manualmente como no habil.'
+    detalle: 'Día marcado manualmente como no hábil.'
   },
   fueraCalendario: {
     label: 'Fuera de calendario',
@@ -37,17 +37,17 @@ const ESTADO_RESUMEN_META = {
   inactivo: {
     label: 'Inactivo',
     clase: 'resumen-estado-neutro',
-    detalle: 'Dia desactivado en la configuracion semanal.'
+    detalle: 'Día desactivado en la configuración semanal.'
   },
   finDeSemana: {
     label: 'Fin de semana',
     clase: 'resumen-estado-neutro',
-    detalle: 'Dia no lectivo por calendario semanal.'
+    detalle: 'Día no lectivo por calendario semanal.'
   },
   futuro: {
     label: 'Pendiente',
     clase: 'resumen-estado-neutro',
-    detalle: 'Dia lectivo aun no transcurre.'
+    detalle: 'Día lectivo aún no transcurre.'
   }
 };
 
@@ -83,12 +83,12 @@ function obtenerFechaHoyIso() {
 }
 
 function nombreDiaDesdeIndice(indice) {
-  return ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][indice] || '';
+  return ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][indice] || '';
 }
 
 function nombreDiaCorto(fechaIso) {
   const fecha = new Date(`${fechaIso}T12:00:00`);
-  return ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'][fecha.getDay()];
+  return ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][fecha.getDay()];
 }
 
 function formatearFechaVisual(fechaIso) {
@@ -99,7 +99,7 @@ function formatearFechaVisual(fechaIso) {
 function obtenerDiasActivosHorario(horario) {
   if (horario && horario.diasActivos) return horario.diasActivos;
   if (typeof window.obtenerDiasActivosPorDefecto === 'function') return window.obtenerDiasActivosPorDefecto();
-  return { lunes: true, martes: true, miercoles: true, jueves: true, viernes: true };
+  return { lunes: true, martes: true, miércoles: true, jueves: true, viernes: true };
 }
 
 function obtenerAniosProfesor(profesor) {
@@ -189,7 +189,7 @@ function construirFilaDiaria(profesor, horario, fechaIso, hoyIso) {
     grupoFiltro = 'noLectivos';
   } else if (!activoSemana) {
     estado = 'inactivo';
-    detalle = 'Dia desactivado en jornada semanal';
+    detalle = 'Día desactivado en jornada semanal';
     grupoFiltro = 'noLectivos';
   } else if (feriado) {
     estado = feriado.tipo;
@@ -198,7 +198,7 @@ function construirFilaDiaria(profesor, horario, fechaIso, hoyIso) {
     grupoFiltro = 'noLectivos';
   } else if (licencia) {
     estado = 'licencia';
-    detalle = 'Licencia medica';
+    detalle = 'Licencia médica';
     motivo = licencia.motivo || '';
     documento = licencia.archivoAdjunto ? 'Adjunto cargado' : '';
     cuentaComoLectivo = true;
@@ -340,20 +340,20 @@ function filtrarFilasResumen(filas) {
 function construirResumenCompacto(datosResumen) {
   const { resumen } = datosResumen;
   const items = [
-    { key: 'futuro', titulo: 'Dias lectivos', valor: resumen.lectivos, texto: 'Base anual del calendario.' },
+    { key: 'futuro', titulo: 'Días lectivos', valor: resumen.lectivos, texto: 'Base anual del calendario.' },
     { key: 'presente', titulo: 'Presentes', valor: resumen.presentes, texto: 'Asistencia registrada.' },
     { key: 'inasistencia', titulo: 'Inasistencia', valor: resumen.inasistencias, texto: 'Falta registrada.' },
     { key: 'permiso', titulo: 'Permiso', valor: resumen.permisos, texto: 'Ausencia autorizada.' },
-    { key: 'licencia', titulo: 'Dias con licencia', valor: resumen.licencias, texto: 'Rango medico cargado.' },
+    { key: 'licencia', titulo: 'Días con licencia', valor: resumen.licencias, texto: 'Rango médico cargado.' },
     { key: 'feriado', titulo: 'Feriados', valor: resumen.feriados, texto: 'Feriados o interferiados.' },
-    { key: 'noHabil', titulo: 'No lectivos', valor: resumen.noHabiles + resumen.fueraCalendario + resumen.inactivos + resumen.finesDeSemana, texto: 'Dias no utilizables en el calendario.' }
+    { key: 'noHabil', titulo: 'No lectivos', valor: resumen.noHabiles + resumen.fueraCalendario + resumen.inactivos + resumen.finesDeSemana, texto: 'Días no utilizables en el calendario.' }
   ];
 
   return `
     <section class="resumen-lectura-card">
       <div class="resumen-lectura-head">
         <div>
-          <h3>Lectura rapida</h3>
+          <h3>Lectura rápida</h3>
           <p>Usa esta franja para entender el año antes de abrir la tabla completa.</p>
         </div>
       </div>
@@ -425,7 +425,7 @@ function construirTablaResumen(filasFiltradas) {
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Dia</th>
+            <th>Día</th>
             <th>Estado</th>
             <th>Detalle</th>
             <th>Motivo</th>
@@ -515,7 +515,7 @@ function construirPayloadPdf(datosResumen, fechaDesde, fechaHasta) {
   return {
     nombre: `${datosResumen.profesor.nombre || 'docente'}_${datosResumen.horario.anio || 'anio'}` ,
     titulo: `Resumen anual - ${datosResumen.profesor.nombre || 'Docente'}` ,
-    subtitulo: `RUT: ${datosResumen.profesor.rut || '-'} | Ano: ${datosResumen.horario.anio || '-'} | Periodo: ${formatearFechaVisual(fechaDesde)} a ${formatearFechaVisual(fechaHasta)}` ,
+    subtitulo: `RUT: ${datosResumen.profesor.rut || '-'} | Año: ${datosResumen.horario.anio || '-'} | Período: ${formatearFechaVisual(fechaDesde)} a ${formatearFechaVisual(fechaHasta)}` ,
     docente: {
       nombre: datosResumen.profesor.nombre || '',
       rut: datosResumen.profesor.rut || '',
@@ -527,7 +527,7 @@ function construirPayloadPdf(datosResumen, fechaDesde, fechaHasta) {
       finSemestre2: formatearFechaVisual(datosResumen.horario.finSemestre2)
     },
     resumen: [
-      { label: 'Dias lectivos', value: resumenRango.resumen.lectivos },
+      { label: 'Días lectivos', value: resumenRango.resumen.lectivos },
       { label: 'Presentes', value: resumenRango.resumen.presentes },
       { label: 'Inasistencias', value: resumenRango.resumen.inasistencias },
       { label: 'Permisos', value: resumenRango.resumen.permisos },
@@ -618,7 +618,7 @@ function construirHtmlPdfResumen(datosResumen, fechaDesde, fechaHasta) {
       <section class="docente">
         <div><strong>Docente</strong>${escapeHtml(payload.docente.nombre)}</div>
         <div><strong>RUT</strong>${escapeHtml(payload.docente.rut)}</div>
-        <div><strong>Profesion</strong>${escapeHtml(payload.docente.profesion)}</div>
+        <div><strong>Profesión</strong>${escapeHtml(payload.docente.profesion)}</div>
         <div><strong>Nacimiento</strong>${escapeHtml(payload.docente.fechaNacimiento)}</div>
         <div><strong>Semestre 1</strong>${escapeHtml(payload.docente.inicioSemestre1)} a ${escapeHtml(payload.docente.finSemestre1)}</div>
         <div><strong>Semestre 2</strong>${escapeHtml(payload.docente.inicioSemestre2)} a ${escapeHtml(payload.docente.finSemestre2)}</div>
@@ -630,7 +630,7 @@ function construirHtmlPdfResumen(datosResumen, fechaDesde, fechaHasta) {
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Dia</th>
+            <th>Día</th>
             <th>Estado</th>
             <th>Detalle</th>
             <th>Motivo</th>
@@ -655,7 +655,7 @@ function abrirModalRangoResumen(datosResumen) {
       <div class="modal-content">
         <button class="btn-cerrar-modal" onclick="cerrarModal()">&times;</button>
         <h3>Exportar PDF anual</h3>
-        <p>Elige el periodo que quieres incluir en el PDF.</p>
+        <p>Elige el período que quieres incluir en el PDF.</p>
         <div class="form-grid">
           <div>
             <label class="d-block mb-1">Desde</label>
@@ -736,7 +736,7 @@ function limpiarMensajeResumen() {
   contenedor.textContent = '';
 }
 
-async function exportarResumenActual(tipo) {
+async function exportarResumenActual() {
   const profesor = profesores[estadoResumenes.profesorIndex];
   if (!profesor) {
     mostrarMensajeResumen('Primero selecciona un docente.', 'warning');
@@ -745,7 +745,7 @@ async function exportarResumenActual(tipo) {
 
   const horario = obtenerHorarioProfesor(estadoResumenes.profesorIndex, estadoResumenes.anio);
   if (!horario) {
-    mostrarMensajeResumen('Selecciona un año valido antes de exportar.', 'warning');
+    mostrarMensajeResumen('Selecciona un año válido antes de exportar.', 'warning');
     return;
   }
 
@@ -857,7 +857,8 @@ function renderDetalleResumenProfesor() {
     <section class="resumenes-detalle">
       <div class="resumenes-acciones-superiores">
         <button class="btn-secundario" id="btnVolverResumenesListado">Volver al listado</button>
-        <div class="d-flex gap-1 flex-wrap">          <button class="btn-principal" id="btnExportarResumenPdf">Exportar PDF completo</button>
+        <div class="d-flex gap-1 flex-wrap">
+          <button class="btn-principal" id="btnExportarResumenPdf">Exportar PDF</button>
         </div>
       </div>
 
@@ -874,10 +875,10 @@ function renderDetalleResumenProfesor() {
         </article>
 
         <aside class="resumen-leyenda-card">
-          <h3>Guia breve</h3>
+          <h3>Guía breve</h3>
           <p>1. Elige el año en las pestañas.</p>
           <p>2. Revisa primero la lectura rápida.</p>
-          <p>3. Usa filtros antes de exportar.</p>
+          <p>3. Exporta solo el período que necesites.</p>
         </aside>
       </section>
 
@@ -949,7 +950,7 @@ function renderDetalleResumenProfesor() {
   });
 
   const btnPdf = document.getElementById('btnExportarResumenPdf');
-  if (btnPdf) btnPdf.addEventListener('click', () => exportarResumenActual('pdf'));
+  if (btnPdf) btnPdf.addEventListener('click', () => exportarResumenActual());
 }
 
 window.verResumenProfesor = function(indexProfesor) {
@@ -995,3 +996,5 @@ window.inicializarVistaResumenes = function() {
     if (estadoResumenes.profesorIndex === null) renderListadoProfesores();
   });
 };
+
+
