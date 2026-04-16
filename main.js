@@ -1,4 +1,4 @@
-﻿const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+﻿const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
@@ -108,6 +108,32 @@ function createWindow() {
 
   win.setMenuBarVisibility(false);
   const baseViewsPath = path.resolve(__dirname, 'views') + path.sep;
+  win.webContents.on('context-menu', (event, params) => {
+    const textoSeleccionado = typeof params.selectionText === 'string' ? params.selectionText.trim() : '';
+    const esCampoEditable = !!params.isEditable;
+
+    if (!esCampoEditable && !textoSeleccionado) return;
+
+    const menu = Menu.buildFromTemplate([
+      ...(esCampoEditable ? [
+        { role: 'undo', label: 'Deshacer' },
+        { role: 'redo', label: 'Rehacer' },
+        { type: 'separator' },
+        { role: 'cut', label: 'Cortar' },
+        { role: 'copy', label: 'Copiar' },
+        { role: 'paste', label: 'Pegar' },
+        { role: 'pasteAndMatchStyle', label: 'Pegar y mantener estilo' },
+        { role: 'delete', label: 'Eliminar' },
+        { type: 'separator' }
+      ] : [
+        { role: 'copy', label: 'Copiar' },
+        { type: 'separator' }
+      ]),
+      { role: 'selectAll', label: 'Seleccionar todo' }
+    ]);
+
+    menu.popup({ window: win });
+  });
   win.webContents.on('will-navigate', (event, url) => {
     try {
       const parsedUrl = new URL(url);

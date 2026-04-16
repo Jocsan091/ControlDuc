@@ -208,7 +208,7 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
         <div class="form-grid formulario-anual-grid">
           <div class="col-span-full">
             <label class="d-block mb-1">Año *</label>
-            <input type="number" id="anioHorarioAnual" class="input-global w-100" value="${horario.anio || ''}" min="2024" max="2099" ${typeof indexEdicion === 'number' ? 'readonly' : ''}>
+            <input type="text" id="anioHorarioAnual" class="input-global w-100" value="${window.escapeHtmlAttr(horario.anio || '')}" inputmode="numeric" maxlength="4" ${typeof indexEdicion === 'number' ? 'readonly' : ''}>
           </div>
           ${camposFecha.map((campo) => window.crearCampoFechaConAnioHtml(campo)).join('')}
         </div>
@@ -222,6 +222,7 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
   `);
 
   const anioInput = document.getElementById('anioHorarioAnual');
+  window.configurarInputNumerico(anioInput, { min: 2024, max: 2099, maxLength: 4, allowEmpty: true });
   const controladorFechas = window.inicializarCamposFechaConAnio(camposFecha, () => anioInput.value.trim());
 
   anioInput.addEventListener('input', () => {
@@ -238,6 +239,12 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
 
     if (!anio || !inicio1 || !fin1 || !inicio2 || !fin2) {
       errorDiv.innerText = 'Completa todos los campos del horario anual.';
+      errorDiv.classList.remove('d-none');
+      return;
+    }
+
+    if (!window.validarAnioEscolar(anio)) {
+      errorDiv.innerText = 'El año debe tener exactamente 4 dígitos.';
       errorDiv.classList.remove('d-none');
       return;
     }
@@ -266,6 +273,11 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
     }
 
     const diasActivos = window.obtenerDiasActivosDeModal('anual-');
+    if (!Object.values(diasActivos).some(Boolean)) {
+      errorDiv.innerText = 'Debes dejar al menos un día activo en la semana.';
+      errorDiv.classList.remove('d-none');
+      return;
+    }
     const horarioNuevo = {
       anio,
       inicioSemestre1: inicio1Fecha,

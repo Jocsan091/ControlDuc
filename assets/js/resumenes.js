@@ -504,6 +504,11 @@ function construirResumenDesdeFilas(filas) {
   return { resumen, incidencias };
 }
 
+function construirRangoNombreArchivo(fechaDesde, fechaHasta) {
+  if (!fechaDesde || !fechaHasta) return 'sin_rango';
+  return `${fechaDesde}_a_${fechaHasta}`;
+}
+
 function construirPayloadPdf(datosResumen, fechaDesde, fechaHasta) {
   const detalleCompleto = filtrarFilasPorRango(
     [...datosResumen.filas].sort((a, b) => a.fecha.localeCompare(b.fecha)),
@@ -511,9 +516,10 @@ function construirPayloadPdf(datosResumen, fechaDesde, fechaHasta) {
     fechaHasta
   );
   const resumenRango = construirResumenDesdeFilas(detalleCompleto);
+  const rangoNombre = construirRangoNombreArchivo(fechaDesde, fechaHasta);
 
   return {
-    nombre: `${datosResumen.profesor.nombre || 'docente'}_${datosResumen.horario.anio || 'anio'}` ,
+    nombre: `${datosResumen.profesor.nombre || 'docente'}_${datosResumen.horario.anio || 'anio'}_${rangoNombre}` ,
     titulo: `Resumen anual - ${datosResumen.profesor.nombre || 'Docente'}` ,
     subtitulo: `RUT: ${datosResumen.profesor.rut || '-'} | Año: ${datosResumen.horario.anio || '-'} | Período: ${formatearFechaVisual(fechaDesde)} a ${formatearFechaVisual(fechaHasta)}` ,
     docente: {

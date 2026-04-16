@@ -24,5 +24,6 @@ contextBridge.exposeInMainWorld('apiConfiguracion', {
 
 contextBridge.exposeInMainWorld('apiExportacion', {
   exportarResumenPdf: (payload) => ipcRenderer.invoke('exportar-resumen-pdf', payload),
+  exportarResumenExcel: (payload) => ipcRenderer.invoke('exportar-resumen-excel', payload),
   exportarHorarioClasesPdf: (payload) => ipcRenderer.invoke('exportar-horario-clases-pdf', payload)
 });
