@@ -430,6 +430,34 @@ body {
   font-size: 15px; 
 }
 
+.horario-clases-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #f8faf7, #eef4eb);
+  border: 1px solid #dbe5d7;
+  border-left: 5px solid var(--verde-principal);
+  border-radius: 16px;
+  box-shadow: var(--sombra-suave);
+}
+
+.horario-clases-info-titulo {
+  color: var(--verde-oscuro);
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.horario-clases-info-texto {
+  margin: 0;
+  color: var(--gris-texto);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .estado-verde { 
   background: #c8e6c9; 
 }
@@ -880,6 +908,29 @@ body {
   margin-bottom: 5px; 
 }
 
+[data-phone-row] {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.telefono-pais,
+.em-pais {
+  flex: 0 0 108px;
+  width: 108px !important;
+  min-width: 108px;
+  max-width: 108px;
+}
+
+.telefono-numero,
+.em-tel {
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;
+}
+
 .ficha-resumen { 
   display: grid; 
   grid-template-columns: 1fr 1fr; 
@@ -1315,6 +1366,10 @@ body {
 .tabla-resumen-anual th:nth-child(6) { width: 160px; }
 
 @media (max-width: 1200px) { 
+  .dashboard-sidebar {
+    width: 240px;
+    padding: 22px 16px;
+  }
   .dashboard-main {
     padding: 0 20px 20px 20px;
   }
@@ -1358,6 +1413,19 @@ body {
   .tabla-horario-contenedor {
     padding: 16px;
   }
+  .tabla-horario-clases {
+    min-width: 720px;
+  }
+  .barra-estados-fija {
+    top: 96px;
+    padding: 12px;
+  }
+  .estado-box {
+    font-size: 14px;
+  }
+  .horario-clases-info {
+    padding: 14px 16px;
+  }
 }
 
 @media (max-width: 900px) { 
@@ -1386,9 +1454,29 @@ body {
     padding: 18px;
     border-radius: 0 0 18px 18px;
   }
+  .dashboard-topbar .d-flex.gap-1.align-center,
+  .dashboard-topbar .d-flex.gap-2.align-center {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .dashboard-topbar .btn-principal,
+  .dashboard-topbar .btn-secundario {
+    width: 100%;
+  }
   .topbar-user {
     width: 100%;
     text-align: left;
+  }
+  .tabla-horario-clases {
+    min-width: 640px;
+  }
+  .tabla-horario-clases th,
+  .tabla-horario-clases td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  .barra-estados-fija {
+    position: static;
   }
   .resumen-lectura-head {
     flex-direction: column;

@@ -78,15 +78,30 @@ function normalizarRutParaComparacion(rut) {
   return formatearRUT(rut).replace(/\./g, '').toUpperCase();
 }
 
+const OPCIONES_VINCULO = ['Madre', 'Padre', 'Cónyuge', 'Hermano/a', 'Hijo/a', 'Tutor/a', 'Otro'];
+const OPCIONES_LICENCIA_CONDUCIR = ['No tiene', 'A1', 'A2', 'A3', 'A4', 'A5', 'B', 'C', 'D', 'E', 'F', 'Otra'];
+
+function construirOpcionesSelect(opciones, valorSeleccionado = '') {
+  const valorNormalizado = window.normalizarEspacios(valorSeleccionado);
+  const lista = [...opciones];
+
+  if (valorNormalizado && !lista.includes(valorNormalizado)) {
+    lista.push(valorNormalizado);
+  }
+
+  return lista.map((opcion) => `
+    <option value="${window.escapeHtmlAttr(opcion)}" ${opcion === valorNormalizado ? 'selected' : ''}>${window.escapeHtml(opcion)}</option>
+  `).join('');
+}
+
 function crearCampoTelefonoEmergencia(valor = '') {
   const telefono = window.descomponerTelefono(valor);
   return `
     <div class="d-flex gap-1 align-center w-100" data-phone-row>
-      <select class="telefono-pais input-global" aria-label="Código de país">
+      <select class="telefono-pais em-pais input-global" aria-label="Código de país">
         ${window.construirOpcionesPaisesTelefonoHtml(telefono.codigo)}
       </select>
-      <input type="text" class="telefono-numero input-global w-100 em-tel-visible" value="${window.escapeHtmlAttr(telefono.numero)}" maxlength="20" placeholder="Teléfono">
-      <input type="hidden" class="telefono-completo em-tel" value="${window.escapeHtmlAttr(valor)}">
+      <input type="text" class="telefono-numero input-global w-100 em-tel" value="${window.escapeHtmlAttr(telefono.numero)}" maxlength="20" placeholder="Teléfono">
     </div>
   `;
 }
@@ -95,7 +110,10 @@ function crearFilaEmergencia(em = {}, index) {
   const ph = index === 0 ? '' : ' (Opcional)';
   return `<div class="form-grid-3 fila-emergencia mb-2" data-index="${index}">
       <input type="text" class="em-nombre input-global w-100" value="${window.escapeHtmlAttr(em.nombre || '')}" maxlength="40" placeholder="Nombre${ph}">
-      <input type="text" class="em-vinculo input-global w-100" value="${window.escapeHtmlAttr(em.vinculo || '')}" maxlength="20" placeholder="Vínculo${ph}">
+      <select class="em-vinculo input-global w-100" aria-label="Vínculo${ph}">
+        <option value="">Vínculo${ph}</option>
+        ${construirOpcionesSelect(OPCIONES_VINCULO, em.vinculo || '')}
+      </select>
       ${crearCampoTelefonoEmergencia(em.telefono || em.tel || '')}
     </div>`;
 }
@@ -123,7 +141,7 @@ function mostrarFormularioProfesor(indexEdicion = null) {
           <div><label class="d-block mb-1">Fecha de Nacimiento</label><input type="date" id="f_fechaNac" class="input-global w-100" value="${window.escapeHtmlAttr(p.fechaNacimiento || '')}"></div>
           <div><label class="d-block mb-1">Domicilio</label><input type="text" id="f_domicilio" class="input-global w-100" value="${window.escapeHtmlAttr(p.domicilio || '')}" maxlength="80"></div>
           <div><label class="d-block mb-1">Traslado Frecuente</label><input type="text" id="f_traslado" class="input-global w-100" value="${window.escapeHtmlAttr(p.traslado || '')}" maxlength="50"></div>
-          <div><label class="d-block mb-1">Licencia de Conducir</label><input type="text" id="f_licencia" class="input-global w-100" value="${window.escapeHtmlAttr(p.licencia || '')}" maxlength="20" placeholder="Ej: B, A2, A3"></div>
+          <div><label class="d-block mb-1">Licencia de Conducir</label><select id="f_licencia" class="input-global w-100"><option value="">Selecciona una opción</option>${construirOpcionesSelect(OPCIONES_LICENCIA_CONDUCIR, p.licencia || '')}</select></div>
           <div><label class="d-block mb-1">Profesión</label><input type="text" id="f_profesion" class="input-global w-100" value="${window.escapeHtmlAttr(p.profesion || '')}" maxlength="50"></div>
           <div><label class="d-block mb-1">Hijos (Cantidad)</label><input type="text" id="f_hijos" class="input-global w-100" value="${window.escapeHtmlAttr(p.hijos || '0')}" inputmode="numeric" maxlength="2"></div>
           <div><label class="d-block mb-1">Personas C/ Vive</label><input type="text" id="f_personasVive" class="input-global w-100" value="${window.escapeHtmlAttr(p.personasVive || '0')}" inputmode="numeric" maxlength="2"></div>
@@ -161,7 +179,6 @@ function mostrarFormularioProfesor(indexEdicion = null) {
   window.configurarFormatoTexto(document.getElementById('f_nombre'), window.formatearNombrePersona);
   window.configurarFormatoTexto(document.getElementById('f_domicilio'), window.formatearTextoTitulo);
   window.configurarFormatoTexto(document.getElementById('f_traslado'), window.formatearTextoTitulo);
-  window.configurarFormatoTexto(document.getElementById('f_licencia'), (valor) => window.normalizarEspacios(valor).toUpperCase());
   window.configurarFormatoTexto(document.getElementById('f_profesion'), window.formatearTextoTitulo);
   window.configurarFormatoTexto(document.getElementById('f_enfermedades'), window.formatearTextoLibre);
   window.configurarFormatoTexto(document.getElementById('f_alergias'), window.formatearTextoTitulo);
@@ -170,7 +187,6 @@ function mostrarFormularioProfesor(indexEdicion = null) {
   window.configurarInputNumerico(document.getElementById('f_hijos'), { min: 0, max: 20, maxLength: 2 });
   window.configurarInputNumerico(document.getElementById('f_personasVive'), { min: 0, max: 20, maxLength: 2 });
   document.querySelectorAll('.em-nombre').forEach((input) => window.configurarFormatoTexto(input, window.formatearNombrePersona));
-  document.querySelectorAll('.em-vinculo').forEach((input) => window.configurarFormatoTexto(input, window.formatearTextoTitulo));
   if (typeof window.inicializarCamposTelefono === 'function') window.inicializarCamposTelefono(document);
 
   let emIndex = emergencias.length;
@@ -179,7 +195,6 @@ function mostrarFormularioProfesor(indexEdicion = null) {
     const nuevaFila = document.querySelector('.fila-emergencia:last-of-type');
     if (nuevaFila) {
       window.configurarFormatoTexto(nuevaFila.querySelector('.em-nombre'), window.formatearNombrePersona);
-      window.configurarFormatoTexto(nuevaFila.querySelector('.em-vinculo'), window.formatearTextoTitulo);
       if (typeof window.inicializarCamposTelefono === 'function') window.inicializarCamposTelefono(nuevaFila);
     }
   });
@@ -195,7 +210,7 @@ async function guardarProfesor(indexEdicion) {
   const fechaNacimiento = document.getElementById('f_fechaNac').value.trim();
   const domicilio = window.formatearTextoTitulo(document.getElementById('f_domicilio').value);
   const traslado = window.formatearTextoTitulo(document.getElementById('f_traslado').value);
-  const licenciaConducir = window.normalizarEspacios(document.getElementById('f_licencia').value).toUpperCase();
+  const licenciaConducir = window.normalizarEspacios(document.getElementById('f_licencia').value);
   const profesion = window.formatearTextoTitulo(document.getElementById('f_profesion').value);
   const hijos = window.formatearNumeroLimitado(document.getElementById('f_hijos').value, 0, 20);
   const personasVive = window.formatearNumeroLimitado(document.getElementById('f_personasVive').value, 0, 20);
@@ -220,8 +235,10 @@ async function guardarProfesor(indexEdicion) {
   const contactos = [];
   for (const fila of Array.from(document.querySelectorAll('.fila-emergencia'))) {
     const nombreEmergencia = window.formatearNombrePersona(fila.querySelector('.em-nombre').value);
-    const vinculo = window.formatearTextoTitulo(fila.querySelector('.em-vinculo').value);
-    const telefono = window.normalizarEspacios(fila.querySelector('.em-tel').value);
+    const vinculo = window.normalizarEspacios(fila.querySelector('.em-vinculo').value);
+    const codigoPais = fila.querySelector('.em-pais')?.value || '+56';
+    const numeroTelefono = fila.querySelector('.em-tel')?.value || '';
+    const telefono = window.obtenerTelefonoCompleto(codigoPais, numeroTelefono);
     const tieneContenido = nombreEmergencia || vinculo || telefono;
 
     if (!tieneContenido) continue;
@@ -1028,10 +1045,10 @@ function verHorarioClases(ip, ih) {
         <button class="btn-principal" id="btnExportarHorarioClasesPdf">Exportar PDF</button>
       </div>
     </header>
-    <div class="barra-estados-fija mt-2">
-      <div class="estado-box estado-gris fs-sm py-2 px-2">Horario de clases</div>
-      <div class="estado-box estado-gris fs-sm py-2 px-2">Incluye llegada y salida de lunes a viernes</div>
-    </div>
+    <section class="horario-clases-info mt-2" aria-label="Información del horario de clases">
+      <div class="horario-clases-info-titulo">Horario de clases</div>
+      <p class="horario-clases-info-texto">Incluye hora de llegada y salida de lunes a viernes.</p>
+    </section>
     <section class="modulo-profesores">
       <section class="tabla-horario-contenedor"><table class="tabla-horario-clases"><thead><tr><th>Bloque</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr></thead><tbody>${generarFilasHorarioClases(ip, ih)}</tbody></table></section>
     </section>

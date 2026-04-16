@@ -134,15 +134,15 @@ window.obtenerTelefonoCompleto = function(codigo, numero) {
 
 window.inicializarCamposTelefono = function(scope = document) {
   scope.querySelectorAll('[data-phone-row]').forEach((fila) => {
-    const select = fila.querySelector('.telefono-pais');
-    const input = fila.querySelector('.telefono-numero');
+    const select = fila.querySelector('.telefono-pais, .em-pais');
+    const input = fila.querySelector('.telefono-numero, .em-tel');
     const hidden = fila.querySelector('.telefono-completo');
 
-    if (!select || !input || !hidden || input.dataset.telefonoInicializado === 'true') return;
+    if (!select || !input || input.dataset.telefonoInicializado === 'true') return;
 
     const sync = () => {
       input.value = window.formatearNumeroTelefono(input.value, select.value);
-      hidden.value = window.obtenerTelefonoCompleto(select.value, input.value);
+      if (hidden) hidden.value = window.obtenerTelefonoCompleto(select.value, input.value);
     };
 
     input.dataset.telefonoInicializado = 'true';
