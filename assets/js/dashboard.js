@@ -87,7 +87,7 @@ window.agregarFeriado = async function() {
   if (!fecha || !desc) return alert("Debes ingresar la fecha y escribir el motivo.");
 
   if (feriadosGlobales.some((f) => f.fecha === fecha)) {
-    return alert("Este día ya está marcado como libre o feriado.");
+    return alert("Este día ya está marcado como libre o no hábil.");
   }
 
   feriadosGlobales.push({ fecha, tipo, desc });
@@ -118,7 +118,9 @@ window.renderFeriados = function() {
   }
 
   lista.innerHTML = feriadosGlobales.map((f, i) => {
-    const badgeColor = f.tipo === 'Interferiado' ? 'bg-morado-light text-morado' : 'bg-gray-light text-muted border-muted';
+    let badgeColor = 'bg-gray-light text-muted border-muted';
+    if (f.tipo === 'Interferiado') badgeColor = 'bg-morado-light text-morado';
+    if (f.tipo === 'Día no hábil') badgeColor = 'bg-azul-light text-azul border-azul';
     return `
     <li class="d-flex justify-between align-center p-2 bg-white border-muted border-radius-md">
       <div>

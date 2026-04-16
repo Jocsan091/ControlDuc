@@ -444,6 +444,12 @@ body {
   color: #4a148c !important; 
 }
 
+.estado-azul {
+  background: #d7e9ff;
+  color: #15549a !important;
+  border: 1px solid #7ba4db;
+}
+
 .estado-tachado { 
   background: var(--gris-suave); 
   color: #555; 
@@ -520,6 +526,12 @@ body {
   background: var(--rojo-suave) !important; 
   color: #c62828 !important; 
   text-decoration: none !important; 
+}
+
+.dia-azul {
+  background: #d7e9ff !important;
+  color: #15549a !important;
+  text-decoration: none !important;
 }
 
 .dia-amarillo { 
@@ -964,6 +976,9 @@ body {
 .bg-danger-light { background-color: var(--rojo-suave) !important; }
 .bg-warning-light { background-color: var(--amarillo-suave) !important; }
 .bg-success-light { background-color: var(--verde-suave) !important; }
+.bg-azul-light { background-color: #d7e9ff !important; }
+.text-azul { color: #15549a !important; }
+.border-azul { border: 1px solid #7ba4db !important; }
 .bg-morado-light { background-color: #e1bee7 !important; }
 .bg-white { background-color: var(--blanco) !important; }
 .bg-transparent { background-color: transparent !important; }

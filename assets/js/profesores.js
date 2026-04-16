@@ -695,10 +695,63 @@ function mostrarAdministradorIncidencias(ip, ih) {
   `);
 }
 
+function contarEstadosHorario(horario) {
+  const listaFeriadosSegura = typeof window.obtenerFeriados === 'function' ? window.obtenerFeriados() : [];
+  const hoyObj = new Date();
+  const hoyStr = `${hoyObj.getFullYear()}-${String(hoyObj.getMonth() + 1).padStart(2, '0')}-${String(hoyObj.getDate()).padStart(2, '0')}`;
+  const diasActivos = horario.diasActivos || (typeof window.obtenerDiasActivosPorDefecto === 'function' ? window.obtenerDiasActivosPorDefecto() : { lunes: true, martes: true, miercoles: true, jueves: true, viernes: true });
+  let asistidos = 0;
+  let futuros = 0;
+  let feriadosInterferencias = 0;
+  let diasNoHabiles = 0;
+  let inactivos = 0;
+
+  const anio = parseInt(horario.anio, 10);
+  if (Number.isNaN(anio)) return { asistidos, futuros, feriadosInterferencias, diasNoHabiles, inactivos };
+
+  for (let m = 0; m < 12; m++) {
+    const diasEnMes = new Date(anio, m + 1, 0).getDate();
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fechaActualStr = `${anio}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const fechaObj = new Date(anio, m, d);
+      const diaSem = fechaObj.getDay();
+      if (diaSem === 0 || diaSem === 6) continue;
+
+      const nombreDia = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][diaSem];
+      const enSemestre1 = fechaActualStr >= horario.inicioSemestre1 && fechaActualStr <= horario.finSemestre1;
+      const enSemestre2 = fechaActualStr >= horario.inicioSemestre2 && fechaActualStr <= horario.finSemestre2;
+      const enSemestreActivo = enSemestre1 || enSemestre2;
+      const esDiaActivo = diasActivos[nombreDia] !== false;
+      const feriadoNacional = typeof window.esFeriadoNacional === 'function' ? window.esFeriadoNacional(fechaActualStr) : null;
+      const feriadoManual = listaFeriadosSegura.find(f => f.fecha === fechaActualStr);
+      const esDiaNoHabil = feriadoManual && feriadoManual.tipo === 'Día no hábil';
+      const tieneLicencia = horario.licencias && horario.licencias.some(lic => fechaActualStr >= lic.fechaInicio && fechaActualStr <= lic.fechaFin);
+      const tieneFalta = horario.faltas && horario.faltas.some(fal => fal.fecha === fechaActualStr);
+
+      if (!enSemestreActivo || !esDiaActivo) {
+        inactivos++;
+      } else if (esDiaNoHabil) {
+        diasNoHabiles++;
+      } else if (feriadoNacional || feriadoManual) {
+        feriadosInterferencias++;
+      } else if (tieneLicencia || tieneFalta) {
+        // Licencias y faltas se muestran en sus propios contadores
+      } else if (fechaActualStr > hoyStr) {
+        futuros++;
+      } else {
+        asistidos++;
+      }
+    }
+  }
+
+  return { asistidos, futuros, feriadosInterferencias, diasNoHabiles, inactivos };
+}
+
 function verHorario(ip, ih) {
   const p = profesores[ip]; const h = p.horarios[ih];
   if (!h.faltas) h.faltas = []; if (!h.licencias) h.licencias = [];
   const totalFaltas = h.faltas.length; const totalLicencias = h.licencias.length;
+  const estados = contarEstadosHorario(h);
 
   document.getElementById('vista-detalle-profesor').innerHTML = `
     <header class="dashboard-topbar">
@@ -715,10 +768,11 @@ function verHorario(ip, ih) {
     </header>
 
     <div class="barra-estados-fija">
-      <div class="estado-box estado-verde fs-sm py-2 px-2">Días asistidos</div>
-      <div class="estado-box estado-gris border-muted fs-sm py-2 px-2">Días futuros</div>
-      <div class="estado-box estado-morado fs-sm py-2 px-2 border-morado">Feriados e Interferiados</div>
-      <div class="estado-box estado-tachado border-dashed fs-sm py-2 px-2">Inactivo</div>
+      <div class="estado-box estado-verde fs-sm py-2 px-2">Días asistidos: <strong>${estados.asistidos}</strong></div>
+      <div class="estado-box estado-gris border-muted fs-sm py-2 px-2">Días futuros: <strong>${estados.futuros}</strong></div>
+      <div class="estado-box estado-morado fs-sm py-2 px-2 border-morado">Feriados e Interferiores: <strong>${estados.feriadosInterferencias}</strong></div>
+      <div class="estado-box bg-azul-light text-azul border-azul fs-sm py-2 px-2">Días no hábiles: <strong>${estados.diasNoHabiles}</strong></div>
+      <div class="estado-box estado-tachado border-dashed fs-sm py-2 px-2">Inactivo: <strong>${estados.inactivos}</strong></div>
       <div class="separador-vertical"></div>
       <div class="estado-box estado-rojo border-danger fs-sm py-2 px-2">Faltas: <strong>${totalFaltas}</strong></div>
       <div class="estado-box estado-amarillo border-warning fs-sm py-2 px-2">Licencias: <strong>${totalLicencias}</strong></div>
@@ -867,6 +921,7 @@ function verHorarioClases(ip, ih) {
     </header>
     <div class="barra-estados-fija mt-2">
       <div class="estado-box estado-gris fs-sm py-2 px-2">Horario semanal</div>
+      <div class="estado-box estado-gris fs-sm py-2 px-2">Incluye llegada y salida de lunes a viernes</div>
     </div>
     <section class="modulo-profesores">
       <section class="tabla-horario-contenedor"><table class="tabla-horario-clases"><thead><tr><th>Bloque</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr></thead><tbody>${generarFilasHorarioClases(ip, ih)}</tbody></table></section>

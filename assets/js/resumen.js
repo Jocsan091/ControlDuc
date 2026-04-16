@@ -46,7 +46,8 @@ window.renderListaDiaria = function() {
       labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-danger fw-bold ml-2">(Fin de semana - No hay clases)</span>`;
     } else if (feriadoNacional || feriadoManual) {
       const motivo = feriadoNacional ? feriadoNacional.desc : feriadoManual.desc;
-      labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-morado fw-bold ml-2">(Día Libre: ${motivo})</span>`;
+      const tipo = feriadoNacional ? 'Feriado' : (feriadoManual?.tipo || 'Día Libre');
+      labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-morado fw-bold ml-2">(${tipo}: ${motivo})</span>`;
     } else {
       labelFecha.innerText = `Fecha en curso: ${fechaVisual}`;
     }
@@ -84,7 +85,7 @@ window.renderListaDiaria = function() {
         botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Acción Bloqueada</button>';
       } else if (esDiaLibreGlobal || !enSemestreActivo) {
         estadoFiltro = 'inactivo';
-        let txtMotivo = esFinde ? 'Fin de semana' : (feriadoNacional ? 'Feriado' : (feriadoManual ? 'Interferiado' : 'Vacaciones'));
+        const txtMotivo = esFinde ? 'Fin de semana' : feriadoNacional ? 'Feriado' : (feriadoManual?.tipo || 'Vacaciones');
         estadoStr = `<span class="estado-box estado-tachado fs-sm py-1 px-2">${txtMotivo}</span>`;
         botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Día Inhábil</button>';
       } else if (tieneFalta) {

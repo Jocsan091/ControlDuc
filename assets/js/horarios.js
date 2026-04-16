@@ -55,7 +55,11 @@ function generarMesesHorario(anio, horario) {
         claseDia = 'dia-morado'; 
         tooltip = `title="${feriadoNacional.desc}"`;
       } else if (feriadoManual) {
-        claseDia = 'dia-morado'; 
+        if (feriadoManual.tipo === 'Día no hábil') {
+          claseDia = 'dia-azul';
+        } else {
+          claseDia = 'dia-morado';
+        }
         tooltip = `title="${feriadoManual.tipo}: ${feriadoManual.desc}"`;
       } else if (!enSemestreActivo || !esDiaActivo) {
         claseDia = 'dia-tachado';
