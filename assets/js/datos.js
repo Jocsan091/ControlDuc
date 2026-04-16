@@ -1,5 +1,5 @@
-const ASIGNATURAS = ['Artes visuales', 'Ciencias naturales', 'Comunicación', 'Educación física y salud', 'Historia, geografía y ciencias sociales', 'Inglés', 'Lengua y literatura', 'Lenguaje', 'Matemáticas', 'Música', 'Orientación', 'Religión', 'Tecnología', 'Taller artístico', 'Taller deportivo'];
-const CURSOS = ['1°', '2°', '3°', '4°', '5°A', '5°B', '6°A', '6°B', '7°A', '7°B', '8°'];
+const ASIGNATURAS = ['Artes visuales', 'Ciencias naturales', 'Comunicaci\u00f3n', 'Educaci\u00f3n f\u00edsica y salud', 'Historia, geograf\u00eda y ciencias sociales', 'Ingl\u00e9s', 'Lengua y literatura', 'Lenguaje', 'Matem\u00e1ticas', 'M\u00fasica', 'Orientaci\u00f3n', 'Religi\u00f3n', 'Tecnolog\u00eda', 'Taller art\u00edstico', 'Taller deportivo'];
+const CURSOS = ['1\u00b0', '2\u00b0', '3\u00b0', '4\u00b0', '5\u00b0A', '5\u00b0B', '6\u00b0A', '6\u00b0B', '7\u00b0A', '7\u00b0B', '8\u00b0'];
 
 var profesores = [];
 var feriadosGlobales = [];
@@ -58,7 +58,7 @@ async function guardarDatosGlobales() {
       feriadosGlobales: feriadosGlobales,
       horariosAnuales: horariosAnuales
     });
-    if (!exito) console.error("Error crítico guardando.");
+    if (!exito) console.error("Error cr\u00edtico guardando.");
   }
 }
 
@@ -79,7 +79,7 @@ window.cargarDatosIniciales = async function() {
     configuracion = window.apiConfiguracion ? await window.apiConfiguracion.obtenerPublica() : {};
 
     if (window.location.pathname.includes('dashboard.html') && configuracion.nombreColegio) {
-      const brandP = document.querySelector('.sidebar-brand p');
+      const brandP = document.querySelector('.sidebar-brand p:last-of-type');
       if (brandP) brandP.innerText = configuracion.nombreColegio;
     }
 
@@ -93,6 +93,7 @@ window.cargarDatosIniciales = async function() {
     if (typeof window.renderHorariosAnuales === 'function') window.renderHorariosAnuales();
     if (typeof window.renderFeriados === 'function') window.renderFeriados();
     if (typeof renderListaDiaria === 'function' && document.getElementById('listaAsistenciaDiaria')) renderListaDiaria();
+    if (typeof window.renderResumenesAnuales === 'function' && document.getElementById('contenidoResumenesAnuales')) window.renderResumenesAnuales();
   }
 }
 

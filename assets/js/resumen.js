@@ -46,7 +46,7 @@ window.renderListaDiaria = function() {
       labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-danger fw-bold ml-2">(Fin de semana - No hay clases)</span>`;
     } else if (feriadoNacional || feriadoManual) {
       const motivo = feriadoNacional ? feriadoNacional.desc : feriadoManual.desc;
-      const tipo = feriadoNacional ? 'Feriado' : (feriadoManual?.tipo || 'Día Libre');
+      const tipo = feriadoNacional ? 'Feriado' : (feriadoManual?.tipo || 'D\u00eda Libre');
       labelFecha.innerHTML = `Fecha en curso: ${fechaVisual} <span class="text-morado fw-bold ml-2">(${tipo}: ${motivo})</span>`;
     } else {
       labelFecha.innerText = `Fecha en curso: ${fechaVisual}`;
@@ -81,13 +81,13 @@ window.renderListaDiaria = function() {
 
       if (tieneLicencia) {
         estadoFiltro = 'licencia';
-        estadoStr = '<span class="estado-box estado-amarillo text-warning fs-sm py-1 px-2">En Licencia Médica</span>';
-        botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Acción Bloqueada</button>';
+        estadoStr = '<span class="estado-box estado-amarillo text-warning fs-sm py-1 px-2">En Licencia M\u00e9dica</span>';
+        botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Acci\u00f3n Bloqueada</button>';
       } else if (esDiaLibreGlobal || !enSemestreActivo) {
         estadoFiltro = 'inactivo';
         const txtMotivo = esFinde ? 'Fin de semana' : feriadoNacional ? 'Feriado' : (feriadoManual?.tipo || 'Vacaciones');
         estadoStr = `<span class="estado-box estado-tachado fs-sm py-1 px-2">${txtMotivo}</span>`;
-        botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>Día Inhábil</button>';
+        botonAccion = '<button class="btn-secundario border-none fs-sm py-1 px-2 border-radius-sm" disabled>D\u00eda Inh\u00e1bil</button>';
       } else if (tieneFalta) {
         estadoFiltro = 'falta';
         estadoStr = '<span class="estado-box estado-rojo text-danger fs-sm py-1 px-2">Ausente (Inasistencia)</span>';
@@ -144,7 +144,7 @@ function verProfesorDesdeResumen(index) { if (typeof verProfesor === 'function')
 async function marcarFaltaRapida(indexP, indexH, fecha) {
   if (indexH === -1) return;
   if (!profesores[indexP].horarios[indexH].faltas) profesores[indexP].horarios[indexH].faltas = [];
-  profesores[indexP].horarios[indexH].faltas.push({ tipo: 'Inasistencia', fecha: fecha, motivo: 'Falta rápida registrada desde la Toma de Lista Diaria', registro: new Date().toISOString().split('T')[0] });
+  profesores[indexP].horarios[indexH].faltas.push({ tipo: 'Inasistencia', fecha: fecha, motivo: 'Falta r\u00e1pida registrada desde la Toma de Lista Diaria', registro: new Date().toISOString().split('T')[0] });
   await guardarDatosGlobales(); renderListaDiaria(); if (typeof actualizarDashboardInicio === 'function') actualizarDashboardInicio();
 }
 

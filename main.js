@@ -10,6 +10,7 @@ const licenciasPath = path.join(userDataPath, 'Licencias');
 const backupsPath = path.join(userDataPath, 'Backups');
 
 let sesionActiva = false;
+let mainWindow = null;
 
 function leerBaseDatos() {
   if (!fs.existsSync(dbPath)) {
@@ -121,6 +122,179 @@ function createWindow() {
     event.preventDefault();
   });
   win.loadFile(path.join(__dirname, 'views', 'login.html'));
+  mainWindow = win;
+  win.on('closed', () => {
+    if (mainWindow === win) mainWindow = null;
+  });
+}
+
+function limpiarNombreArchivo(nombre = 'reporte') {
+  return String(nombre).replace(/[<>:"/\\|?*\u0000-\u001F]/g, '_').trim() || 'reporte';
+}
+
+async function guardarArchivoConDialogo(config) {
+  if (!mainWindow) return { ok: false, cancelado: true };
+
+  const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, config);
+  if (canceled || !filePath) return { ok: false, cancelado: true };
+
+  return { ok: true, filePath };
+}
+
+function escaparXml(valor = '') {
+  return String(valor ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function crearExcelXmlResumen(payload = {}) {
+  const resumen = Array.isArray(payload.resumen) ? payload.resumen : [];
+  const detalle = Array.isArray(payload.detalle) ? payload.detalle : [];
+  const titulo = payload.titulo || 'Resumen anual';
+  const subtitulo = payload.subtitulo || '';
+
+  const filasResumen = resumen.map((item) => `
+      <Row>
+        <Cell ss:StyleID="labelCell"><Data ss:Type="String">${escaparXml(item.label || '')}</Data></Cell>
+        <Cell ss:StyleID="valueCell"><Data ss:Type="String">${escaparXml(item.value ?? '')}</Data></Cell>
+      </Row>
+  `).join('');
+
+  const filasDetalle = detalle.map((fila) => `
+      <Row>
+        <Cell><Data ss:Type="String">${escaparXml(fila.fecha || '')}</Data></Cell>
+        <Cell><Data ss:Type="String">${escaparXml(fila.dia || '')}</Data></Cell>
+        <Cell><Data ss:Type="String">${escaparXml(fila.estado || '')}</Data></Cell>
+        <Cell><Data ss:Type="String">${escaparXml(fila.detalle || '')}</Data></Cell>
+        <Cell><Data ss:Type="String">${escaparXml(fila.motivo || '')}</Data></Cell>
+        <Cell><Data ss:Type="String">${escaparXml(fila.documento || '')}</Data></Cell>
+      </Row>
+  `).join('');
+
+  return `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Styles>
+    <Style ss:ID="title">
+      <Font ss:Bold="1" ss:Size="14"/>
+    </Style>
+    <Style ss:ID="header">
+      <Font ss:Bold="1"/>
+      <Interior ss:Color="#EAF4E6" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="labelCell">
+      <Font ss:Bold="1"/>
+    </Style>
+    <Style ss:ID="valueCell">
+      <Interior ss:Color="#F8FBF6" ss:Pattern="Solid"/>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="Resumen">
+    <Table>
+      <Column ss:Width="180"/>
+      <Column ss:Width="180"/>
+      <Row>
+        <Cell ss:MergeAcross="1" ss:StyleID="title"><Data ss:Type="String">${escaparXml(titulo)}</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="1"><Data ss:Type="String">${escaparXml(subtitulo)}</Data></Cell>
+      </Row>
+      <Row />
+      ${filasResumen}
+    </Table>
+  </Worksheet>
+  <Worksheet ss:Name="Detalle diario">
+    <Table>
+      <Column ss:Width="90"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="110"/>
+      <Column ss:Width="180"/>
+      <Column ss:Width="220"/>
+      <Column ss:Width="120"/>
+      <Row>
+        <Cell ss:StyleID="header"><Data ss:Type="String">Fecha</Data></Cell>
+        <Cell ss:StyleID="header"><Data ss:Type="String">Día</Data></Cell>
+        <Cell ss:StyleID="header"><Data ss:Type="String">Estado</Data></Cell>
+        <Cell ss:StyleID="header"><Data ss:Type="String">Detalle</Data></Cell>
+        <Cell ss:StyleID="header"><Data ss:Type="String">Motivo</Data></Cell>
+        <Cell ss:StyleID="header"><Data ss:Type="String">Documento</Data></Cell>
+      </Row>
+      ${filasDetalle}
+    </Table>
+  </Worksheet>
+</Workbook>`;
+}
+
+function crearHtmlExportacionResumen(payload = {}) {
+  const titulo = payload.titulo || 'Resumen anual';
+  const subtitulo = payload.subtitulo || '';
+  const resumen = Array.isArray(payload.resumen) ? payload.resumen : [];
+  const detalle = Array.isArray(payload.detalle) ? payload.detalle : [];
+
+  const resumenHtml = resumen.map((item) => `
+    <div class="metric">
+      <span>${item.label || ''}</span>
+      <strong>${item.value ?? ''}</strong>
+    </div>
+  `).join('');
+
+  const filasHtml = detalle.map((fila) => `
+    <tr>
+      <td>${fila.fecha || ''}</td>
+      <td>${fila.dia || ''}</td>
+      <td>${fila.estado || ''}</td>
+      <td>${fila.detalle || ''}</td>
+      <td>${fila.motivo || ''}</td>
+      <td>${fila.documento || ''}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>${titulo}</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 28px; color: #1d2a1f; }
+        h1 { margin: 0 0 6px 0; font-size: 28px; }
+        p { margin: 0 0 18px 0; color: #4f5d52; }
+        .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 24px; }
+        .metric { padding: 12px 14px; border: 1px solid #d9e2d4; border-radius: 12px; background: #f8fbf6; }
+        .metric span { display: block; font-size: 12px; color: #58705d; margin-bottom: 4px; }
+        .metric strong { font-size: 20px; color: #1f4e2d; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #d9e2d4; padding: 8px; font-size: 12px; text-align: left; vertical-align: top; word-break: break-word; }
+        th { background: #eef5ea; color: #1f4e2d; }
+      </style>
+    </head>
+    <body>
+      <h1>${titulo}</h1>
+      <p>${subtitulo}</p>
+      <section class="metrics">${resumenHtml}</section>
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Día</th>
+            <th>Estado</th>
+            <th>Detalle</th>
+            <th>Motivo</th>
+            <th>Documento</th>
+          </tr>
+        </thead>
+        <tbody>${filasHtml}</tbody>
+      </table>
+    </body>
+    </html>
+  `;
 }
 
 app.whenReady().then(() => {
@@ -290,6 +464,129 @@ ipcMain.handle('abrir-licencia', async (event, nombreArchivo) => {
   }
 
   return false;
+});
+
+ipcMain.handle('exportar-resumen-excel', async (event, payload = {}) => {
+  try {
+    if (!sesionActiva) return { ok: false, cancelado: false, mensaje: 'Debes iniciar sesión para exportar.' };
+    if (!Array.isArray(payload.detalle) || !payload.detalle.length) {
+      return { ok: false, cancelado: false, mensaje: 'No hay datos válidos para exportar.' };
+    }
+
+    const nombreBase = limpiarNombreArchivo(payload.nombre || 'resumen_anual');
+    const resultado = await guardarArchivoConDialogo({
+      title: 'Guardar resumen para Excel',
+      defaultPath: `${nombreBase}.xls`,
+      filters: [{ name: 'Libro de Excel', extensions: ['xls'] }]
+    });
+
+    if (!resultado.ok) return resultado;
+
+    fs.writeFileSync(resultado.filePath, crearExcelXmlResumen(payload), 'utf8');
+    return { ok: true, cancelado: false, ruta: resultado.filePath };
+  } catch (error) {
+    return { ok: false, cancelado: false, mensaje: `No se pudo exportar el archivo de Excel. ${error.message || ''}`.trim() };
+  }
+});
+
+ipcMain.handle('exportar-resumen-pdf', async (event, payload = {}) => {
+  let exportWindow = null;
+  try {
+    if (!sesionActiva) return { ok: false, cancelado: false, mensaje: 'Debes iniciar sesión para exportar.' };
+    if (!Array.isArray(payload.detalle) || !payload.detalle.length) {
+      return { ok: false, cancelado: false, mensaje: 'No hay datos válidos para exportar.' };
+    }
+
+    const nombreBase = limpiarNombreArchivo(payload.nombre || 'resumen_anual');
+    const resultado = await guardarArchivoConDialogo({
+      title: 'Guardar resumen en PDF',
+      defaultPath: `${nombreBase}.pdf`,
+      filters: [{ name: 'Documento PDF', extensions: ['pdf'] }]
+    });
+
+    if (!resultado.ok) return resultado;
+
+    exportWindow = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        sandbox: true,
+        contextIsolation: true,
+        nodeIntegration: false
+      }
+    });
+
+    const html = typeof payload.html === 'string' && payload.html.trim()
+      ? payload.html
+      : crearHtmlExportacionResumen(payload);
+    await exportWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    await exportWindow.webContents.executeJavaScript(`
+      new Promise((resolve) => {
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => resolve(true)).catch(() => resolve(true));
+        } else {
+          resolve(true);
+        }
+      });
+    `);
+    const pdfBuffer = await exportWindow.webContents.printToPDF({
+      printBackground: true,
+      pageSize: 'A4',
+      marginsType: 1,
+      landscape: false,
+      preferCSSPageSize: true
+    });
+
+    fs.writeFileSync(resultado.filePath, pdfBuffer);
+    return { ok: true, cancelado: false, ruta: resultado.filePath };
+  } catch (error) {
+    return { ok: false, cancelado: false, mensaje: `No se pudo exportar el PDF. ${error.message || ''}`.trim() };
+  } finally {
+    if (exportWindow && !exportWindow.isDestroyed()) exportWindow.close();
+  }
+});
+
+ipcMain.handle('exportar-horario-clases-pdf', async (event, payload = {}) => {
+  let exportWindow = null;
+  try {
+    if (!sesionActiva) return { ok: false, cancelado: false, mensaje: 'Debes iniciar sesión para exportar.' };
+    if (typeof payload.html !== 'string' || !payload.html.trim()) {
+      return { ok: false, cancelado: false, mensaje: 'No hay datos válidos para exportar.' };
+    }
+
+    const nombreBase = limpiarNombreArchivo(payload.nombre || 'horario_clases');
+    const resultado = await guardarArchivoConDialogo({
+      title: 'Guardar horario de clases en PDF',
+      defaultPath: `${nombreBase}.pdf`,
+      filters: [{ name: 'Documento PDF', extensions: ['pdf'] }]
+    });
+
+    if (!resultado.ok) return resultado;
+
+    exportWindow = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        sandbox: true,
+        contextIsolation: true,
+        nodeIntegration: false
+      }
+    });
+
+    await exportWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(payload.html)}`);
+    const pdfBuffer = await exportWindow.webContents.printToPDF({
+      printBackground: true,
+      pageSize: 'A4',
+      marginsType: 1,
+      landscape: true,
+      preferCSSPageSize: true
+    });
+
+    fs.writeFileSync(resultado.filePath, pdfBuffer);
+    return { ok: true, cancelado: false, ruta: resultado.filePath };
+  } catch (error) {
+    return { ok: false, cancelado: false, mensaje: `No se pudo exportar el horario de clases. ${error.message || ''}`.trim() };
+  } finally {
+    if (exportWindow && !exportWindow.isDestroyed()) exportWindow.close();
+  }
 });
 
 app.on('window-all-closed', () => {

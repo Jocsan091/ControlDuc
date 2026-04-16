@@ -918,6 +918,9 @@ function verHorarioClases(ip, ih) {
           <p class="m-0 fs-lg text-muted">Horario Semanal ${h.anio}</p>
         </div>
       </div>
+      <div class="d-flex gap-1 align-center">
+        <button class="btn-principal" id="btnExportarHorarioClasesPdf">Exportar PDF</button>
+      </div>
     </header>
     <div class="barra-estados-fija mt-2">
       <div class="estado-box estado-gris fs-sm py-2 px-2">Horario semanal</div>
@@ -928,6 +931,143 @@ function verHorarioClases(ip, ih) {
     </section>
   `;
   document.getElementById('btnVolverCalendario').addEventListener('click', () => verHorario(ip, ih));
+  const btnExportarHorario = document.getElementById('btnExportarHorarioClasesPdf');
+  if (btnExportarHorario) btnExportarHorario.addEventListener('click', () => exportarHorarioClasesPdf(ip, ih));
+}
+
+function construirFilasHorarioClasesExportables(horarioClases) {
+  const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+  const filas = [];
+
+  filas.push({
+    tipo: 'fila',
+    label: 'Llegada',
+    celdas: dias.map((dia) => ({
+      valor: horarioClases[dia].llegada || '<span class="vacio">--:--</span>',
+      clase: horarioClases[dia].llegada ? '' : 'vacio'
+    }))
+  });
+
+  for (let bloque = 1; bloque <= 10; bloque++) {
+    filas.push({
+      tipo: 'fila',
+      label: `Bloque ${bloque}`,
+      celdas: dias.map((dia) => {
+        if (dia === 'viernes' && bloque >= 7) {
+          return { valor: 'X', clase: 'bloqueado' };
+        }
+
+        const valor = horarioClases[dia][bloque] || '<span class="vacio">Libre</span>';
+        return { valor, clase: horarioClases[dia][bloque] ? '' : 'vacio' };
+      })
+    });
+
+    if (bloque === 2 || bloque === 4 || bloque === 6) {
+      filas.push({ tipo: 'separador', label: 'RECREO' });
+    }
+
+    if (bloque === 8) {
+      filas.push({ tipo: 'separador', label: 'ALMUERZO' });
+    }
+  }
+
+  filas.push({
+    tipo: 'fila',
+    label: 'Salida',
+    celdas: dias.map((dia) => ({
+      valor: horarioClases[dia].salida || '<span class="vacio">--:--</span>',
+      clase: horarioClases[dia].salida ? '' : 'vacio'
+    }))
+  });
+
+  return filas;
+}
+
+function construirHtmlHorarioClasesPdf(profesor, horario) {
+  const filas = construirFilasHorarioClasesExportables(horario.horarioClases || crearHorarioClasesBase());
+
+  const filasHtml = filas.map((fila) => {
+    if (fila.tipo === 'separador') {
+      return `<tr><td class="separador" colspan="6">${fila.label}</td></tr>`;
+    }
+
+    return `
+      <tr>
+        <td class="col-bloque">${fila.label}</td>
+        ${fila.celdas.map((celda) => `<td class="${celda.clase || ''}">${celda.valor}</td>`).join('')}
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Horario de clases</title>
+      <style>
+        @page { size: A4 landscape; margin: 6mm; }
+        body { font-family: Arial, sans-serif; margin: 8px; color: #1d2a1f; }
+        h1 { margin: 0 0 2px 0; font-size: 18px; }
+        p { margin: 0 0 8px 0; color: #4f5d52; font-size: 11px; }
+        .banda { display: flex; gap: 6px; margin: 8px 0 10px; }
+        .pill { padding: 5px 8px; border-radius: 999px; background: #eef2ef; color: #445048; font-size: 10px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #d8d8d8; padding: 4px 3px; font-size: 9px; text-align: center; vertical-align: middle; word-break: break-word; line-height: 1.15; }
+        th { background: #f3f5ef; color: #145a1f; font-size: 10px; }
+        .col-bloque { background: #f9faf7; color: #145a1f; font-weight: bold; }
+        .separador { background: #dff0df; color: #145a1f; font-weight: bold; letter-spacing: 1px; }
+        .bloqueado { background: #f1f1f1; color: #777; text-decoration: line-through; font-weight: bold; }
+        .vacio { color: #999; font-style: italic; }
+      </style>
+    </head>
+    <body>
+      <h1>${profesor.nombre}</h1>
+      <p>RUT: ${profesor.rut} | Horario semanal ${horario.anio}</p>
+      <div class="banda">
+        <span class="pill">Horario semanal</span>
+        <span class="pill">Incluye llegada y salida de lunes a viernes</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Bloque</th>
+            <th>Lunes</th>
+            <th>Martes</th>
+            <th>Miercoles</th>
+            <th>Jueves</th>
+            <th>Viernes</th>
+          </tr>
+        </thead>
+        <tbody>${filasHtml}</tbody>
+      </table>
+    </body>
+    </html>
+  `;
+}
+
+async function exportarHorarioClasesPdf(ip, ih) {
+  const profesor = profesores[ip];
+  const horario = profesor?.horarios?.[ih];
+
+  if (!profesor || !horario) {
+    alert('No se pudo preparar el horario para exportar.');
+    return;
+  }
+
+  if (!window.apiExportacion || typeof window.apiExportacion.exportarHorarioClasesPdf !== 'function') {
+    alert('La exportacion PDF solo funciona en la aplicacion de escritorio.');
+    return;
+  }
+
+  const resultado = await window.apiExportacion.exportarHorarioClasesPdf({
+    nombre: `${profesor.nombre || 'docente'}_${horario.anio || 'horario'}_clases`,
+    html: construirHtmlHorarioClasesPdf(profesor, horario)
+  });
+
+  if (!resultado?.ok && !resultado?.cancelado) {
+    alert(resultado?.mensaje || 'No se pudo exportar el horario de clases.');
+  }
 }
 
 function editarBloque(ip, ih, d, b) {

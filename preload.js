@@ -21,3 +21,8 @@ contextBridge.exposeInMainWorld('apiAuth', {
 contextBridge.exposeInMainWorld('apiConfiguracion', {
   obtenerPublica: () => ipcRenderer.invoke('obtener-configuracion-publica')
 });
+
+contextBridge.exposeInMainWorld('apiExportacion', {
+  exportarResumenPdf: (payload) => ipcRenderer.invoke('exportar-resumen-pdf', payload),
+  exportarHorarioClasesPdf: (payload) => ipcRenderer.invoke('exportar-horario-clases-pdf', payload)
+});

@@ -33,12 +33,14 @@ async function inicializarDashboard() {
     cargarVistaParcial('vista-profesores', 'profesores.html'),
     cargarVistaParcial('vista-horariosanuales', 'horariosanuales.html'),
     cargarVistaParcial('vista-resumen', 'resumen.html'),
-    cargarVistaParcial('vista-interferiados', 'interferiados.html')
+    cargarVistaParcial('vista-interferiados', 'interferiados.html'),
+    cargarVistaParcial('vista-resumenes', 'resumenes.html')
   ]);
 
   inicializarLogout();
   if (typeof window.inicializarVistaProfesores === 'function') window.inicializarVistaProfesores();
   if (typeof window.inicializarVistaResumen === 'function') window.inicializarVistaResumen();
+  if (typeof window.inicializarVistaResumenes === 'function') window.inicializarVistaResumenes();
   if (typeof window.inicializarNavegacion === 'function') window.inicializarNavegacion();
   if (typeof window.cargarDatosIniciales === 'function') await window.cargarDatosIniciales();
 }
@@ -87,7 +89,7 @@ window.agregarFeriado = async function() {
   if (!fecha || !desc) return alert("Debes ingresar la fecha y escribir el motivo.");
 
   if (feriadosGlobales.some((f) => f.fecha === fecha)) {
-    return alert("Este día ya está marcado como libre o no hábil.");
+    return alert("Este d\u00eda ya est\u00e1 marcado como libre o no h\u00e1bil.");
   }
 
   feriadosGlobales.push({ fecha, tipo, desc });
@@ -101,7 +103,7 @@ window.agregarFeriado = async function() {
 }
 
 window.eliminarFeriado = async function(index) {
-  if (confirm("¿Quitar este día libre? El día volverá a ser hábil para todos los profesores.")) {
+  if (confirm("\u00bfQuitar este d\u00eda libre? El d\u00eda volver\u00e1 a ser h\u00e1bil para todos los profesores.")) {
     feriadosGlobales.splice(index, 1);
     await guardarDatosGlobales();
     window.renderFeriados();
@@ -113,14 +115,14 @@ window.renderFeriados = function() {
   if (!lista) return;
 
   if (feriadosGlobales.length === 0) {
-    lista.innerHTML = '<li class="text-muted" style="font-style: italic;">No hay días libres registrados.</li>';
+    lista.innerHTML = '<li class="text-muted" style="font-style: italic;">No hay d\u00edas libres registrados.</li>';
     return;
   }
 
   lista.innerHTML = feriadosGlobales.map((f, i) => {
     let badgeColor = 'bg-gray-light text-muted border-muted';
     if (f.tipo === 'Interferiado') badgeColor = 'bg-morado-light text-morado';
-    if (f.tipo === 'Día no hábil') badgeColor = 'bg-azul-light text-azul border-azul';
+    if (f.tipo === 'D\u00eda no h\u00e1bil') badgeColor = 'bg-azul-light text-azul border-azul';
     return `
     <li class="d-flex justify-between align-center p-2 bg-white border-muted border-radius-md">
       <div>

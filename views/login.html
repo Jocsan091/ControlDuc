@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ControlDocentes - Iniciar Sesión</title>
+  <title>ControlDocentes - Iniciar Sesi&oacute;n</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body class="login-body">
   <div class="container d-none" id="pantallaLogin">
     <h2>ControlDocentes</h2>
-    <p class="text-muted mb-3" id="subtituloLogin">Acceso exclusivo Inspectoría</p>
+    <p class="text-muted mb-3" id="subtituloLogin">Acceso exclusivo Inspector&iacute;a</p>
 
     <form id="formLogin">
       <div class="text-left mb-3">
@@ -16,18 +16,18 @@
         <input type="text" id="loginUsuario" placeholder="Tu nombre de usuario" class="input-global w-100" required>
       </div>
       <div class="text-left mb-3">
-        <label class="fw-bold fs-sm text-primary mb-1 d-block">Contraseña:</label>
-        <input type="password" id="loginPassword" placeholder="Tu contraseña" class="input-global w-100" required>
+        <label class="fw-bold fs-sm text-primary mb-1 d-block">Contrase&ntilde;a:</label>
+        <input type="password" id="loginPassword" placeholder="Tu contrase&ntilde;a" class="input-global w-100" required>
       </div>
 
-      <button type="submit" class="btn-principal w-100 py-2 fs-md mt-2">Iniciar Sesión</button>
-      <div id="successLogin" class="text-success fw-bold mt-3 d-none">Usuario creado correctamente. Ahora inicia sesión.</div>
-      <div id="errorLogin" class="text-danger fw-bold mt-3 d-none">Usuario o contraseña incorrectos.</div>
+      <button type="submit" class="btn-principal w-100 py-2 fs-md mt-2">Iniciar Sesi&oacute;n</button>
+      <div id="successLogin" class="text-success fw-bold mt-3 d-none">Usuario creado correctamente. Ahora inicia sesi&oacute;n.</div>
+      <div id="errorLogin" class="text-danger fw-bold mt-3 d-none">Usuario o contrase&ntilde;a incorrectos.</div>
     </form>
   </div>
 
   <div class="container d-none" id="pantallaSetup">
-    <h2 class="text-primary">¡Bienvenido!</h2>
+    <h2 class="text-primary">&iexcl;Bienvenido!</h2>
     <p class="text-muted mb-4 fs-sm">Parece que es la primera vez que abres ControlDocentes. Vamos a configurar tu sistema principal.</p>
 
     <form id="formSetup">
@@ -37,13 +37,13 @@
       </div>
 
       <div class="text-left mb-4">
-        <label class="fw-bold fs-sm text-primary mb-1 d-block">Crea tu Contraseña Maestra:</label>
-        <input type="password" id="setupPass" placeholder="Mínimo 6 caracteres" class="input-global w-100 mb-2" required minlength="6">
-        <input type="password" id="setupPassConfirm" placeholder="Confirma tu contraseña" class="input-global w-100" required minlength="6">
+        <label class="fw-bold fs-sm text-primary mb-1 d-block">Crea tu Contrase&ntilde;a Maestra:</label>
+        <input type="password" id="setupPass" placeholder="M&iacute;nimo 6 caracteres" class="input-global w-100 mb-2" required minlength="6">
+        <input type="password" id="setupPassConfirm" placeholder="Confirma tu contrase&ntilde;a" class="input-global w-100" required minlength="6">
       </div>
 
       <button type="submit" class="btn-principal w-100 py-2 fs-md">Guardar y Comenzar</button>
-      <div id="errorSetup" class="text-danger fw-bold mt-3 d-none">Las contraseñas no coinciden.</div>
+      <div id="errorSetup" class="text-danger fw-bold mt-3 d-none">Las contrase&ntilde;as no coinciden.</div>
     </form>
   </div>
 

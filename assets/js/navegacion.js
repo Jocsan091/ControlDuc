@@ -4,6 +4,7 @@ window.inicializarNavegacion = function() {
   const menuHorariosAnuales = document.getElementById('menuHorariosAnuales');
   const menuResumen = document.getElementById('menuResumen');
   const menuInterferiados = document.getElementById('menuInterferiados');
+  const menuResumenes = document.getElementById('menuResumenes');
 
   const vistaInicio = document.getElementById('vista-inicio');
   const vistaProfesores = document.getElementById('vista-profesores');
@@ -11,9 +12,10 @@ window.inicializarNavegacion = function() {
   const vistaDetalleProfesor = document.getElementById('vista-detalle-profesor');
   const vistaResumen = document.getElementById('vista-resumen');
   const vistaInterferiados = document.getElementById('vista-interferiados');
+  const vistaResumenes = document.getElementById('vista-resumenes');
 
-  const todasLasVistas = [vistaInicio, vistaProfesores, vistaHorariosAnuales, vistaDetalleProfesor, vistaResumen, vistaInterferiados];
-  const todosLosMenus = [menuInicio, menuProfesores, menuHorariosAnuales, menuResumen, menuInterferiados];
+  const todasLasVistas = [vistaInicio, vistaProfesores, vistaHorariosAnuales, vistaDetalleProfesor, vistaResumen, vistaInterferiados, vistaResumenes];
+  const todosLosMenus = [menuInicio, menuProfesores, menuHorariosAnuales, menuResumen, menuInterferiados, menuResumenes];
 
   window.cambiarVista = function(vistaDestino, menuActivo) {
     todasLasVistas.forEach((vista) => {
@@ -64,6 +66,12 @@ window.inicializarNavegacion = function() {
     window.cambiarVista(vistaInterferiados, menuInterferiados);
   });
 
+  if (menuResumenes) menuResumenes.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.cambiarVista(vistaResumenes, menuResumenes);
+    if (typeof window.renderResumenesAnuales === 'function') window.renderResumenesAnuales();
+  });
+
   const btnAccionProfesores = document.getElementById('btnAccionProfesores');
   if (btnAccionProfesores) btnAccionProfesores.addEventListener('click', () => {
     window.cambiarVista(vistaProfesores, menuProfesores);
@@ -85,6 +93,12 @@ window.inicializarNavegacion = function() {
   const btnAccionInterferiados = document.getElementById('btnAccionInterferiados');
   if (btnAccionInterferiados) btnAccionInterferiados.addEventListener('click', () => {
     window.cambiarVista(vistaInterferiados, menuInterferiados);
+  });
+
+  const btnAccionResumenes = document.getElementById('btnAccionResumenes');
+  if (btnAccionResumenes) btnAccionResumenes.addEventListener('click', () => {
+    window.cambiarVista(vistaResumenes, menuResumenes);
+    if (typeof window.renderResumenesAnuales === 'function') window.renderResumenesAnuales();
   });
 
   function navegarYFiltrarResumen(filtro) {

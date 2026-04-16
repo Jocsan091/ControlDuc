@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const pass2 = document.getElementById('setupPassConfirm').value;
 
       if (pass1 !== pass2) {
-        errorSetup.innerText = "Error: Las contraseñas no coinciden.";
+        errorSetup.innerText = "Error: Las contrase\u00f1as no coinciden.";
         errorSetup.classList.remove('d-none');
         errorSetup.classList.add('d-block');
         return;
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             successLogin.classList.add('d-block');
           }
         } else {
-          alert("Error crítico al guardar la configuración inicial.");
+          alert("Error cr\u00edtico al guardar la configuraci\u00f3n inicial.");
         }
       }
     });
