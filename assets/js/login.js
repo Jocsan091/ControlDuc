@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const inputUser = document.getElementById('loginUsuario').value.trim();
+      const inputUser = window.normalizarUsuarioAcceso(document.getElementById('loginUsuario').value);
       const inputPass = document.getElementById('loginPassword').value;
       const res = await window.apiAuth.login({ usuario: inputUser, password: inputPass });
 
@@ -53,9 +53,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     formSetup.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const nuevoUsuario = document.getElementById('setupUsuario').value.trim();
+      const nuevoUsuario = window.normalizarUsuarioAcceso(document.getElementById('setupUsuario').value);
       const pass1 = document.getElementById('setupPass').value;
       const pass2 = document.getElementById('setupPassConfirm').value;
+
+      if (!nuevoUsuario) {
+        errorSetup.innerText = "Error: Debes ingresar un nombre de usuario.";
+        errorSetup.classList.remove('d-none');
+        errorSetup.classList.add('d-block');
+        return;
+      }
 
       if (pass1 !== pass2) {
         errorSetup.innerText = "Error: Las contrase\u00f1as no coinciden.";

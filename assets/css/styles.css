@@ -31,6 +31,7 @@ body {
   font-family: Arial, sans-serif; 
   background: var(--gris-fondo); 
   color: #222; 
+  overflow-x: hidden;
 }
 
 .login-body { 
@@ -669,6 +670,7 @@ body {
   display: flex; 
   align-items: center; 
   justify-content: center; 
+  padding: 20px;
   background: rgba(0, 0, 0, 0.35); 
 }
 
@@ -679,16 +681,17 @@ body {
   gap: 12px; 
   width: 100%; 
   max-width: 470px; 
+  max-height: calc(100vh - 40px);
   padding: 28px; 
   background: var(--blanco); 
   border-radius: 20px; 
   box-shadow: var(--sombra-media); 
+  overflow-y: auto;
 }
 
 .modal-largo { 
   max-width: 750px !important; 
-  max-height: 90vh; 
-  overflow-y: auto; 
+  max-height: calc(100vh - 40px); 
 }
 
 .btn-cerrar-modal { 
@@ -1483,6 +1486,106 @@ body {
   }
   .resumen-tabla-barra {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    margin: 24px auto;
+    padding: 22px 16px;
+    border-radius: 16px;
+  }
+  .container h2 {
+    font-size: 30px;
+  }
+  .dashboard-sidebar {
+    padding: 18px 14px;
+  }
+  .sidebar-brand h2 {
+    font-size: 28px;
+  }
+  .sidebar-brand p,
+  .menu-item,
+  .dashboard-topbar p,
+  .topbar-user {
+    font-size: 15px;
+  }
+  .dashboard-main {
+    padding: 0 10px 14px 10px;
+  }
+  .dashboard-topbar,
+  .profesores-superior,
+  .profesores-barra,
+  .profesor-card,
+  .horario-card,
+  .mes-card,
+  .tabla-horario-contenedor,
+  .resumen-bloque-lista,
+  .resumen-lectura-card,
+  .resumen-leyenda-card,
+  .resumen-indicadores-secundarios {
+    padding: 14px;
+  }
+  .dashboard-topbar h1 {
+    font-size: 28px;
+  }
+  .profesor-info h3,
+  .horario-info h3 {
+    font-size: 20px;
+  }
+  .btn-principal,
+  .btn-secundario,
+  .input-global,
+  .resumen-tab,
+  .resumen-filtro-btn {
+    width: 100%;
+  }
+  .modal {
+    align-items: flex-start;
+    padding: 10px;
+  }
+  .modal-content {
+    max-height: calc(100vh - 20px);
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+  .modal-botones {
+    flex-direction: column;
+  }
+  .acciones-tarjeta {
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-topbar {
+    padding: 14px;
+  }
+  .sidebar-logo {
+    width: 58px;
+    height: 58px;
+  }
+  .separador-vertical {
+    display: none;
+  }
+  .estado-box {
+    width: 100%;
+  }
+  .dias-semana,
+  .dias-grid {
+    gap: 6px;
+  }
+  .dia-box {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+  .telefono-pais,
+  .em-pais {
+    flex-basis: 92px;
+    width: 92px !important;
+    min-width: 92px;
+    max-width: 92px;
   }
 }
 

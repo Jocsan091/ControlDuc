@@ -136,8 +136,8 @@ function mostrarFormularioProfesor(indexEdicion = null) {
         
         <h4 class="seccion-titulo">Datos Personales</h4>
         <div class="form-grid">
-          <div><label class="d-block mb-1">Nombre Completo *</label><input type="text" id="f_nombre" class="input-global w-100" value="${window.escapeHtmlAttr(p.nombre || '')}" maxlength="60" placeholder="Ej: Juan Pérez"></div>
-          <div><label class="d-block mb-1">RUT *</label><input type="text" id="f_rut" class="input-global w-100" value="${window.escapeHtmlAttr(p.rut || '')}" maxlength="12" placeholder="12.345.678-9"></div>
+          <div><label class="d-block mb-1">Nombre Completo</label><input type="text" id="f_nombre" class="input-global w-100" value="${window.escapeHtmlAttr(p.nombre || '')}" maxlength="60" placeholder="Ej: Juan Pérez"></div>
+          <div><label class="d-block mb-1">RUT</label><input type="text" id="f_rut" class="input-global w-100" value="${window.escapeHtmlAttr(p.rut || '')}" maxlength="12" placeholder="12.345.678-9"></div>
           <div><label class="d-block mb-1">Fecha de Nacimiento</label><input type="date" id="f_fechaNac" class="input-global w-100" value="${window.escapeHtmlAttr(p.fechaNacimiento || '')}"></div>
           <div><label class="d-block mb-1">Domicilio</label><input type="text" id="f_domicilio" class="input-global w-100" value="${window.escapeHtmlAttr(p.domicilio || '')}" maxlength="80"></div>
           <div><label class="d-block mb-1">Traslado Frecuente</label><input type="text" id="f_traslado" class="input-global w-100" value="${window.escapeHtmlAttr(p.traslado || '')}" maxlength="50"></div>
@@ -441,10 +441,10 @@ function verProfesor(index) {
  
 function crearCamposFechaHorario(prefix, horario = {}) {
   return [
-    { label: 'Inicio Semestre 1 *', visibleId: `${prefix}Inicio1`, hiddenId: `${prefix}HiddenInicio1`, suffixId: `${prefix}SuffixInicio1`, visibleValue: formatearFechaParaInput(horario.inicioSemestre1), hiddenValue: formatearFechaParaInput(horario.inicioSemestre1), anio: horario.anio || '' },
-    { label: 'Fin Semestre 1 *', visibleId: `${prefix}Fin1`, hiddenId: `${prefix}HiddenFin1`, suffixId: `${prefix}SuffixFin1`, visibleValue: formatearFechaParaInput(horario.finSemestre1), hiddenValue: formatearFechaParaInput(horario.finSemestre1), anio: horario.anio || '' },
-    { label: 'Inicio Semestre 2 *', visibleId: `${prefix}Inicio2`, hiddenId: `${prefix}HiddenInicio2`, suffixId: `${prefix}SuffixInicio2`, visibleValue: formatearFechaParaInput(horario.inicioSemestre2), hiddenValue: formatearFechaParaInput(horario.inicioSemestre2), anio: horario.anio || '' },
-    { label: 'Fin Semestre 2 *', visibleId: `${prefix}Fin2`, hiddenId: `${prefix}HiddenFin2`, suffixId: `${prefix}SuffixFin2`, visibleValue: formatearFechaParaInput(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
+    { label: 'Inicio Semestre 1', visibleId: `${prefix}Inicio1`, hiddenId: `${prefix}HiddenInicio1`, suffixId: `${prefix}SuffixInicio1`, visibleValue: formatearFechaParaInput(horario.inicioSemestre1), hiddenValue: formatearFechaParaInput(horario.inicioSemestre1), anio: horario.anio || '' },
+    { label: 'Fin Semestre 1', visibleId: `${prefix}Fin1`, hiddenId: `${prefix}HiddenFin1`, suffixId: `${prefix}SuffixFin1`, visibleValue: formatearFechaParaInput(horario.finSemestre1), hiddenValue: formatearFechaParaInput(horario.finSemestre1), anio: horario.anio || '' },
+    { label: 'Inicio Semestre 2', visibleId: `${prefix}Inicio2`, hiddenId: `${prefix}HiddenInicio2`, suffixId: `${prefix}SuffixInicio2`, visibleValue: formatearFechaParaInput(horario.inicioSemestre2), hiddenValue: formatearFechaParaInput(horario.inicioSemestre2), anio: horario.anio || '' },
+    { label: 'Fin Semestre 2', visibleId: `${prefix}Fin2`, hiddenId: `${prefix}HiddenFin2`, suffixId: `${prefix}SuffixFin2`, visibleValue: formatearFechaParaInput(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
   ];
 }
 
@@ -499,7 +499,7 @@ function actualizarFormularioPrecargado(ip) {
 
   contenedor.innerHTML = `
     <div>
-      <label class="d-block mb-1">Año precargado *</label>
+      <label class="d-block mb-1">Año precargado</label>
       <select id="selectHorarioPrecargado" class="input-global w-100">
         <option value="">Selecciona un año</option>
         ${disponibles.map((horario) => `<option value="${horario.anio}">${horario.anio}</option>`).join('')}
@@ -581,7 +581,7 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
           <h3>Agregar horario sobrecargado</h3>
           <p class="fs-sm text-muted mt-0">Selecciona un año precargado para clonar sus fechas.</p>
           <div>
-            <label class="d-block mb-1">Año precargado *</label>
+            <label class="d-block mb-1">Año precargado</label>
             <select id="selectHorarioPrecargado" class="input-global w-100">
               <option value="">Selecciona un año</option>
               ${disponibles.map((horario) => `<option value="${horario.anio}">${horario.anio}</option>`).join('')}

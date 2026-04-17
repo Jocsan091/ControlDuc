@@ -38,6 +38,10 @@ window.normalizarEspacios = function(valor) {
   return String(valor ?? '').replace(/\s+/g, ' ').trim();
 };
 
+window.normalizarUsuarioAcceso = function(valor) {
+  return window.normalizarEspacios(valor).toLowerCase();
+};
+
 window.formatearTextoTitulo = function(valor) {
   return window.normalizarEspacios(valor)
     .toLowerCase()
@@ -158,7 +162,11 @@ window.configurarFormatoTexto = function(input, formatter) {
   input.dataset.formatterInicializado = 'true';
   input.addEventListener('input', () => {
     const valorOriginal = input.value;
-    const valorFormateado = formatter(valorOriginal);
+    const terminaConEspacio = /\s$/.test(valorOriginal);
+    let valorFormateado = formatter(valorOriginal);
+
+    // Permite seguir escribiendo nombres compuestos sin borrar el espacio final en cada tecla.
+    if (terminaConEspacio && valorFormateado) valorFormateado = `${valorFormateado} `;
     if (valorOriginal !== valorFormateado) input.value = valorFormateado;
   });
 };

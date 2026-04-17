@@ -192,10 +192,10 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
 
   const horario = typeof indexEdicion === 'number' ? horariosAnuales[indexEdicion] : {};
   const camposFecha = [
-    { label: 'Inicio Semestre 1 *', visibleId: 'inicioSemestre1Anual', hiddenId: 'hiddenInicioSemestre1Anual', suffixId: 'suffixInicioSemestre1Anual', visibleValue: formatearFechaParaInput(horario.inicioSemestre1), hiddenValue: formatearFechaParaInput(horario.inicioSemestre1), anio: horario.anio || '' },
-    { label: 'Fin Semestre 1 *', visibleId: 'finSemestre1Anual', hiddenId: 'hiddenFinSemestre1Anual', suffixId: 'suffixFinSemestre1Anual', visibleValue: formatearFechaParaInput(horario.finSemestre1), hiddenValue: formatearFechaParaInput(horario.finSemestre1), anio: horario.anio || '' },
-    { label: 'Inicio Semestre 2 *', visibleId: 'inicioSemestre2Anual', hiddenId: 'hiddenInicioSemestre2Anual', suffixId: 'suffixInicioSemestre2Anual', visibleValue: formatearFechaParaInput(horario.inicioSemestre2), hiddenValue: formatearFechaParaInput(horario.inicioSemestre2), anio: horario.anio || '' },
-    { label: 'Fin Semestre 2 *', visibleId: 'finSemestre2Anual', hiddenId: 'hiddenFinSemestre2Anual', suffixId: 'suffixFinSemestre2Anual', visibleValue: formatearFechaParaInput(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
+    { label: 'Inicio Semestre 1', visibleId: 'inicioSemestre1Anual', hiddenId: 'hiddenInicioSemestre1Anual', suffixId: 'suffixInicioSemestre1Anual', visibleValue: formatearFechaParaInput(horario.inicioSemestre1), hiddenValue: formatearFechaParaInput(horario.inicioSemestre1), anio: horario.anio || '' },
+    { label: 'Fin Semestre 1', visibleId: 'finSemestre1Anual', hiddenId: 'hiddenFinSemestre1Anual', suffixId: 'suffixFinSemestre1Anual', visibleValue: formatearFechaParaInput(horario.finSemestre1), hiddenValue: formatearFechaParaInput(horario.finSemestre1), anio: horario.anio || '' },
+    { label: 'Inicio Semestre 2', visibleId: 'inicioSemestre2Anual', hiddenId: 'hiddenInicioSemestre2Anual', suffixId: 'suffixInicioSemestre2Anual', visibleValue: formatearFechaParaInput(horario.inicioSemestre2), hiddenValue: formatearFechaParaInput(horario.inicioSemestre2), anio: horario.anio || '' },
+    { label: 'Fin Semestre 2', visibleId: 'finSemestre2Anual', hiddenId: 'hiddenFinSemestre2Anual', suffixId: 'suffixFinSemestre2Anual', visibleValue: formatearFechaParaInput(horario.finSemestre2), hiddenValue: formatearFechaParaInput(horario.finSemestre2), anio: horario.anio || '' }
   ];
 
   const diasActivosIniciales = horario.diasActivos || window.obtenerDiasActivosPorDefecto();
@@ -207,7 +207,7 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
         ${window.renderDiasActivosSelector('anual-', diasActivosIniciales)}
         <div class="form-grid formulario-anual-grid">
           <div class="col-span-full">
-            <label class="d-block mb-1">Año *</label>
+            <label class="d-block mb-1">Año</label>
             <input type="text" id="anioHorarioAnual" class="input-global w-100" value="${window.escapeHtmlAttr(horario.anio || '')}" inputmode="numeric" maxlength="4" ${typeof indexEdicion === 'number' ? 'readonly' : ''}>
           </div>
           ${camposFecha.map((campo) => window.crearCampoFechaConAnioHtml(campo)).join('')}

@@ -12,6 +12,21 @@ const backupsPath = path.join(userDataPath, 'Backups');
 let sesionActiva = false;
 let mainWindow = null;
 
+function normalizarUsuarioAcceso(valor = '') {
+  return String(valor ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function passwordsCoincidenConTolerancia(passwordIngresada, salt, hashGuardado) {
+  if (passwordCoincide(passwordIngresada, salt, hashGuardado)) return true;
+
+  const passwordRecortada = String(passwordIngresada ?? '').trim();
+  if (passwordRecortada && passwordRecortada !== passwordIngresada) {
+    return passwordCoincide(passwordRecortada, salt, hashGuardado);
+  }
+
+  return false;
+}
+
 function leerBaseDatos() {
   if (!fs.existsSync(dbPath)) {
     return { profesores: [], feriadosGlobales: [], horariosAnuales: [] };
@@ -357,11 +372,15 @@ ipcMain.handle('crear-usuario-inicial', async (event, datos) => {
     const data = leerBaseDatos();
     if (existeUsuarioConfigurado(data)) return false;
 
-    const { salt, hash } = generarHashPassword(datos.password);
+    const usuario = String(datos?.usuario ?? '').replace(/\s+/g, ' ').trim();
+    const password = String(datos?.password ?? '');
+    if (!usuario || !password) return false;
+
+    const { salt, hash } = generarHashPassword(password);
 
     data.configuracion = {
       ...data.configuracion,
-      usuario: datos.usuario,
+      usuario,
       passwordHash: hash,
       passwordSalt: salt
     };
@@ -379,21 +398,24 @@ ipcMain.handle('crear-usuario-inicial', async (event, datos) => {
 ipcMain.handle('intentar-login', async (event, { usuario, password }) => {
   try {
     const data = leerBaseDatos();
-    const config = data.configuracion;
+    const config = data.configuracion || {};
+    const usuarioGuardado = normalizarUsuarioAcceso(config.usuario);
+    const usuarioIngresado = normalizarUsuarioAcceso(usuario);
 
-    if (!config || config.usuario !== usuario) {
+    if (!usuarioGuardado || usuarioGuardado !== usuarioIngresado) {
       sesionActiva = false;
       return { exito: false };
     }
 
     if (config.passwordHash && config.passwordSalt) {
-      const exito = passwordCoincide(password, config.passwordSalt, config.passwordHash);
+      const exito = passwordsCoincidenConTolerancia(String(password ?? ''), config.passwordSalt, config.passwordHash);
       sesionActiva = exito;
       return { exito };
     }
 
-    if (config.password === password) {
-      const { salt, hash } = generarHashPassword(password);
+    if (config.password === password || config.password === String(password ?? '').trim()) {
+      const passwordMigrada = config.password === password ? password : String(password ?? '').trim();
+      const { salt, hash } = generarHashPassword(passwordMigrada);
       data.configuracion = {
         ...config,
         passwordHash: hash,
