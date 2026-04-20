@@ -127,29 +127,11 @@ window.inicializarCamposFechaConAnio = function(campos, getAnio) {
       const visibleInput = document.getElementById(visibleId);
       if (!visibleInput) return;
 
-      visibleInput.min = anio ? `${anio}-01-01` : '';
-      visibleInput.max = anio ? `${anio}-12-31` : '';
-
-      if (visibleInput.value && anio && /^\d{4}-\d{2}-\d{2}$/.test(visibleInput.value)) {
-        const partes = visibleInput.value.split('-');
-        visibleInput.value = `${anio}-${partes[1]}-${partes[2]}`;
-      }
+      const anioValido = /^\d{4}$/.test(String(anio || '').trim());
+      visibleInput.min = anioValido ? `${anio}-01-01` : '';
+      visibleInput.max = anioValido ? `${anio}-12-31` : '';
     });
   };
-
-  campos.forEach(({ visibleId }) => {
-    const visibleInput = document.getElementById(visibleId);
-    if (!visibleInput) return;
-
-    visibleInput.addEventListener('input', () => {
-      const anio = getAnio();
-      if (!anio) return;
-      if (visibleInput.value && /^\d{4}-\d{2}-\d{2}$/.test(visibleInput.value)) {
-        const partes = visibleInput.value.split('-');
-        visibleInput.value = `${anio}-${partes[1]}-${partes[2]}`;
-      }
-    });
-  });
 
   actualizarAnioEnCampos(getAnio());
 
@@ -222,10 +204,9 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
   `);
 
   const anioInput = document.getElementById('anioHorarioAnual');
-  window.configurarInputNumerico(anioInput, { min: 2024, max: 2099, maxLength: 4, allowEmpty: true });
   const controladorFechas = window.inicializarCamposFechaConAnio(camposFecha, () => anioInput.value.trim());
-
   anioInput.addEventListener('input', () => {
+    anioInput.value = String(anioInput.value ?? '').replace(/\D/g, '').slice(0, 4);
     controladorFechas.actualizarAnioEnCampos(anioInput.value.trim());
   });
 
@@ -251,6 +232,12 @@ window.agregarHorarioAnual = function(indexEdicion = null) {
 
     if (![inicio1, fin1, inicio2, fin2].every(window.validarFechaISO)) {
       errorDiv.innerText = 'Completa las 4 fechas usando el selector de fecha.';
+      errorDiv.classList.remove('d-none');
+      return;
+    }
+
+    if (![inicio1, fin1, inicio2, fin2].every((fecha) => fecha.startsWith(`${anio}-`))) {
+      errorDiv.innerText = 'Todas las fechas deben pertenecer al año indicado.';
       errorDiv.classList.remove('d-none');
       return;
     }

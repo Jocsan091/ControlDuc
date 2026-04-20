@@ -1,5 +1,6 @@
 ﻿const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
 const crypto = require('crypto');
+const { screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { fileURLToPath } = require('url');
@@ -108,9 +109,15 @@ function crearBackup(dataString) {
 }
 
 function createWindow() {
+  const { workAreaSize } = screen.getPrimaryDisplay();
+  const width = Math.max(320, Math.min(1200, workAreaSize.width));
+  const height = Math.max(560, Math.min(800, workAreaSize.height));
+
   const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width,
+    height,
+    minWidth: 320,
+    minHeight: 560,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       sandbox: true,
