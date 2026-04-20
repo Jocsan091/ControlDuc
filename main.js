@@ -42,21 +42,8 @@ function ajustarVentanaSegunVista(win) {
   if (!win || win.isDestroyed()) return;
 
   const nombreVista = obtenerNombreVistaDesdeUrl(win.webContents.getURL());
-  const display = screen.getDisplayMatching(win.getBounds());
-  const { workArea } = display;
 
-  if (nombreVista === 'login.html' || !nombreVista) {
-    if (win.isMaximized()) win.unmaximize();
-
-    const width = Math.max(320, Math.min(540, workArea.width - 40));
-    const height = Math.max(560, Math.min(720, workArea.height - 40));
-    win.setBounds({
-      width,
-      height,
-      x: workArea.x + Math.max(0, Math.floor((workArea.width - width) / 2)),
-      y: workArea.y + Math.max(0, Math.floor((workArea.height - height) / 2))
-    });
-  } else {
+  if (nombreVista !== 'login.html' && nombreVista) {
     if (!win.isMaximized()) win.maximize();
   }
 
@@ -160,8 +147,8 @@ function crearBackup(dataString) {
 
 function createWindow() {
   const { workAreaSize } = screen.getPrimaryDisplay();
-  const width = Math.max(320, Math.min(540, workAreaSize.width - 40));
-  const height = Math.max(560, Math.min(720, workAreaSize.height - 40));
+  const width = Math.max(320, Math.min(1200, workAreaSize.width));
+  const height = Math.max(560, Math.min(800, workAreaSize.height));
 
   const win = new BrowserWindow({
     width,
@@ -367,6 +354,10 @@ function crearHtmlExportacionResumen(payload = {}) {
         body { font-family: Arial, sans-serif; margin: 28px; color: #1d2a1f; }
         h1 { margin: 0 0 6px 0; font-size: 28px; }
         p { margin: 0 0 18px 0; color: #4f5d52; }
+        .pdf-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid #d9e2d4; }
+        .pdf-header img { width: 70px; height: 70px; object-fit: contain; }
+        .pdf-header-text small { display: block; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: #58705d; margin-bottom: 4px; }
+        .pdf-header-text strong { display: block; font-size: 18px; color: #1f4e2d; }
         .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 24px; }
         .metric { padding: 12px 14px; border: 1px solid #d9e2d4; border-radius: 12px; background: #f8fbf6; }
         .metric span { display: block; font-size: 12px; color: #58705d; margin-bottom: 4px; }
@@ -377,6 +368,13 @@ function crearHtmlExportacionResumen(payload = {}) {
       </style>
     </head>
     <body>
+      <header class="pdf-header">
+        <img src="__LOGO_INSTITUCIONAL__" alt="Logo institucional">
+        <div class="pdf-header-text">
+          <small>Documento institucional</small>
+          <strong>Escuela Esperanza</strong>
+        </div>
+      </header>
       <h1>${titulo}</h1>
       <p>${subtitulo}</p>
       <section class="metrics">${resumenHtml}</section>
@@ -396,6 +394,22 @@ function crearHtmlExportacionResumen(payload = {}) {
     </body>
     </html>
   `;
+}
+
+function obtenerLogoPdfDataUrl() {
+  try {
+    const logoPath = path.join(__dirname, 'assets', 'img', 'logo.png');
+    if (!fs.existsSync(logoPath)) return '';
+    const logoBuffer = fs.readFileSync(logoPath);
+    return `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  } catch (error) {
+    return '';
+  }
+}
+
+function inyectarLogoEnHtmlPdf(html = '', logoDataUrl = '') {
+  if (typeof html !== 'string' || !html.trim()) return html;
+  return html.replace(/__LOGO_INSTITUCIONAL__/g, logoDataUrl || '');
 }
 
 app.whenReady().then(() => {
@@ -623,9 +637,11 @@ ipcMain.handle('exportar-resumen-pdf', async (event, payload = {}) => {
       }
     });
 
-    const html = typeof payload.html === 'string' && payload.html.trim()
+    const logoDataUrl = obtenerLogoPdfDataUrl();
+    const htmlBase = typeof payload.html === 'string' && payload.html.trim()
       ? payload.html
       : crearHtmlExportacionResumen(payload);
+    const html = inyectarLogoEnHtmlPdf(htmlBase, logoDataUrl);
     await exportWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
     await exportWindow.webContents.executeJavaScript(`
       new Promise((resolve) => {
@@ -679,7 +695,9 @@ ipcMain.handle('exportar-horario-clases-pdf', async (event, payload = {}) => {
       }
     });
 
-    await exportWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(payload.html)}`);
+    const logoDataUrl = obtenerLogoPdfDataUrl();
+    const html = inyectarLogoEnHtmlPdf(payload.html, logoDataUrl);
+    await exportWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
     const pdfBuffer = await exportWindow.webContents.printToPDF({
       printBackground: true,
       pageSize: 'A4',

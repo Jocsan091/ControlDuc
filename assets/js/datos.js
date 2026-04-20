@@ -164,8 +164,6 @@ window.configurarFormatoTexto = function(input, formatter) {
     const valorOriginal = input.value;
     const terminaConEspacio = /\s$/.test(valorOriginal);
     let valorFormateado = formatter(valorOriginal);
-
-    // Permite seguir escribiendo nombres compuestos sin borrar el espacio final en cada tecla.
     if (terminaConEspacio && valorFormateado) valorFormateado = `${valorFormateado} `;
     if (valorOriginal !== valorFormateado) input.value = valorFormateado;
   });

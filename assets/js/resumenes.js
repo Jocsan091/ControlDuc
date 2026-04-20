@@ -1,4 +1,4 @@
-﻿const ESTADO_RESUMEN_META = {
+const ESTADO_RESUMEN_META = {
   presente: {
     label: 'Presente',
     clase: 'resumen-estado-presente',
@@ -658,6 +658,10 @@ function construirHtmlPdfResumen(datosResumen, fechaDesde, fechaHasta) {
         h2 { margin: 22px 0 12px 0; font-size: 18px; color: #1f4e2d; }
         h3 { margin: 0 0 10px 0; font-size: 15px; color: #1f4e2d; }
         p { margin: 0 0 14px 0; color: #4f5d52; }
+        .pdf-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid #d9e2d4; }
+        .pdf-header img { width: 72px; height: 72px; object-fit: contain; }
+        .pdf-header-text small { display: block; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: #58705d; margin-bottom: 4px; }
+        .pdf-header-text strong { display: block; font-size: 18px; color: #1f4e2d; }
         .docente { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 18px; margin: 18px 0 20px; padding: 14px 16px; border: 1px solid #d9e2d4; border-radius: 14px; background: #fbfcfa; }
         .docente div { font-size: 13px; }
         .docente strong { display: block; color: #1f4e2d; margin-bottom: 3px; }
@@ -675,6 +679,13 @@ function construirHtmlPdfResumen(datosResumen, fechaDesde, fechaHasta) {
       </style>
     </head>
     <body>
+      <header class="pdf-header">
+        <img src="__LOGO_INSTITUCIONAL__" alt="Logo institucional">
+        <div class="pdf-header-text">
+          <small>Documento institucional</small>
+          <strong>Escuela Esperanza</strong>
+        </div>
+      </header>
       <h1>${escapeHtml(payload.titulo)}</h1>
       <p>${escapeHtml(payload.subtitulo)}</p>
       <section class="docente">
@@ -1058,5 +1069,3 @@ window.inicializarVistaResumenes = function() {
     if (estadoResumenes.profesorIndex === null) renderListadoProfesores();
   });
 };
-
-

@@ -9,19 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const successLogin = document.getElementById('successLogin');
   const errorSetup = document.getElementById('errorSetup');
 
-  document.querySelectorAll('.password-toggle').forEach((boton) => {
-    boton.addEventListener('click', () => {
-      const targetId = boton.dataset.target;
-      const input = targetId ? document.getElementById(targetId) : null;
-      if (!input) return;
-
-      const mostrar = input.type === 'password';
-      input.type = mostrar ? 'text' : 'password';
-      boton.textContent = mostrar ? 'Ocultar' : 'Mostrar';
-      boton.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
-    });
-  });
-
   let config = { existeUsuario: false };
   if (window.apiAuth) {
     const sesion = await window.apiAuth.estadoSesion();

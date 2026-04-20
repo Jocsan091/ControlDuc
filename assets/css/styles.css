@@ -51,34 +51,6 @@ canvas {
   font-size: 15px; 
 }
 
-.password-field {
-  position: relative;
-}
-
-.password-input {
-  padding-right: 96px;
-}
-
-.password-toggle {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  min-width: 74px;
-  padding: 7px 10px;
-  background: var(--gris-suave);
-  color: var(--gris-oscuro);
-  border: 1px solid var(--gris-borde);
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.password-toggle:hover {
-  background: #e7e7e7;
-}
-
 .separador-vertical { 
   width: 2px; 
   height: 24px; 
