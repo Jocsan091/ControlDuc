@@ -13,6 +13,56 @@ const backupsPath = path.join(userDataPath, 'Backups');
 let sesionActiva = false;
 let mainWindow = null;
 
+function obtenerNombreVistaDesdeUrl(url = '') {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol !== 'file:') return '';
+    return path.basename(fileURLToPath(parsedUrl));
+  } catch (error) {
+    return '';
+  }
+}
+
+function aplicarZoomResponsive(win) {
+  if (!win || win.isDestroyed()) return;
+
+  const nombreVista = obtenerNombreVistaDesdeUrl(win.webContents.getURL());
+  if (nombreVista === 'login.html') {
+    win.webContents.setZoomFactor(1);
+    return;
+  }
+
+  const { width, height } = win.getContentBounds();
+  const factorBase = Math.min(width / 1440, height / 900);
+  const zoomFactor = Math.max(0.72, Math.min(1, factorBase));
+  win.webContents.setZoomFactor(zoomFactor);
+}
+
+function ajustarVentanaSegunVista(win) {
+  if (!win || win.isDestroyed()) return;
+
+  const nombreVista = obtenerNombreVistaDesdeUrl(win.webContents.getURL());
+  const display = screen.getDisplayMatching(win.getBounds());
+  const { workArea } = display;
+
+  if (nombreVista === 'login.html' || !nombreVista) {
+    if (win.isMaximized()) win.unmaximize();
+
+    const width = Math.max(320, Math.min(540, workArea.width - 40));
+    const height = Math.max(560, Math.min(720, workArea.height - 40));
+    win.setBounds({
+      width,
+      height,
+      x: workArea.x + Math.max(0, Math.floor((workArea.width - width) / 2)),
+      y: workArea.y + Math.max(0, Math.floor((workArea.height - height) / 2))
+    });
+  } else {
+    if (!win.isMaximized()) win.maximize();
+  }
+
+  aplicarZoomResponsive(win);
+}
+
 function normalizarUsuarioAcceso(valor = '') {
   return String(valor ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
 }
@@ -110,8 +160,8 @@ function crearBackup(dataString) {
 
 function createWindow() {
   const { workAreaSize } = screen.getPrimaryDisplay();
-  const width = Math.max(320, Math.min(1200, workAreaSize.width));
-  const height = Math.max(560, Math.min(800, workAreaSize.height));
+  const width = Math.max(320, Math.min(540, workAreaSize.width - 40));
+  const height = Math.max(560, Math.min(720, workAreaSize.height - 40));
 
   const win = new BrowserWindow({
     width,
@@ -129,6 +179,9 @@ function createWindow() {
   });
 
   win.setMenuBarVisibility(false);
+  win.webContents.on('did-finish-load', () => ajustarVentanaSegunVista(win));
+  win.webContents.on('did-navigate', () => ajustarVentanaSegunVista(win));
+  win.on('resize', () => aplicarZoomResponsive(win));
   const baseViewsPath = path.resolve(__dirname, 'views') + path.sep;
   win.webContents.on('context-menu', (event, params) => {
     const textoSeleccionado = typeof params.selectionText === 'string' ? params.selectionText.trim() : '';

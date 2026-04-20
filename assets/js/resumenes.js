@@ -409,6 +409,62 @@ function construirDetalleFechas(titulo, filas, estadoClave) {
   `;
 }
 
+function construirRangoVisual(fechaInicio, fechaFin) {
+  const inicio = formatearFechaVisual(fechaInicio);
+  const fin = formatearFechaVisual(fechaFin);
+  return fechaInicio === fechaFin ? inicio : `${inicio} a ${fin}`;
+}
+
+function obtenerLicenciasAgrupadas(horario, fechaDesde = null, fechaHasta = null) {
+  const licencias = Array.isArray(horario?.licencias) ? horario.licencias : [];
+
+  return licencias
+    .filter((licencia) => {
+      if (!licencia?.fechaInicio || !licencia?.fechaFin) return false;
+      if (fechaDesde && licencia.fechaFin < fechaDesde) return false;
+      if (fechaHasta && licencia.fechaInicio > fechaHasta) return false;
+      return true;
+    })
+    .map((licencia) => {
+      const inicio = fechaDesde && licencia.fechaInicio < fechaDesde ? fechaDesde : licencia.fechaInicio;
+      const fin = fechaHasta && licencia.fechaFin > fechaHasta ? fechaHasta : licencia.fechaFin;
+
+      return {
+        fechaInicio: inicio,
+        fechaFin: fin,
+        rango: construirRangoVisual(inicio, fin),
+        motivo: licencia.motivo || '',
+        documento: licencia.archivoAdjunto ? 'Adjunto cargado' : ''
+      };
+    })
+    .sort((a, b) => a.fechaInicio.localeCompare(b.fechaInicio));
+}
+
+function construirDetalleLicencias(datosResumen) {
+  const licencias = obtenerLicenciasAgrupadas(datosResumen.horario);
+  const vacio = `<p class="text-muted fs-sm">No hay registros para este bloque.</p>`;
+
+  return `
+    <details class="resumen-detalle-panel">
+      <summary>
+        <span>${licencias.length}</span>
+        <span class="resumen-badge-estado ${obtenerClaseEstado('licencia')}">Licencias</span>
+      </summary>
+      <div class="resumen-tags-panel">
+        ${licencias.length ? `
+          <div class="resumen-tags">
+            ${licencias.map((licencia) => `
+              <span class="resumen-tag ${obtenerClaseEstado('licencia')}">
+                ${licencia.rango}${licencia.motivo ? ` · ${escapeHtml(licencia.motivo)}` : ''}
+              </span>
+            `).join('')}
+          </div>
+        ` : vacio}
+      </div>
+    </details>
+  `;
+}
+
 function construirTablaResumen(filasFiltradas) {
   if (!filasFiltradas.length) {
     return `
@@ -491,7 +547,6 @@ function construirResumenDesdeFilas(filas) {
     }
     if (fila.estado === 'licencia') {
       resumen.licencias++;
-      incidencias.licencias.push(`${fila.fechaVisual}${fila.motivo ? ` - ${fila.motivo}` : ''}`);
     }
     if (fila.estado === 'feriado') resumen.feriados++;
     if (fila.estado === 'noHabil') resumen.noHabiles++;
@@ -516,6 +571,7 @@ function construirPayloadPdf(datosResumen, fechaDesde, fechaHasta) {
     fechaHasta
   );
   const resumenRango = construirResumenDesdeFilas(detalleCompleto);
+  const licenciasAgrupadas = obtenerLicenciasAgrupadas(datosResumen.horario, fechaDesde, fechaHasta);
   const rangoNombre = construirRangoNombreArchivo(fechaDesde, fechaHasta);
 
   return {
@@ -543,7 +599,7 @@ function construirPayloadPdf(datosResumen, fechaDesde, fechaHasta) {
     incidencias: {
       inasistencias: resumenRango.incidencias.inasistencias,
       permisos: resumenRango.incidencias.permisos,
-      licencias: resumenRango.incidencias.licencias
+      licencias: licenciasAgrupadas.map((licencia) => `${licencia.rango}${licencia.motivo ? ` - ${licencia.motivo}` : ''}`)
     },
     detalle: detalleCompleto.map((fila) => ({
       fecha: fila.fechaVisual,
@@ -902,7 +958,7 @@ function renderDetalleResumenProfesor() {
       <section class="resumen-paneles-grid">
         ${construirDetalleFechas('Inasistencias', datosResumen.detalle.inasistencias, 'inasistencia')}
         ${construirDetalleFechas('Permisos', datosResumen.detalle.permisos, 'permiso')}
-        ${construirDetalleFechas('Licencias', datosResumen.detalle.licencias, 'licencia')}
+        ${construirDetalleLicencias(datosResumen)}
       </section>
 
       <section class="resumen-bloque-lista">

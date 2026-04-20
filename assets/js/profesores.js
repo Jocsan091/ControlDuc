@@ -672,7 +672,6 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
   const anioInp = document.getElementById('anioHorario');
   const contF = document.getElementById('contenedorFechas');
   const inputsFechas = [document.getElementById('is1'), document.getElementById('fs1'), document.getElementById('is2'), document.getElementById('fs2')];
-  window.configurarInputNumerico(anioInp, { min: 2024, max: 2099, maxLength: 4, allowEmpty: true });
 
   const actualizarLimites = () => {
     const val = anioInp.value.trim();
@@ -688,22 +687,12 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
     }
   };
 
-  anioInp.addEventListener('input', actualizarLimites);
+  anioInp.addEventListener('input', () => {
+    anioInp.value = String(anioInp.value ?? '').replace(/\D/g, '').slice(0, 4);
+    actualizarLimites();
+  });
 
   if (typeof ih === 'number') actualizarLimites();
-
-  inputsFechas.forEach(inp => {
-    inp.addEventListener('change', (e) => {
-      const valAnio = anioInp.value.trim();
-      if (valAnio.length === 4 && e.target.value) {
-        let partes = e.target.value.split('-');
-        if (partes[0] !== valAnio) {
-          partes[0] = valAnio;
-          e.target.value = partes.join('-');
-        }
-      }
-    });
-  });
 
   document.getElementById('guardarHorario').addEventListener('click', async () => {
     const anio = anioInp.value.trim();
@@ -726,6 +715,10 @@ function mostrarFormularioHorario(ip, ih = null, modoInicial = null) {
 
     if (!window.validarSemestres(is1, fs1, is2, fs2)) {
       return alert("Error lógico: Las fechas están desordenadas. Revisa que el inicio sea antes del fin, y el semestre 1 termine antes de que empiece el semestre 2.");
+    }
+
+    if (![is1, fs1, is2, fs2].every((fecha) => fecha.startsWith(`${anio}-`))) {
+      return alert("Error: Todas las fechas deben pertenecer al año indicado.");
     }
 
     const diasActivos = window.obtenerDiasActivosDeModal('horario-');

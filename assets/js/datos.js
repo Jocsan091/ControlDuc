@@ -199,6 +199,17 @@ window.configurarAccionesModal = function(config = {}) {
       primaryButton.click();
     }
   });
+
+  modal.addEventListener('pointerdown', (event) => {
+    const campo = event.target.closest('input, textarea, select');
+    if (!campo) return;
+    requestAnimationFrame(() => campo.focus());
+  });
+
+  const primerCampo = modal.querySelector('input:not([type="hidden"]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly]), select:not([disabled]):not([readonly])');
+  if (primerCampo) {
+    setTimeout(() => primerCampo.focus(), 30);
+  }
 };
 
 window.validarAnioEscolar = function(valor) {
@@ -270,7 +281,7 @@ window.esFeriadoNacional = function(fechaStr) {
 
 function cerrarModal() {
   const modal = document.querySelector('.modal');
-  if (modal) modal.replaceWith();
+  if (modal) modal.remove();
 }
 
 document.addEventListener('keydown', (event) => {
